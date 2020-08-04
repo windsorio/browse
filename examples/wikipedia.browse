@@ -1,0 +1,12 @@
+@page(
+  cache
+  ttl=7d
+) https://en.wikipedia.org/wiki/(slug:.+) {
+  @string title `#firstHeading`
+  @string summary `#mw-content-text > div > p:nth-child(4)`
+  @arr headings `.mw-headline` {
+    @string text `.span`
+    @url? mainArticle `a` href
+  }
+  crawl `a`
+}
