@@ -1,0 +1,79 @@
+# Sets the max number of tabs that the browser window will use at any time
+@config {
+  @set concurrency 4
+}
+
+@page(
+  render
+) https://www.indiehackers.com/products?minRevenue=1&techSkills=code {
+
+  # We have to manually click a filter to refresh the page and evaluate 
+  # the filters
+  wait `.collapsible-filters--active`
+  click `.collapsible-filters--active`
+  click `.collapsible-filters__option--selected`
+  sleep 1s # TODO: remove?
+  wait `.product-card__link`
+
+
+  # Scroll multiple 
+  eval(async) |
+    await new Promise((resolve, reject) => {
+      const timer = setInterval(() => {
+        const height = document.body.scrollHeight - 600;
+
+        if (height >= 5000) {
+          clearInterval(timer);
+          resolve();
+        }
+
+        window.scrollBy(0, height);
+      }, 200);
+    });
+  |
+
+
+  # crawl works by:
+  #  if the matcher only matches one element, click into it
+  #  if it matches multiple elements, then open new tabs for each href found
+  #     until exhausted, and then close the current tab
+  # however, if crawl is not the last Rule in a RuleSet, then it will always be in a new tab
+  # and following rules will continue to be evaluated (in parallel, or after the crawls are done?)
+  crawl `.product-card__link` 
+}
+
+@page(
+  render
+  cache
+  ttl=30d
+) https://www.indiehackers.com/(.+)/history {
+  wait `.product-header__title`
+
+  @string title `.product-header__title`
+  @url website `.product-metrics__stat--website`
+  @url twitter `.product-metrics__stat--twitter`
+
+  @set firstUserSelector `.product-sidebar__users  .user-link__link:nth-of-type(1)`
+  wait $firstUserSelector
+  click $firstUserSelector
+}
+
+@page(
+  render
+  cache
+  ttl=30d
+) https://www.indiehackers.com/product/(.+) {
+  wait `.user-header__username`
+
+  @string username `.user-header__username`
+  @string fullNameEl `.user-header__full-name`
+  
+  # @map will iterate through each element that matches the mapper, and then evaluate the `key` and `value` 
+  # RuleSets to create a dictionary. @mergemap works just the same, but the dictionary is merged into the parent
+  # object instead of a nested object
+  @mergemap(
+    !nested
+    key=string
+    value=string
+  ) { @attr title } { @attr href } `.user-header__satellite--contact`
+}
