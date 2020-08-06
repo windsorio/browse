@@ -1,7 +1,7 @@
 Browse {
 
   Program
-  	= any
+  	= RuleSet
   
   
   /**************\
@@ -11,7 +11,7 @@ Browse {
   sourceCharacter = any
 
   // Override Ohm's built-in definition of space.
-  space := whitespace | lineTerminator
+  space := whitespace
 
   whitespace = "\t"
              | "\x0B"    -- verticalTab
@@ -51,7 +51,7 @@ Browse {
   identifier (an identifier) = ~reservedWord identifierName
   identifierName = identifierStart identifierPart*
 
-  identifierStart = letter | "$" | "_" | "@"
+  identifierStart = letter | "_" | "@"
                   | "\\" unicodeEscapeSequence -- escaped
   identifierPart = identifierStart | unicodeCombiningMark
                  | unicodeDigit | unicodeConnectorPunctuation
@@ -200,5 +200,15 @@ Browse {
    ** Semantic Rules **
   \********************/
  
+  Word
+  	= identifier
+    | stringLiteral
+    | RuleSet
   
+  Rule 
+  	=  Word (Word)* ";"
+    |  Word (Word)* lineTerminator
+    
+    
+  RuleSet = "{" (lineTerminator* Rule)+ lineTerminator* "}"
 }
