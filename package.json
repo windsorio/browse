@@ -1,0 +1,14 @@
+{
+  "name": "browse",
+  "version": "0.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:windsorio/browse.git",
+  "author": "Windsor Team <oss@windsor.io>",
+  "license": "MIT",
+  "dependencies": {
+    "ohm-js": "^0.14.0"
+  },
+  "devDependencies": {
+    "lerna": "^3.22.1"
+  }
+}

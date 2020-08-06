@@ -1,0 +1,33 @@
+{
+  "name": "@browselang/parser",
+  "version": "0.0.0",
+  "description": "Parser for Browse using the ohm parser generator",
+  "keywords": [
+    "browse",
+    "parser"
+  ],
+  "author": "Windsor Team <oss@windsor.io>",
+  "homepage": "https://github.com/windsorio/browse#readme",
+  "license": "MIT",
+  "main": "lib/index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.yarnpkg.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/windsorio/browse.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "bugs": {
+    "url": "https://github.com/windsorio/browse/issues"
+  }
+}
