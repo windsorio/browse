@@ -1,4 +1,4 @@
-# `browse-parser`
+# `@browselang/parser`
 
 > TODO: description
 
