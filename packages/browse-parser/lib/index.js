@@ -10,6 +10,38 @@ const contents = fs.readFileSync(path.join(__dirname, "browse.ohm"));
 const g = ohm.grammars(contents).Browse;
 const semantics = g.createSemantics();
 
+semantics.addAttribute("errors", {
+  EqExpr_neError(_l, o, _r) {
+    return [
+      {
+        message: "!== is not supported. Use != instead.",
+        source: o.source,
+      },
+    ];
+  },
+  EqExpr_eqError(_l, o, _r) {
+    return [
+      {
+        message: "=== is not supported. Use == instead.",
+        source: o.source,
+      },
+    ];
+  },
+
+  // Base Cases
+  _iter(children) {
+    const errors = children.map((c) => c.errors);
+    return [].concat(...errors);
+  },
+  _nonterminal(children) {
+    const errors = children.map((c) => c.errors);
+    return [].concat(...errors);
+  },
+  _terminal() {
+    return [];
+  },
+});
+
 // prettier-ignore
 semantics.addAttribute('asLisp', {
   PriExpr_paren:    function(_l, e, _r) { return ["group", e.asLisp]; }, 
@@ -36,7 +68,7 @@ semantics.addAttribute('asLisp', {
     if (children.length === 1) {
       return children[0].asLisp;
     } else {
-      throw new Error("Missing semantic action for " + this.constructor);
+      throw new Error("Missing semantic action for " + this.ctorName);
     }
   },
   _terminal: function () { return this.sourceString },

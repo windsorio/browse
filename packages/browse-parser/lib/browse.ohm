@@ -234,8 +234,10 @@ Browse {
     | AddExpr
 
   EqExpr
-    = EqExpr "!=" CompExpr -- ne
-    | EqExpr "==" CompExpr -- eq
+    = EqExpr "!=" CompExpr  -- ne
+    | EqExpr "==" CompExpr  -- eq
+    | EqExpr "!==" CompExpr -- neError
+    | EqExpr "===" CompExpr -- eqError
     | CompExpr
 
   Expr = EqExpr

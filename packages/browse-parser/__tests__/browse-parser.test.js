@@ -48,6 +48,7 @@ const expressions = [
   `1 == "1"`,
   `"hi" == 'hi'`,
   `"hi" == \`hi\``,
+  `(2 * (3 / -"muffin")) > null - false * true / null % "string" == "huh" * "wtf" / "this" != !"works?"`,
   `"a\\nb \\
 c"`,
   `'a\\nb \\
@@ -62,7 +63,8 @@ c|`,
   `"hi \\
 " == |hi 
 |`,
-  `(2 * (3 / -"muffin")) > null - false * true / null % "string" == "huh" * "wtf" / "this" != !"works?"`,
+  "1 === 1",
+  "1 !== 1",
 ];
 
 expressions.forEach((source) => {
@@ -72,6 +74,18 @@ expressions.forEach((source) => {
 
   if (r.succeeded()) {
     const n = browse.semantics(r);
+    if (n.errors.length > 0) {
+      n.errors.forEach((e) => {
+        console.log(
+          "  \u001b[31;1m" +
+            [e.message, ...e.source.getLineAndColumnMessage().split("\n")]
+              .join("\n  ")
+              .trim() +
+            "\u001b[0m"
+        );
+      });
+      return;
+    }
     console.log(`  Lisp: ${util.inspect(n.asLisp, false, 10, true)}`);
 
     console.log("  Value: %O", n.interpret());
