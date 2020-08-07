@@ -88,14 +88,16 @@ Browse {
     not currently used by this grammar.
   */
 
-  literal = booleanLiteral | numericLiteral | stringLiteral
+  literal = nullLiteral | booleanLiteral | numericLiteral | stringLiteral
+
+  nullLiteral = "null" ~identifierPart
   booleanLiteral = ("true" | "false") ~identifierPart
   
 
   // Note that the ordering of hexIntegerLiteral and decimalLiteral is reversed w.r.t. the spec
   // This is intentional: the order decimalLiteral | hexIntegerLiteral will parse
   // "0x..." as a decimal literal "0" followed by "x..."
-  numericLiteral = octalIntegerLiteral | hexIntegerLiteral | decimalLiteral
+  numericLiteral = hexIntegerLiteral | decimalLiteral
 
   decimalLiteral = decimalIntegerLiteral "." decimalDigit* exponentPart -- bothParts
                  |                       "." decimalDigit+ exponentPart -- decimalsOnly
@@ -107,7 +109,7 @@ Browse {
   exponentPart = exponentIndicator signedInteger -- present
                |                                 -- absent
   exponentIndicator = "e" | "E"
-  signedInteger = "+" decimalDigit* -- positive
+  signedInteger (an integer) = "+" decimalDigit* -- positive
                 | "-" decimalDigit* -- negative
                 |     decimalDigit+ -- noSign
 
@@ -115,8 +117,6 @@ Browse {
                     | "0X" hexDigit+
 
   // hexDigit defined in Ohm's built-in rules (otherwise: hexDigit = "0".."9" | "a".."f" | "A".."F")
-
-  octalIntegerLiteral = "0" octalDigit+
 
 
   // For semantics on how string literals are constructed, see section 7.8.4
@@ -142,7 +142,7 @@ Browse {
                  | characterEscapeSequence  // Must come last.
   characterEscapeSequence = singleEscapeCharacter
                           | nonEscapeCharacter
-  singleEscapeCharacter = "'" | "\"" | "\\" | "b" | "f" | "n" | "r" | "t" | "v"
+  singleEscapeCharacter = "'" | "`" | "|" | "\"" | "\\" | "b" | "f" | "n" | "r" | "t" | "v"
   nonEscapeCharacter = ~(escapeCharacter | lineTerminator) sourceCharacter
   escapeCharacter = singleEscapeCharacter | decimalDigit | "x" | "u"
   octalEscapeSequence = zeroToThree octalDigit octalDigit    -- whole
