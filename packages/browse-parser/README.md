@@ -5,7 +5,7 @@
 ## Usage
 
 ```
-const browseParser = require('browse-parser');
+const browseParser = require('@browselang/parser');
 
 // TODO: DEMONSTRATE API
 ```
