@@ -1,7 +1,7 @@
 Browse {
 
   Program
-  	= RuleSet
+  	= Expr
   
   
   /**************\
@@ -80,6 +80,8 @@ Browse {
                            | yield
 
   futureReservedWord = futureReservedWordStrict
+  
+  operator = "==" | "!=" |  "<=" | ">=" | "<" | ">" |"+" | "-" | "*" | "/"
 
   /*
     Note: Punctuator and DivPunctuator (see https://es5.github.io/x7.html#x7.7) are
@@ -150,6 +152,9 @@ Browse {
   hexEscapeSequence = "x" hexDigit hexDigit
   unicodeEscapeSequence = "u" hexDigit hexDigit hexDigit hexDigit
   
+  // does not accept lineTerminators, not even implicit ones in a multiLineComment (cf. section 7.4)
+  spacesNoNL = (whitespace | comment)*
+  
   // Convenience rules for parsing keyword tokens.
   break = "break" ~identifierPart
   do = "do" ~identifierPart
@@ -196,10 +201,45 @@ Browse {
   static = "static" ~identifierPart
   yield = "yield" ~identifierPart
     
-  /********************\
-   ** Semantic Rules **
-  \********************/
- 
+  /*****************\
+   ** Expressions **
+  \*****************/
+
+  PriExpr
+    =  "(" Expr ")"	-- paren
+    | literal
+    | identifier
+
+  UnaryExpr 
+    = "!" UnaryExpr -- not
+    | "-" UnaryExpr -- neg
+    | PriExpr
+  
+  MultExpr
+    = MultExpr "*" UnaryExpr  -- mul
+    | MultExpr "/" UnaryExpr  -- div
+    | MultExpr "%" UnaryExpr  -- mod
+    | UnaryExpr
+
+  AddExpr 
+    = AddExpr "+" MultExpr -- add
+    | AddExpr "-" MultExpr -- sub
+    | MultExpr
+
+  CompExpr
+    = CompExpr ">=" AddExpr -- ge
+    | CompExpr "<=" AddExpr -- le
+    | CompExpr ">" AddExpr  -- gt
+    | CompExpr "<" AddExpr  -- lt
+    | AddExpr
+
+  EqExpr
+    = EqExpr "!=" CompExpr -- ne
+    | EqExpr "==" CompExpr -- eq
+    | CompExpr
+
+  Expr = EqExpr
+  
   Word
   	= identifier
     | stringLiteral
