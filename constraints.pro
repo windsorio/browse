@@ -74,9 +74,4 @@ gen_enforced_dependency(WorkspaceCwd, DependencyIdent, WorkspaceRange, Dependenc
   % Quirk: we must discard the workspaces that don't declare a version
     atom(DependencyVersion),
   % Derive the expected range from the version
-    (
-      (vercel(WorkspaceCwd) ; \+ workspace_field(WorkspaceCwd, 'private', 'true')) ->
-        (WorkspaceRange = DependencyVersion)
-        ;
-        atom_concat('workspace:', DependencyCwd, WorkspaceRange)
-    ).
+    atom_concat('workspace:', DependencyCwd, WorkspaceRange)
