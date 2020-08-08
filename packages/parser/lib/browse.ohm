@@ -214,6 +214,7 @@ Browse {
     =  "(" Expr ")"	-- paren
     | literal
     | identifier
+    | RuleSet
 
   UnaryExpr 
     = "!" UnaryExpr -- not
@@ -245,7 +246,8 @@ Browse {
     | EqExpr "===" CompExpr -- eqError
     | CompExpr
 
-  Expr = EqExpr
+  Expr (an expression)
+    = EqExpr
   
   /****************\
    ** Statements **

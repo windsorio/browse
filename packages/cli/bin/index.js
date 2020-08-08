@@ -31,7 +31,8 @@ if (!script) {
           rl.write(n.errors[0].message);
           rl.write("\u001b[0m");
         } else {
-          rl.write(util.inspect(n.interpret(), { colors: true }));
+          rl.write(util.inspect(n.asLisp, { colors: true, depth: null }));
+          // rl.write(util.inspect(n.interpret(), { colors: true }));
         }
       } else {
         rl.write("\u001b[31;1m");

@@ -44,26 +44,43 @@ semantics.addAttribute("errors", {
 
 // prettier-ignore
 semantics.addAttribute('asLisp', {
-  PriExpr_paren:    function(_l, e, _r) { return ["group", e.asLisp]; }, 
+  PriExpr_paren:  function(_l, e, _r) { return ["group", e.asLisp]; }, 
 
-  UnaryExpr_not:    function(_, e)      { return ["!", e.asLisp]; },
-  UnaryExpr_neg:    function(_, e)      { return ["-", e.asLisp]; },
+  UnaryExpr_not:  function(_, e)      { return ["!", e.asLisp]; },
+  UnaryExpr_neg:  function(_, e)      { return ["-", e.asLisp]; },
   
-  MultExpr_mul:     function(l, _, r)   { return ["*", l.asLisp, r.asLisp]; },
-  MultExpr_div:     function(l, _, r)   { return ["/", l.asLisp, r.asLisp]; },
-  MultExpr_mod:     function(l, _, r)   { return ["%", l.asLisp, r.asLisp]; },
-  AddExpr_add:     function(l, _, r)   { return ["+", l.asLisp, r.asLisp]; },
-  AddExpr_sub:     function(l, _, r)   { return ["-", l.asLisp, r.asLisp]; },
-  CompExpr_ge:     function(l, _, r)   { return [">=", l.asLisp, r.asLisp]; },
-  CompExpr_le:     function(l, _, r)   { return ["<=", l.asLisp, r.asLisp]; },
-  CompExpr_gt:     function(l, _, r)   { return [">", l.asLisp, r.asLisp]; },
-  CompExpr_lt:     function(l, _, r)   { return ["<", l.asLisp, r.asLisp]; },
-  EqExpr_ne:     function(l, _, r)   { return ["!=", l.asLisp, r.asLisp]; },
-  EqExpr_eq:     function(l, _, r)   { return ["==", l.asLisp, r.asLisp]; },
-  
-  identifier:    function(_, _name)  { return this.sourceString; },
-  literal:       function(_)         { return this.interpret(); },
+  MultExpr_mul:   function(l, _, r)   { return ["*", l.asLisp, r.asLisp]; },
+  MultExpr_div:   function(l, _, r)   { return ["/", l.asLisp, r.asLisp]; },
+  MultExpr_mod:   function(l, _, r)   { return ["%", l.asLisp, r.asLisp]; },
+  AddExpr_add:    function(l, _, r)   { return ["+", l.asLisp, r.asLisp]; },
+  AddExpr_sub:    function(l, _, r)   { return ["-", l.asLisp, r.asLisp]; },
+  CompExpr_ge:    function(l, _, r)   { return [">=", l.asLisp, r.asLisp]; },
+  CompExpr_le:    function(l, _, r)   { return ["<=", l.asLisp, r.asLisp]; },
+  CompExpr_gt:    function(l, _, r)   { return [">", l.asLisp, r.asLisp]; },
+  CompExpr_lt:    function(l, _, r)   { return ["<", l.asLisp, r.asLisp]; },
+  EqExpr_ne:      function(l, _, r)   { return ["!=", l.asLisp, r.asLisp]; },
+  EqExpr_eq:      function(l, _, r)   { return ["==", l.asLisp, r.asLisp]; },
 
+  Rule:           function(w, es)     { return [w.asLisp, es.asLisp] },
+  Rules:          function (_nl, first, _rs, rest, _s) 
+                                      {
+                                        return [
+                                          "seq",
+                                          first.asLisp,
+                                          rest.asLisp,
+                                        ];
+                                      },
+  RuleSet_withRules(_l, r, _r)        { return r.asLisp },
+  RuleSet_empty(_l, _r)               { return [] },
+
+  word:          function(_)          { return this.sourceString; },
+  identifier:    function(_, _name)   { return this.sourceString; },
+  literal:       function(_)          { return this.interpret(); },
+
+  // Base Cases
+  _iter(children) {
+    return children.map((c) => c.asLisp);
+  },
   _nonterminal:  function(children) {
     if (children.length === 1) {
       return children[0].asLisp;
