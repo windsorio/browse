@@ -23,14 +23,19 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         "reference": "workspace:."
       },
       {
+        "name": "@browselang/cli",
+        "reference": "workspace:packages/cli"
+      },
+      {
         "name": "@browselang/parser",
-        "reference": "workspace:packages/browse-parser"
+        "reference": "workspace:packages/parser"
       }
     ],
     "enableTopLevelFallback": true,
     "ignorePatternData": "(^(?:\\.yarn\\/sdks(?:\\/(?!\\.)(?:(?:(?!(?:^|\\/)\\.).)*?)|$))$)",
     "fallbackExclusionList": [
-      ["@browselang/parser", ["workspace:packages/browse-parser"]],
+      ["@browselang/cli", ["workspace:packages/cli"]],
+      ["@browselang/parser", ["workspace:packages/parser"]],
       ["browse", ["workspace:."]]
     ],
     "fallbackPool": [
@@ -51,8 +56,12 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         "npm:7.10.4"
       ],
       [
+        "@browselang/cli",
+        "workspace:packages/cli"
+      ],
+      [
         "@browselang/parser",
-        "workspace:packages/browse-parser"
+        "workspace:packages/parser"
       ],
       [
         "@concordance/react",
@@ -121,6 +130,14 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       [
         "@types/responselike",
         "npm:1.0.0"
+      ],
+      [
+        "@types/yargs",
+        "npm:15.0.5"
+      ],
+      [
+        "@types/yargs-parser",
+        "npm:15.0.0"
       ],
       [
         "@yarnpkg/core",
@@ -708,7 +725,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       ],
       [
         "has-flag",
-        "npm:4.0.0"
+        "npm:3.0.0"
       ],
       [
         "has-own-prop",
@@ -1733,11 +1750,24 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD",
         }]
       ]],
-      ["@browselang/parser", [
-        ["workspace:packages/browse-parser", {
-          "packageLocation": "./packages/browse-parser/",
+      ["@browselang/cli", [
+        ["workspace:packages/cli", {
+          "packageLocation": "./packages/cli/",
           "packageDependencies": [
-            ["@browselang/parser", "workspace:packages/browse-parser"],
+            ["@browselang/cli", "workspace:packages/cli"],
+            ["@browselang/parser", "workspace:packages/parser"],
+            ["@types/yargs", "npm:15.0.5"],
+            ["ohm-js", "npm:0.14.0"],
+            ["yargs", "npm:15.4.1"]
+          ],
+          "linkType": "SOFT",
+        }]
+      ]],
+      ["@browselang/parser", [
+        ["workspace:packages/parser", {
+          "packageLocation": "./packages/parser/",
+          "packageDependencies": [
+            ["@browselang/parser", "workspace:packages/parser"],
             ["ava", "npm:3.11.1"],
             ["ohm-js", "npm:0.14.0"]
           ],
@@ -1929,6 +1959,25 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [
             ["@types/responselike", "npm:1.0.0"],
             ["@types/node", "npm:14.0.27"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["@types/yargs", [
+        ["npm:15.0.5", {
+          "packageLocation": "./.yarn/cache/@types-yargs-npm-15.0.5-18a2128a57-2133c8cb58.zip/node_modules/@types/yargs/",
+          "packageDependencies": [
+            ["@types/yargs", "npm:15.0.5"],
+            ["@types/yargs-parser", "npm:15.0.0"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["@types/yargs-parser", [
+        ["npm:15.0.0", {
+          "packageLocation": "./.yarn/cache/@types-yargs-parser-npm-15.0.0-db1d59832c-74bfaefde9.zip/node_modules/@types/yargs-parser/",
+          "packageDependencies": [
+            ["@types/yargs-parser", "npm:15.0.0"]
           ],
           "linkType": "HARD",
         }]

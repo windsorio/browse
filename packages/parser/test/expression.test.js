@@ -2,7 +2,6 @@
 
 const test = require("ava");
 
-const util = require("util");
 const browse = require("..");
 
 const expressions = [

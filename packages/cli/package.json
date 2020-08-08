@@ -1,0 +1,42 @@
+{
+  "name": "@browselang/cli",
+  "version": "0.0.0",
+  "description": "The Browse CLI",
+  "keywords": [
+    "browse",
+    "cli"
+  ],
+  "author": "Windsor Team <oss@windsor.io>",
+  "homepage": "https://github.com/windsorio/browse#readme",
+  "license": "MIT",
+  "main": "lib/index.js",
+  "bin": {
+    "browse": "bin/index.js"
+  },
+  "directories": {
+    "lib": "lib",
+    "bin": "bin"
+  },
+  "files": [
+    "lib",
+    "bin"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.yarnpkg.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/windsorio/browse.git"
+  },
+  "bugs": {
+    "url": "https://github.com/windsorio/browse/issues"
+  },
+  "dependencies": {
+    "@browselang/parser": "workspace:packages/parser",
+    "ohm-js": "0.14.0",
+    "yargs": "15.4.1"
+  },
+  "devDependencies": {
+    "@types/yargs": "15.0.5"
+  }
+}

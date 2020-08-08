@@ -41,9 +41,22 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@browselang/parser@workspace:packages/browse-parser":
+"@browselang/cli@workspace:packages/cli":
   version: 0.0.0-use.local
-  resolution: "@browselang/parser@workspace:packages/browse-parser"
+  resolution: "@browselang/cli@workspace:packages/cli"
+  dependencies:
+    "@browselang/parser": "workspace:packages/parser"
+    "@types/yargs": 15.0.5
+    ohm-js: 0.14.0
+    yargs: 15.4.1
+  bin:
+    browse: bin/index.js
+  languageName: unknown
+  linkType: soft
+
+"@browselang/parser@workspace:packages/parser":
+  version: 0.0.0-use.local
+  resolution: "@browselang/parser@workspace:packages/parser"
   dependencies:
     ava: 3.11.1
     ohm-js: 0.14.0
@@ -211,6 +224,22 @@ __metadata:
   dependencies:
     "@types/node": "*"
   checksum: e6e6613c800aeda63e2331e753e8d21df1a2c9aa7a4bc71ed792a848e4811fc96e609759089355314a2318c76eff1f161499cd242044838ab1e6f56e463ebb9c
+  languageName: node
+  linkType: hard
+
+"@types/yargs-parser@npm:*":
+  version: 15.0.0
+  resolution: "@types/yargs-parser@npm:15.0.0"
+  checksum: 74bfaefde90fb28eace49469fa6c2da63161176cb6dfbd2cfea2c3cb3268e4ca6abe174ae3ff7e633a49a6d6d1a114901c78799a19d0cbc5a9b539585afe6c4f
+  languageName: node
+  linkType: hard
+
+"@types/yargs@npm:15.0.5":
+  version: 15.0.5
+  resolution: "@types/yargs@npm:15.0.5"
+  dependencies:
+    "@types/yargs-parser": "*"
+  checksum: 2133c8cb5878d13959844f98e546e69dacdf44cd9baf87d84c828a1a093febfc97c8f4df19cffd34a4a4f726a3cdb1851da4391176accf56534c5f8a1c271f46
   languageName: node
   linkType: hard
 
@@ -4276,7 +4305,7 @@ typescript@3.9.7:
   languageName: node
   linkType: hard
 
-"yargs@npm:^15.4.1":
+"yargs@npm:15.4.1, yargs@npm:^15.4.1":
   version: 15.4.1
   resolution: "yargs@npm:15.4.1"
   dependencies:
