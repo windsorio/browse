@@ -12,7 +12,7 @@
   "main": "lib/index.js",
   "directories": {
     "lib": "lib",
-    "test": "__tests__"
+    "test": "test"
   },
   "files": [
     "lib"
@@ -25,9 +25,15 @@
     "url": "git+https://github.com/windsorio/browse.git"
   },
   "scripts": {
-    "test": "echo \"Error: run tests from root\" && exit 1"
+    "test": "ava"
   },
   "bugs": {
     "url": "https://github.com/windsorio/browse/issues"
+  },
+  "dependencies": {
+    "ohm-js": "0.14.0"
+  },
+  "devDependencies": {
+    "ava": "3.11.1"
   }
 }

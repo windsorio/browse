@@ -1,1 +1,13 @@
+.DS_Store
+yarn-error.log
 node_modules
+
+.yarn/*
+!.yarn/cache
+!.yarn/releases
+!.yarn/plugins
+
+**/generated
+
+tsconfig.tsbuildinfo
+.env

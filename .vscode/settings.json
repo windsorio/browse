@@ -1,0 +1,14 @@
+{
+  "prettier.prettierPath": ".vscode/pnpify/prettier/index.js",
+  "typescript.tsdk": ".vscode/pnpify/typescript/lib",
+  "search.exclude": {
+    "**/.pnp.js": true,
+    "**/.yarn/**": true,
+    "**/yarn.lock": true,
+    "**/out/**": true
+  },
+  "editor.detectIndentation": false,
+  "editor.tabSize": 2,
+  "python.formatting.provider": "black",
+  "typescript.enablePromptUseWorkspaceTsdk": true
+}

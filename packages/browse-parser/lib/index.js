@@ -14,7 +14,7 @@ semantics.addAttribute("errors", {
   EqExpr_neError(_l, o, _r) {
     return [
       {
-        message: "!== is not supported. Use != instead.",
+        message: "!== is not supported, use != instead",
         source: o.source,
       },
     ];
@@ -22,7 +22,7 @@ semantics.addAttribute("errors", {
   EqExpr_eqError(_l, o, _r) {
     return [
       {
-        message: "=== is not supported. Use == instead.",
+        message: "=== is not supported, use == instead",
         source: o.source,
       },
     ];
