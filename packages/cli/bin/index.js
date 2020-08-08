@@ -23,7 +23,7 @@ if (!script) {
   });
   const rep = () => {
     rl.question("> ", (stmt) => {
-      const r = parser.grammar.match(stmt, "Expr");
+      const r = parser.grammar.match(stmt, "Rule");
       if (r.succeeded()) {
         const n = parser.semantics(r);
         if (n.errors.length > 0) {

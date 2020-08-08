@@ -61,7 +61,7 @@ semantics.addAttribute('asLisp', {
   EqExpr_ne:     function(l, _, r)   { return ["!=", l.asLisp, r.asLisp]; },
   EqExpr_eq:     function(l, _, r)   { return ["==", l.asLisp, r.asLisp]; },
   
-  identifier:    function(_)         { return this.sourceString; },
+  identifier:    function(_, _name)  { return this.sourceString; },
   literal:       function(_)         { return this.interpret(); },
 
   _nonterminal:  function(children) {
@@ -98,13 +98,13 @@ semantics.addOperation('interpret()', {
   numericLiteral: function(_)         { return Number(this.sourceString) },
   stringLiteral: function(l, c, _r)   { return c.sourceString },
 
-  identifier:    function(_)         { return this.sourceString; },
+  identifier:    function(_, _name)  { return this.sourceString; },
 
   _nonterminal:  function(children) {
     if (children.length === 1) {
       return children[0].interpret();
     } else {
-      throw new Error("Missing semantic action for " + this.constructor);
+      throw new Error("Missing semantic action for " + this.ctorName);
     }
   },
   // _terminal: function () { return this.sourceString },

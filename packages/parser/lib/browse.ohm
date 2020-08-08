@@ -1,8 +1,8 @@
 Browse {
 
   Program
-  	= Expr
-  
+    = Rules
+    | lineTerminator*
   
   /**************\
    ** Preamble ** 
@@ -48,14 +48,15 @@ Browse {
   
   comment = "#" (~lineTerminator sourceCharacter)*
   
-  identifier (an identifier) = ~reservedWord identifierName
-  identifierName = identifierStart identifierPart*
+  identifier (an identifier) = "$" wordName
+  word (a word) = ~reservedWord wordName
+  wordName = wordStart wordPart*
 
-  identifierStart = letter | "_" | "@"
-                  | "\\" unicodeEscapeSequence -- escaped
-  identifierPart = identifierStart | unicodeCombiningMark
-                 | unicodeDigit | unicodeConnectorPunctuation
-                 | "\u200C" | "\u200D"
+  wordStart = letter | "_" 
+            | "\\" unicodeEscapeSequence -- escaped
+  wordPart = wordStart | unicodeCombiningMark
+            | unicodeDigit | unicodeConnectorPunctuation
+            | "\u200C" | "\u200D"
   letter += unicodeCategoryNl
   
   reservedWord = keyword | futureReservedWord | booleanLiteral
@@ -90,8 +91,8 @@ Browse {
 
   literal = nullLiteral | booleanLiteral | numericLiteral | stringLiteral
 
-  nullLiteral = "null" ~identifierPart
-  booleanLiteral = ("true" | "false") ~identifierPart
+  nullLiteral = "null" ~wordPart
+  booleanLiteral = ("true" | "false") ~wordPart
   
 
   // Note that the ordering of hexIntegerLiteral and decimalLiteral is reversed w.r.t. the spec
@@ -109,7 +110,8 @@ Browse {
   exponentPart = exponentIndicator signedInteger -- present
                |                                 -- absent
   exponentIndicator = "e" | "E"
-  signedInteger (an integer) = "+" decimalDigit* -- positive
+  signedInteger (an integer)
+                = "+" decimalDigit* -- positive
                 | "-" decimalDigit* -- negative
                 |     decimalDigit+ -- noSign
 
@@ -156,50 +158,53 @@ Browse {
   spacesNoNL = (whitespace | comment)*
   
   // Convenience rules for parsing keyword tokens.
-  break = "break" ~identifierPart
-  do = "do" ~identifierPart
-  instanceof = "instanceof" ~identifierPart
-  typeof = "typeof" ~identifierPart
-  case = "case" ~identifierPart
-  else = "else" ~identifierPart
-  new = "new" ~identifierPart
-  var = "var" ~identifierPart
-  catch = "catch" ~identifierPart
-  finally = "finally" ~identifierPart
-  return = "return" ~identifierPart
-  void = "void" ~identifierPart
-  continue = "continue" ~identifierPart
-  for = "for" ~identifierPart
-  switch = "switch" ~identifierPart
-  while = "while" ~identifierPart
-  debugger = "debugger" ~identifierPart
-  function = "function" ~identifierPart
-  this = "this" ~identifierPart
-  with = "with" ~identifierPart
-  default = "default" ~identifierPart
-  if = "if" ~identifierPart
-  throw = "throw" ~identifierPart
-  delete = "delete" ~identifierPart
-  in = "in" ~identifierPart
-  try = "try" ~identifierPart
-  get = "get" ~identifierPart
-  set = "set" ~identifierPart
-  class = "class" ~identifierPart
-  enum = "enum" ~identifierPart
-  extends = "extends" ~identifierPart
-  super = "super" ~identifierPart
-  const = "const" ~identifierPart
-  export = "export" ~identifierPart
-  import = "import" ~identifierPart
-  implements = "implements" ~identifierPart
-  let = "let" ~identifierPart
-  private = "private" ~identifierPart
-  public = "public" ~identifierPart
-  interface = "interface" ~identifierPart
-  package = "package" ~identifierPart
-  protected = "protected" ~identifierPart
-  static = "static" ~identifierPart
-  yield = "yield" ~identifierPart
+  break = "break" ~wordPart
+  do = "do" ~wordPart
+  instanceof = "instanceof" ~wordPart
+  typeof = "typeof" ~wordPart
+  case = "case" ~wordPart
+  else = "else" ~wordPart
+  new = "new" ~wordPart
+  var = "var" ~wordPart
+  catch = "catch" ~wordPart
+  finally = "finally" ~wordPart
+  return = "return" ~wordPart
+  void = "void" ~wordPart
+  continue = "continue" ~wordPart
+  for = "for" ~wordPart
+  switch = "switch" ~wordPart
+  while = "while" ~wordPart
+  debugger = "debugger" ~wordPart
+  function = "function" ~wordPart
+  this = "this" ~wordPart
+  with = "with" ~wordPart
+  default = "default" ~wordPart
+  if = "if" ~wordPart
+  throw = "throw" ~wordPart
+  delete = "delete" ~wordPart
+  in = "in" ~wordPart
+  try = "try" ~wordPart
+  get = "get" ~wordPart
+  set = "set" ~wordPart
+  class = "class" ~wordPart
+  enum = "enum" ~wordPart
+  extends = "extends" ~wordPart
+  super = "super" ~wordPart
+  const = "const" ~wordPart
+  export = "export" ~wordPart
+  import = "import" ~wordPart
+  implements = "implements" ~wordPart
+  let = "let" ~wordPart
+  private = "private" ~wordPart
+  public = "public" ~wordPart
+  interface = "interface" ~wordPart
+  package = "package" ~wordPart
+  protected = "protected" ~wordPart
+  static = "static" ~wordPart
+  yield = "yield" ~wordPart
+
+  sep = ";" lineTerminator*   -- semi
+      | lineTerminator+       -- noSemi
     
   /*****************\
    ** Expressions **
@@ -242,15 +247,16 @@ Browse {
 
   Expr = EqExpr
   
-  Word
-  	= identifier
-    | stringLiteral
-    | RuleSet
+  /****************\
+   ** Statements **
+  \****************/ 
   
-  Rule 
-  	=  Word (Word)* ";"
-    |  Word (Word)* lineTerminator
-    
-    
-  RuleSet = "{" (lineTerminator* Rule)+ lineTerminator* "}"
+  Rule
+    = word (Expr)*
+  
+  Rules = lineTerminator* Rule (sep Rule)* sep?
+
+  RuleSet 
+  	= "{" Rules "}"		-- withRules
+    | "{" "}"	            -- empty
 }
