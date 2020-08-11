@@ -2,6 +2,8 @@
 
 "use strict";
 
+const fs = require("fs");
+const path = require("path");
 const { argv } = require("yargs")
   .alias("v", "version")
   .command("$0 [script]")
@@ -11,7 +13,12 @@ const { argv } = require("yargs")
 const { script } = argv;
 
 const parser = require("@browselang/parser");
-const { evalRule, getNewScope, stringify } = require("@browselang/core");
+const {
+  evalRule,
+  getNewScope,
+  stringify,
+  evalRuleSet,
+} = require("@browselang/core");
 
 if (!script) {
   const readline = require("readline");
@@ -56,5 +63,38 @@ if (!script) {
   };
   rep();
 } else {
-  console.log(`Executing ${script}`);
+  const code = fs.readFileSync(path.resolve(process.cwd(), script), "utf8");
+  if (!code) {
+    console.log(`Could not find any browse code at ${script}`);
+  }
+
+  const r = parser.grammar.match(code);
+  if (r.succeeded()) {
+    const n = parser.semantics(r);
+    if (n.errors.length > 0) {
+      process.stderr.write("\u001b[31;1m");
+      n.errors.forEach((err) => {
+        process.stderr.write(err[0].message);
+        process.stderr.write("\n");
+      });
+      process.stderr.write("\u001b[0m");
+    } else {
+      try {
+        evalRuleSet({
+          type: "RuleSet",
+          rules: n.asAST,
+        });
+      } catch (e) {
+        process.stderr.write("\u001b[31;1m");
+        process.stderr.write(e.message);
+        process.stderr.write("\u001b[0m");
+        process.stderr.write("\n");
+      }
+    }
+  } else {
+    process.stderr.write("\u001b[31;1m");
+    process.stderr.write(r.shortMessage);
+    process.stderr.write("\u001b[0m");
+    process.stderr.write("\n");
+  }
 }

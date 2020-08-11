@@ -1,0 +1,14 @@
+fun fib {
+  bind n
+  if ($n <= 1) then {
+    return 1
+  } else {
+    evalTo a fib $n-1
+    evalTo b fib $n - 2
+    return $a + $b
+  }
+}
+
+evalTo answer fib 5
+
+print $answer

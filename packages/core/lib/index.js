@@ -94,7 +94,7 @@ const evalRuleSet = (ruleSet, parent) => {
   assert(ruleSet.type === "RuleSet");
 
   if (!parent) {
-    parent = getSTD({ evalRuleSet });
+    parent = getSTD({ evalRuleSet, getNewScope });
   }
 
   const { rules: oRules } = ruleSet;
