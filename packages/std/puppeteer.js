@@ -1,18 +1,8 @@
 const puppeteer = require("puppeteer");
 const { sleep } = require("./std");
+const fns = require("./scrapeLib");
 
 const pageDefs = {};
-
-let fns = {};
-
-//const escapeRegExp = string => string.replace(/[.*+\-?^${}()|[\]\\]/g, '\\$&');
-//TODO: We need to figure out how we're going to do regex as part of a URL where a lot of the characters are meant to be literals.
-//Alredy tried 'escape' and the like. The issue is that, for instance, 'space' being converted to multiple characters actually significantly effects the regex matching. For now we will ignore most regex characters.
-//Exluding (*, +, ., (, and ) )
-//My solution would be to implement a limited regex specifically for browse to drastically reduce collisions between regex characters and url characters. The few remaining collisions could be escaped.
-//
-//Alternatively we could define a regex transformer where ' *' for instance would be replaced with (%20)* and then we could use escape with traditional regex
-const escapeRegExp = (string) => string.replace(/[\-?^${}|[\]\\]/g, "\\$&");
 
 (async () => {
   const browser = await puppeteer.launch({ headless: false });
@@ -29,20 +19,11 @@ const escapeRegExp = (string) => string.replace(/[\-?^${}|[\]\\]/g, "\\$&");
           rtn.push(sleep(...args));
         } else {
           console.log(`Executing ${name} with args ${args}`);
-          rtn.push(await fns[name](page, ...args));
+          rtn.push(await fns[name]({ page, browser, pageDefs }, ...args));
         }
       }
       return rtn;
     };
-  };
-
-  //TODO: Make this determinisitic, find a better way to do escaping
-  const scanPageDefs = (href) => {
-    const regexps = Object.keys(pageDefs);
-    console.log(href);
-    return regexps
-      .filter((r) => new RegExp(escapeRegExp(r), "g").test(href))
-      .map((match) => ({ name: match, ruleSet: pageDefs[match] }));
   };
 
   /* The Core Scraping Functions */
@@ -61,61 +42,6 @@ const escapeRegExp = (string) => string.replace(/[\-?^${}|[\]\\]/g, "\\$&");
     //We now have a rule for this href Regex so we push it
     console.log("Rulesets", rulesets);
     pageDefs[hrefRegex] = generateLambda(rulesets[0]);
-  };
-
-  const visit = async (page, href, newTab = true) => {
-    const newPage = await browser.newPage();
-    await newPage.goto(href);
-    const matchingDefs = scanPageDefs(href);
-
-    //Really this should be a promise race or something similar
-    // For now we just take the first rule
-    const results = await Promise.all(
-      matchingDefs.map(async (def, i) => {
-        if (i === 0) return await def.ruleSet(newPage);
-        return false;
-      })
-    );
-    return results;
-  };
-
-  const wait = async (page, value) => await page.waitForSelector(value);
-  const click = async (page, value) => await page.click(value);
-
-  const _eval = async (page, value, async = false) => {
-    console.log("_eval");
-    const fnWrapper = (value) => {
-      return `
-        ${async ? "async" : ""} () => {
-	  ${value}
-	}
-      `;
-    };
-
-    return await page.evaluate(eval(fnWrapper(value)));
-  };
-
-  const crawl = async (page, value) => {
-    const matching = await page.evaluate(
-      (value) =>
-        Array.from(document.querySelectorAll(value), (elem) => elem.href),
-      value
-    );
-
-    const pages = await Promise.all(
-      matching.map(async (href) => visit(page, href))
-    );
-    return pages;
-
-    //    matching.forEach(elem => console.log(elem));
-  };
-
-  fns = {
-    visit,
-    wait,
-    click,
-    _eval,
-    crawl,
   };
 
   //I *think* this concept (rulesets) needs to be implemented at the js level because passing rulesets around isn't the same as passing lambdas around and the JS code might need to know that in some cases.
@@ -166,8 +92,8 @@ const escapeRegExp = (string) => string.replace(/[\-?^${}|[\]\\]/g, "\\$&");
     optionalArgs: {},
   });
 
-  const res = await visit(
-    page,
+  const res = await fns.visit(
+    { page, browser, pageDefs },
     "https://www.indiehackers.com/products?minRevenue=1&techSkills=code"
   );
 
