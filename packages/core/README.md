@@ -1,11 +1,11 @@
-# `@browselang/parser`
+# `@browselang/core`
 
 > TODO: description
 
 ## Usage
 
 ```
-const browseParser = require('@browselang/parser');
+const browse = require('@browselang/core');
 
 // TODO: DEMONSTRATE API
 ```
