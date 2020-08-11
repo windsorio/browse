@@ -1,15 +1,20 @@
 "use strict";
 
-const std = require("./std");
+const getSTD = require("./std");
 const assert = require("assert");
 const { stringify } = require("./utils");
 const { resolveFn, resolveVar } = require("./scope");
 
-const getNewScope = (parent = std) => ({
-  fns: {},
-  vars: {},
-  parent,
-});
+const getNewScope = (parent) => {
+  if (!parent) {
+    parent = getSTD({ evalRuleSet, getNewScope });
+  }
+  return {
+    fns: {},
+    vars: {},
+    parent,
+  };
+};
 
 const evalExpr = (expr, scope) => {
   switch (expr.type) {
@@ -28,6 +33,8 @@ const evalExpr = (expr, scope) => {
         default:
           throw new Error(`Invalid unary operator '${op}'`);
       }
+    case "RuleSet":
+      return expr;
     case "BinExpr":
       const l = evalExpr(expr.left, scope);
       const r = evalExpr(expr.right, scope);
@@ -83,10 +90,15 @@ const evalRule = (rule, scope) => {
   return retVal;
 };
 
-const evalRuleSet = (ruleSet, parent = std) => {
+const evalRuleSet = (ruleSet, parent) => {
   assert(ruleSet.type === "RuleSet");
 
-  const { rules } = ruleSet;
+  if (!parent) {
+    parent = getSTD({ evalRuleSet });
+  }
+
+  const { rules: oRules } = ruleSet;
+  const rules = [...oRules]; // Don't want to modify the original rules
 
   const scope = getNewScope(parent);
   if (!rules.length) {

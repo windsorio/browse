@@ -23,7 +23,7 @@ const resolveVar = (name, scope) => {
   if (!scope) {
     throw new Error(`Variable '${name}' is not defined`);
   }
-  if (scope.vars[name]) {
+  if (scope.vars[name] !== undefined) {
     return scope.vars[name];
   } else {
     return resolveVar(name, scope.parent);

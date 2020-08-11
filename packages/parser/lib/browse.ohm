@@ -64,11 +64,11 @@ Browse {
   // Note: keywords that are the complete prefix of another keyword should
   // be prioritized (e.g. 'in' should come before 'instanceof')
   keyword = break    | do        | instanceof | typeof
-          | case     | else      | new        | var
-          | catch    | finally   | return     | void
+          | case     | new        | var
+          | catch    | finally   | void
           | continue | for       | switch     | while
           | debugger | function  | this       | with
-          | default  | if        | throw
+          | default  | throw
           | delete   | in        | try
 
   futureReservedWordLax = class  | enum  | extends
@@ -140,7 +140,7 @@ Browse {
                         | "\\" escapeSequence                             -- escaped
   implicitStringStart = ~"$" letter
   implicitStringPart
-                    = ~(space | "\\" | lineTerminator) sourceCharacter 	  -- nonEscaped
+                    = ~(space | ";" | "\\" | lineTerminator) sourceCharacter 	  -- nonEscaped
                     | "\\" escapeSequence                                 -- escaped
   						
   lineContinuation = "\\" lineTerminatorSequence
@@ -169,12 +169,10 @@ Browse {
   instanceof = "instanceof" ~wordPart
   typeof = "typeof" ~wordPart
   case = "case" ~wordPart
-  else = "else" ~wordPart
   new = "new" ~wordPart
   var = "var" ~wordPart
   catch = "catch" ~wordPart
   finally = "finally" ~wordPart
-  return = "return" ~wordPart
   void = "void" ~wordPart
   continue = "continue" ~wordPart
   for = "for" ~wordPart
@@ -185,7 +183,6 @@ Browse {
   this = "this" ~wordPart
   with = "with" ~wordPart
   default = "default" ~wordPart
-  if = "if" ~wordPart
   throw = "throw" ~wordPart
   delete = "delete" ~wordPart
   in = "in" ~wordPart
@@ -219,8 +216,8 @@ Browse {
   PriExpr
     =  "(" Expr ")"	-- paren
     | literal
-    | identifier
     | RuleSet
+    | identifier
 
   UnaryExpr 
     = "!" UnaryExpr -- not
