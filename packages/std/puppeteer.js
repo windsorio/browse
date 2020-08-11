@@ -5,6 +5,15 @@ const pageDefs = {};
 
 let fns = {};
 
+//const escapeRegExp = string => string.replace(/[.*+\-?^${}()|[\]\\]/g, '\\$&');
+//TODO: We need to figure out how we're going to do regex as part of a URL where a lot of the characters are meant to be literals.
+//Alredy tried 'escape' and the like. The issue is that, for instance, 'space' being converted to multiple characters actually significantly effects the regex matching. For now we will ignore most regex characters.
+//Exluding (*, +, ., (, and ) )
+//My solution would be to implement a limited regex specifically for browse to drastically reduce collisions between regex characters and url characters. The few remaining collisions could be escaped.
+//
+//Alternatively we could define a regex transformer where ' *' for instance would be replaced with (%20)* and then we could use escape with traditional regex
+const escapeRegExp = (string) => string.replace(/[\-?^${}|[\]\\]/g, "\\$&");
+
 (async () => {
   const browser = await puppeteer.launch({ headless: false });
   const page = await browser.newPage();
@@ -13,7 +22,6 @@ let fns = {};
     return async (page) => {
       const rtn = [];
       for (let i = 0; i < ruleset.length; i++) {
-        console.log("I", i);
         const rule = ruleset[i];
         const name = rule[0];
         const args = rule.slice(1);
@@ -21,8 +29,6 @@ let fns = {};
           rtn.push(sleep(...args));
         } else {
           console.log(`Executing ${name} with args ${args}`);
-          console.log("FN", fns[name].toString());
-          console.log("args", args);
           rtn.push(await fns[name](page, ...args));
         }
       }
@@ -35,7 +41,7 @@ let fns = {};
     const regexps = Object.keys(pageDefs);
     console.log(href);
     return regexps
-      .filter((r) => new RegExp(r, "g").test(href))
+      .filter((r) => new RegExp(escapeRegExp(r), "g").test(href))
       .map((match) => ({ name: match, ruleSet: pageDefs[match] }));
   };
 
@@ -61,14 +67,11 @@ let fns = {};
     const newPage = await browser.newPage();
     await newPage.goto(href);
     const matchingDefs = scanPageDefs(href);
-    console.log("rules", matchingDefs);
 
     //Really this should be a promise race or something similar
     // For now we just take the first rule
     const results = await Promise.all(
       matchingDefs.map(async (def, i) => {
-        console.log("ruleset lambda", def.ruleSet.toString());
-        console.log("i", i);
         if (i === 0) return await def.ruleSet(newPage);
         return false;
       })
@@ -115,7 +118,7 @@ let fns = {};
     crawl,
   };
 
-  //I *think* this concept needs to be implemented at the js level because passing rulesets around isn't the same as passing lambdas around.
+  //I *think* this concept (rulesets) needs to be implemented at the js level because passing rulesets around isn't the same as passing lambdas around and the JS code might need to know that in some cases.
   pageDef({
     requiredArgs: [
       // The url
@@ -172,7 +175,7 @@ let fns = {};
 
   console.log(pageDefs);
 
-  /* An Example Implemented */
+  /* An Example Implemented WITHOUT rulesets */
   /*
   ;(async () => {
     await page.goto('https://www.indiehackers.com/products?minRevenue=1&techSkills=code');
