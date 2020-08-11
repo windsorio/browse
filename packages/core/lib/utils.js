@@ -9,6 +9,9 @@ const stringify = (jsValue) => {
       "The value was somehow 'undefined'. This should not be possible as browse doesn't have 'undefined'. There's an error with this browse implementation"
     );
   }
+  if (jsValue === null) {
+    return "nil";
+  }
   if (typeof jsValue === "function") {
     return "Function";
   }

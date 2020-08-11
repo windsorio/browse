@@ -7,7 +7,7 @@ const browse = require("..");
 const expressions = [
   "true",
   "false",
-  "null",
+  "nil",
   "0",
   "1",
   "1.1",
@@ -49,7 +49,7 @@ const expressions = [
   `1 == "1"`,
   `"hi" == 'hi'`,
   `"hi" == \`hi\``,
-  `(2 * (3 / -"muffin")) > null - false * true / null % "string" == "huh" * "wtf" / "this" != !"works?"`,
+  `(2 * (3 / -"muffin")) > nil - false * true / nil % "string" == "huh" * "wtf" / "this" != !"works?"`,
   `"a\\nb \\
 c"`,
   `'a\\nb \\

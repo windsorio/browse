@@ -89,9 +89,9 @@ Browse {
     not currently used by this grammar.
   */
 
-  literal = nullLiteral | booleanLiteral | numericLiteral | stringLiteral
+  literal = nilLiteral | booleanLiteral | numericLiteral | stringLiteral
 
-  nullLiteral = "null" ~wordPart
+  nilLiteral = "nil" ~wordPart
   booleanLiteral = ("true" | "false") ~wordPart
   
 

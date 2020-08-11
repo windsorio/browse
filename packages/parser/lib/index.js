@@ -233,7 +233,7 @@ semantics.addAttribute("asAST", {
     };
   },
 
-  nullLiteral: function (_) {
+  nilLiteral: function (_) {
     return {
       type: "Literal",
       value: null,
@@ -340,7 +340,7 @@ semantics.addOperation('interpret()', {
   RuleSet_withRules(_l, r, _r)        { return r.interpret() },
   RuleSet_empty(_l, _r)               { return [] },
   
-  nullLiteral: function(_)              { return null },
+  nilLiteral: function(_)              { return null },
   booleanLiteral: function(_)           { return this.sourceString === "true" ? true : false; },
   numericLiteral: function(_)           { return Number(this.sourceString) },
   stringLiteral_doubleQuote: function(l, c, _r) { return c.sourceString },
