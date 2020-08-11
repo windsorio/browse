@@ -139,7 +139,7 @@ Browse {
                         | "\\" escapeSequence                             -- escaped
   implicitStringStart = ~"$" letter
   implicitStringPart
-                    = ~(space | ";" | "\\" | lineTerminator) sourceCharacter 	  -- nonEscaped
+                    = ~(whitespace | ";" | "\\" | lineTerminator) sourceCharacter 	  -- nonEscaped
                     | "\\" escapeSequence                                 -- escaped
   						
   lineContinuation = "\\" lineTerminatorSequence
