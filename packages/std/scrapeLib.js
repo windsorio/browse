@@ -1,16 +1,6 @@
 /* All of these functions take in context as their first argument */
 const { sleep } = require("./std");
 
-const _arr = async ({ page, data }, name, value) => {
-  const element = await page.$(value);
-  const text = await page.evaluate((element) => element.textContent, element);
-  if (!data[page.url()]) {
-    data[page.url()] = [{ type: "url", name, value: text }];
-  } else {
-    data[page.url()].push({ type: "url", name, value: text });
-  }
-};
-
 const _eval = async ({ page }, value, async = false) => {
   const fnWrapper = (value) => {
     return `
@@ -95,6 +85,8 @@ const crawl = async ({ page, browser, pageDefs, data }, value) => {
   return pages;
 };
 
+const press = async ({ page }, value) => await page.keyboard.press(value);
+
 const visit = async ({ browser, pageDefs, data }, href, newTab = true) => {
   //const escapeRegExp = string => string.replace(/[.*+\-?^${}()|[\]\\]/g, '\\$&');
   //TODO: We need to figure out how we're going to do regex as part of a URL where a lot of the characters are meant to be literals.
@@ -139,6 +131,7 @@ module.exports = {
   _url,
   click,
   crawl,
+  press,
   visit,
   wait,
 };
