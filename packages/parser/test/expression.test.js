@@ -11,7 +11,7 @@ const expressions = [
   "0",
   "1",
   "1.1",
-  ["1.2e", "Line 1, col 5: expected an integer"],
+  ["1.2e", "Line 1, col 4: expected end of input"],
   "1.2e5",
   "1.2e+5",
   "1.2e-5",
@@ -66,6 +66,7 @@ c|`,
 |`,
   ["1 === 1", "=== is not supported, use == instead"],
   ["1 !== 1", "!== is not supported, use != instead"],
+  "$x + $y",
 ];
 
 expressions.forEach((expr) => {
@@ -91,6 +92,7 @@ expressions.forEach((expr) => {
           return t.fail(n.errors[0].message);
         }
         t.snapshot(n.asLisp);
+        t.snapshot(n.asAST);
 
         // Check interpret value
         console.log(source);

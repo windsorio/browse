@@ -27,6 +27,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         "reference": "workspace:packages/cli"
       },
       {
+        "name": "@browselang/core",
+        "reference": "workspace:packages/core"
+      },
+      {
         "name": "@browselang/parser",
         "reference": "workspace:packages/parser"
       }
@@ -35,6 +39,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
     "ignorePatternData": "(^(?:\\.yarn\\/sdks(?:\\/(?!\\.)(?:(?:(?!(?:^|\\/)\\.).)*?)|$))$)",
     "fallbackExclusionList": [
       ["@browselang/cli", ["workspace:packages/cli"]],
+      ["@browselang/core", ["workspace:packages/core"]],
       ["@browselang/parser", ["workspace:packages/parser"]],
       ["browse", ["workspace:."]]
     ],
@@ -58,6 +63,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       [
         "@browselang/cli",
         "workspace:packages/cli"
+      ],
+      [
+        "@browselang/core",
+        "workspace:packages/core"
       ],
       [
         "@browselang/parser",
@@ -1755,10 +1764,21 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./packages/cli/",
           "packageDependencies": [
             ["@browselang/cli", "workspace:packages/cli"],
+            ["@browselang/core", "workspace:packages/core"],
             ["@browselang/parser", "workspace:packages/parser"],
             ["@types/yargs", "npm:15.0.5"],
             ["ohm-js", "npm:0.14.0"],
             ["yargs", "npm:15.4.1"]
+          ],
+          "linkType": "SOFT",
+        }]
+      ]],
+      ["@browselang/core", [
+        ["workspace:packages/core", {
+          "packageLocation": "./packages/core/",
+          "packageDependencies": [
+            ["@browselang/core", "workspace:packages/core"],
+            ["ava", "npm:3.11.1"]
           ],
           "linkType": "SOFT",
         }]

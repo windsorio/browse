@@ -67,7 +67,7 @@ semantics.addAttribute('asLisp', {
                                         return [
                                           "seq",
                                           first.asLisp,
-                                          rest.asLisp,
+                                          ...rest.asLisp,
                                         ];
                                       },
   RuleSet_withRules(_l, r, _r)        { return r.asLisp },
@@ -91,6 +91,192 @@ semantics.addAttribute('asLisp', {
   _terminal: function () { return this.sourceString },
 });
 
+semantics.addAttribute("asAST", {
+  PriExpr_paren: function (_l, e, _r) {
+    return {
+      type: "Paren",
+      expr: e.asAST,
+    };
+  },
+
+  UnaryExpr_not: function (_, e) {
+    return {
+      type: "UnaryExpr",
+      op: "!",
+      expr: e.asAST,
+    };
+  },
+  UnaryExpr_neg: function (_, e) {
+    return {
+      type: "UnaryExpr",
+      op: "-",
+      expr: e.asAST,
+    };
+  },
+
+  MultExpr_mul: function (l, _, r) {
+    return {
+      type: "BinExpr",
+      op: "*",
+      left: l.asAST,
+      right: r.asAST,
+    };
+  },
+  MultExpr_div: function (l, _, r) {
+    return {
+      type: "BinExpr",
+      op: "/",
+      left: l.asAST,
+      right: r.asAST,
+    };
+  },
+  MultExpr_mod: function (l, _, r) {
+    return {
+      type: "BinExpr",
+      op: "%",
+      left: l.asAST,
+      right: r.asAST,
+    };
+  },
+  AddExpr_add: function (l, _, r) {
+    return {
+      type: "BinExpr",
+      op: "+",
+      left: l.asAST,
+      right: r.asAST,
+    };
+  },
+  AddExpr_sub: function (l, _, r) {
+    return {
+      type: "BinExpr",
+      op: "-",
+      left: l.asAST,
+      right: r.asAST,
+    };
+  },
+  CompExpr_ge: function (l, _, r) {
+    return {
+      type: "BinExpr",
+      op: ">=",
+      left: l.asAST,
+      right: r.asAST,
+    };
+  },
+  CompExpr_le: function (l, _, r) {
+    return {
+      type: "BinExpr",
+      op: "<=",
+      left: l.asAST,
+      right: r.asAST,
+    };
+  },
+  CompExpr_gt: function (l, _, r) {
+    return {
+      type: "BinExpr",
+      op: ">",
+      left: l.asAST,
+      right: r.asAST,
+    };
+  },
+  CompExpr_lt: function (l, _, r) {
+    return {
+      type: "BinExpr",
+      op: "<",
+      left: l.asAST,
+      right: r.asAST,
+    };
+  },
+  EqExpr_ne: function (l, _, r) {
+    return {
+      type: "BinExpr",
+      op: "!=",
+      left: l.asAST,
+      right: r.asAST,
+    };
+  },
+  EqExpr_eq: function (l, _, r) {
+    return {
+      type: "BinExpr",
+      op: "==",
+      left: l.asAST,
+      right: r.asAST,
+    };
+  },
+
+  Rule: function (w, es) {
+    return {
+      type: "Rule",
+      fn: w.asAST,
+      args: es.asAST,
+    };
+  },
+  Rules: function (_nl, first, _rs, rest, _s) {
+    return [first.asAST, ...rest.asAST];
+  },
+  RuleSet_withRules(_l, r, _r) {
+    return {
+      type: "RuleSet",
+      rules: r.asAST,
+    };
+  },
+  RuleSet_empty(_l, _r) {
+    return {
+      type: "RuleSet",
+      rules: [],
+    };
+  },
+
+  nullLiteral: function (_) {
+    return {
+      type: "Literal",
+      value: null,
+    };
+  },
+  booleanLiteral: function (_) {
+    return {
+      type: "Literal",
+      value: this.sourceString === "true" ? true : false,
+    };
+  },
+  numericLiteral: function (_) {
+    return {
+      type: "Literal",
+      value: Number(this.sourceString),
+    };
+  },
+  stringLiteral: function (l, c, _r) {
+    return {
+      type: "Literal",
+      value: c.sourceString,
+    };
+  },
+
+  word: function (_) {
+    return {
+      type: "Word",
+      name: this.sourceString,
+    };
+  },
+  identifier: function (_, _name) {
+    return {
+      type: "Ident",
+      name: _name.sourceString,
+    };
+  },
+
+  _iter(children) {
+    return children.map((c) => c.asAST);
+  },
+  _nonterminal: function (children) {
+    if (children.length === 1) {
+      return children[0].asAST;
+    } else {
+      throw new Error("Missing semantic action for " + this.ctorName);
+    }
+  },
+  // _terminal: function () { return this.sourceString },
+});
+
 // prettier-ignore
 semantics.addOperation('interpret()', {
   PriExpr_paren:    function(_l, e, _r) { return e.interpret(); }, 
@@ -101,22 +287,37 @@ semantics.addOperation('interpret()', {
   MultExpr_mul:     function(l, _, r)   { return l.interpret() * r.interpret(); },
   MultExpr_div:     function(l, _, r)   { return l.interpret()  /  r.interpret(); },
   MultExpr_mod:     function(l, _, r)   { return l.interpret()  %  r.interpret(); },
-  AddExpr_add:     function(l, _, r)   { return l.interpret()  +  r.interpret(); },
-  AddExpr_sub:     function(l, _, r)   { return l.interpret()  -  r.interpret(); },
-  CompExpr_ge:     function(l, _, r)   { return  l.interpret() >=  r.interpret(); },
-  CompExpr_le:     function(l, _, r)   { return  l.interpret() <=  r.interpret(); },
-  CompExpr_gt:     function(l, _, r)   { return l.interpret()  >  r.interpret(); },
-  CompExpr_lt:     function(l, _, r)   { return l.interpret()  <  r.interpret(); },
-  EqExpr_ne:     function(l, _, r)   { return  l.interpret() !==  r.interpret(); },
-  EqExpr_eq:     function(l, _, r)   { return  l.interpret() ===  r.interpret(); },
+  AddExpr_add:     function(l, _, r)    { return l.interpret()  +  r.interpret(); },
+  AddExpr_sub:     function(l, _, r)    { return l.interpret()  -  r.interpret(); },
+  CompExpr_ge:     function(l, _, r)    { return  l.interpret() >=  r.interpret(); },
+  CompExpr_le:     function(l, _, r)    { return  l.interpret() <=  r.interpret(); },
+  CompExpr_gt:     function(l, _, r)    { return l.interpret()  >  r.interpret(); },
+  CompExpr_lt:     function(l, _, r)    { return l.interpret()  <  r.interpret(); },
+  EqExpr_ne:     function(l, _, r)      { return  l.interpret() !==  r.interpret(); },
+  EqExpr_eq:     function(l, _, r)      { return  l.interpret() ===  r.interpret(); },
+
+  Rule:           function(w, es)     { return [w.interpret(), es.interpret()] },
+  Rules:          function (_nl, first, _rs, rest, _s) 
+                                      {
+                                        return [
+                                          first.interpret(),
+                                          ...rest.interpret(),
+                                        ];
+                                      },
+  RuleSet_withRules(_l, r, _r)        { return r.interpret() },
+  RuleSet_empty(_l, _r)               { return [] },
   
-  nullLiteral: function(_)            { return null },
-  booleanLiteral: function(_)         { return this.sourceString === "true" ? true : false; },
-  numericLiteral: function(_)         { return Number(this.sourceString) },
-  stringLiteral: function(l, c, _r)   { return c.sourceString },
+  nullLiteral: function(_)              { return null },
+  booleanLiteral: function(_)           { return this.sourceString === "true" ? true : false; },
+  numericLiteral: function(_)           { return Number(this.sourceString) },
+  stringLiteral: function(l, c, _r)     { return c.sourceString },
 
-  identifier:    function(_, _name)  { return this.sourceString; },
+  word:          function(_)            { return this.sourceString; },
+  identifier:    function(_, _name)     { return this.sourceString; },
 
+  _iter(children) {
+    return children.map((c) => c.interpret());
+  },
   _nonterminal:  function(children) {
     if (children.length === 1) {
       return children[0].interpret();

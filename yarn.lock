@@ -45,12 +45,21 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@browselang/cli@workspace:packages/cli"
   dependencies:
+    "@browselang/core": "workspace:packages/core"
     "@browselang/parser": "workspace:packages/parser"
     "@types/yargs": 15.0.5
     ohm-js: 0.14.0
     yargs: 15.4.1
   bin:
     browse: bin/index.js
+  languageName: unknown
+  linkType: soft
+
+"@browselang/core@workspace:packages/core":
+  version: 0.0.0-use.local
+  resolution: "@browselang/core@workspace:packages/core"
+  dependencies:
+    ava: 3.11.1
   languageName: unknown
   linkType: soft
 

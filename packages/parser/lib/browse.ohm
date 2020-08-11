@@ -21,7 +21,7 @@ Browse {
              | "\uFEFF"  -- byteOrderMark
              | unicodeSpaceSeparator
 
-  lineTerminator = "\n" | "\r" | "\u2028" | "\u2029"
+  lineTerminator (a line break) = "\n" | "\r" | "\u2028" | "\u2029"
   lineTerminatorSequence = "\n" | "\r" ~"\n" | "\u2028" | "\u2029" | "\r\n"
   
   decimalDigit = "0".."9"

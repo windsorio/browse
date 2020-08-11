@@ -2,8 +2,6 @@
 
 "use strict";
 
-const util = require("util");
-
 const { argv } = require("yargs")
   .alias("v", "version")
   .command("$0 [script]")
@@ -13,6 +11,7 @@ const { argv } = require("yargs")
 const { script } = argv;
 
 const parser = require("@browselang/parser");
+const { evalRule, getNewScope, stringify } = require("@browselang/core");
 
 if (!script) {
   const readline = require("readline");
@@ -21,6 +20,7 @@ if (!script) {
     input: process.stdin,
     output: process.stdout,
   });
+  const scope = getNewScope();
   const rep = () => {
     rl.question("> ", (stmt) => {
       const r = parser.grammar.match(stmt, "Rule");
@@ -31,7 +31,15 @@ if (!script) {
           rl.write(n.errors[0].message);
           rl.write("\u001b[0m");
         } else {
-          rl.write(util.inspect(n.asLisp, { colors: true, depth: null }));
+          // rl.write(util.inspect(n.asLisp, { colors: true, depth: null }));
+          // rl.write(util.inspect(n.interpret(), { colors: true, depth: null }));
+          try {
+            rl.write(stringify(evalRule(n.asAST, scope)));
+          } catch (e) {
+            rl.write("\u001b[31;1m");
+            rl.write(e.message);
+            rl.write("\u001b[0m");
+          }
           // rl.write(util.inspect(n.interpret(), { colors: true }));
         }
       } else {
