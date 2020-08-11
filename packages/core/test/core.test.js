@@ -5,6 +5,16 @@ const test = require("ava");
 const { evalRule, getNewScope } = require("..");
 
 test("print", (t) => {
-  evalRule(["print", ["hello", "world"]], getNewScope());
+  evalRule(
+    {
+      type: "Rule",
+      fn: { type: "Word", name: "print" },
+      args: [
+        { type: "Literal", value: "hello" },
+        { type: "Literal", value: "world" },
+      ],
+    },
+    getNewScope()
+  );
   t.pass();
 });

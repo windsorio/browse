@@ -741,7 +741,7 @@ c'
       type: 'BinExpr',
     }
 
-## (2 * (3 / -"muffin")) > null - false * true / null % "string" == "huh" * "wtf" / "this" != !"works?"
+## (2 * (3 / -"muffin")) > nil - false * true / nil % "string" == "huh" * "wtf" / "this" != !"works?"
 
 > Snapshot 1
 
@@ -1511,7 +1511,7 @@ c`
       value: 'implicit\\ string',
     }
 
-## null
+## nil
 
 > Snapshot 1
 
