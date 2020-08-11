@@ -67,6 +67,10 @@ c|`,
   ["1 === 1", "=== is not supported, use == instead"],
   ["1 !== 1", "!== is not supported, use != instead"],
   "$x + $y",
+  "implicitString",
+  "implicit\\ string",
+  "https://implicit.url/something?q=123&term=implcit%20string#withAHash",
+  "stringWith$dollarSign",
 ];
 
 expressions.forEach((expr) => {

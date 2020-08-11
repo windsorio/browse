@@ -5,6 +5,7 @@ const test = require("ava");
 const browse = require("..");
 
 const programs = [
+  "print hello world",
   `page "https://en.wikipedia.org/wiki/(slug:.+)" {
     string 'title' \`#firstHeading\`
     string 'summary' \`#mw-content-text > div > p:nth-child(4)\`

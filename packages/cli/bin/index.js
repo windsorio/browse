@@ -34,7 +34,10 @@ if (!script) {
           // rl.write(util.inspect(n.asLisp, { colors: true, depth: null }));
           // rl.write(util.inspect(n.interpret(), { colors: true, depth: null }));
           try {
-            rl.write(stringify(evalRule(n.asAST, scope)));
+            const out = stringify(evalRule(n.asAST, scope));
+            rl.write("\u001b[32m");
+            rl.write(out);
+            rl.write("\u001b[0m");
           } catch (e) {
             rl.write("\u001b[31;1m");
             rl.write(e.message);

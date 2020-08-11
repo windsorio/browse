@@ -244,10 +244,35 @@ semantics.addAttribute("asAST", {
       value: Number(this.sourceString),
     };
   },
-  stringLiteral: function (l, c, _r) {
+
+  stringLiteral_doubleQuote: function (l, c, _r) {
     return {
       type: "Literal",
       value: c.sourceString,
+    };
+  },
+  stringLiteral_singleQuote: function (l, c, _r) {
+    return {
+      type: "Literal",
+      value: c.sourceString,
+    };
+  },
+  stringLiteral_cssSelector: function (l, c, _r) {
+    return {
+      type: "Literal",
+      value: c.sourceString,
+    };
+  },
+  stringLiteral_javascript: function (l, c, _r) {
+    return {
+      type: "Literal",
+      value: c.sourceString,
+    };
+  },
+  stringLiteral_implicit: function (_f, _r) {
+    return {
+      type: "Literal",
+      value: this.sourceString,
     };
   },
 
@@ -310,7 +335,11 @@ semantics.addOperation('interpret()', {
   nullLiteral: function(_)              { return null },
   booleanLiteral: function(_)           { return this.sourceString === "true" ? true : false; },
   numericLiteral: function(_)           { return Number(this.sourceString) },
-  stringLiteral: function(l, c, _r)     { return c.sourceString },
+  stringLiteral_doubleQuote: function(l, c, _r) { return c.sourceString },
+  stringLiteral_singleQuote: function(l, c, _r) { return c.sourceString },
+  stringLiteral_cssSelector: function(l, c, _r) { return c.sourceString },
+  stringLiteral_javascript: function(l, c, _r) { return c.sourceString },
+  stringLiteral_implicit: function(_f, _r) { return this.sourceString },
 
   word:          function(_)            { return this.sourceString; },
   identifier:    function(_, _name)     { return this.sourceString; },

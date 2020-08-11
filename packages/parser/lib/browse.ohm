@@ -122,10 +122,11 @@ Browse {
 
 
   // For semantics on how string literals are constructed, see section 7.8.4
-  stringLiteral = "\"" doubleStringCharacter* "\""
-                | "'" singleStringCharacter* "'"
-                | "`" cssSelectorCharacter* "`"
-                | "|" javascriptCharacter* "|"
+  stringLiteral = "\"" doubleStringCharacter* "\""						            -- doubleQuote
+                | "'" singleStringCharacter* "'"							            -- singleQuote
+                | "`" cssSelectorCharacter* "`"								            -- cssSelector
+                | "|" javascriptCharacter* "|"								            -- javascript
+                | implicitStringStart implicitStringPart*		              -- implicit
   doubleStringCharacter = ~("\"" | "\\" | lineTerminator) sourceCharacter -- nonEscaped
                         | "\\" escapeSequence                             -- escaped
                         | lineContinuation                                -- lineContinuation
@@ -135,8 +136,13 @@ Browse {
   cssSelectorCharacter = ~("`" | "\\" | lineTerminator) sourceCharacter   -- nonEscaped
                         | "\\" escapeSequence                             -- escaped
                         | lineContinuation                                -- lineContinuation
-  javascriptCharacter = ~("|" | "\\") sourceCharacter 					  -- nonEscaped
+  javascriptCharacter = ~("|" | "\\") sourceCharacter 					          -- nonEscaped
                         | "\\" escapeSequence                             -- escaped
+  implicitStringStart = ~"$" letter
+  implicitStringPart
+                    = ~(space | "\\" | lineTerminator) sourceCharacter 	  -- nonEscaped
+                    | "\\" escapeSequence                                 -- escaped
+  						
   lineContinuation = "\\" lineTerminatorSequence
   escapeSequence = unicodeEscapeSequence
                  | hexEscapeSequence
@@ -144,7 +150,7 @@ Browse {
                  | characterEscapeSequence  // Must come last.
   characterEscapeSequence = singleEscapeCharacter
                           | nonEscapeCharacter
-  singleEscapeCharacter = "'" | "`" | "|" | "\"" | "\\" | "b" | "f" | "n" | "r" | "t" | "v"
+  singleEscapeCharacter = "'" | "`" | "|" | "\"" | "\\" | "b" | "f" | "n" | "r" | "t" | "v" | space
   nonEscapeCharacter = ~(escapeCharacter | lineTerminator) sourceCharacter
   escapeCharacter = singleEscapeCharacter | decimalDigit | "x" | "u"
   octalEscapeSequence = zeroToThree octalDigit octalDigit    -- whole
