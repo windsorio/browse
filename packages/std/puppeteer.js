@@ -1,0 +1,207 @@
+const puppeteer = require("puppeteer");
+const { sleep } = require("./std");
+
+const pageDefs = {};
+
+let fns = {};
+
+(async () => {
+  const browser = await puppeteer.launch({ headless: false });
+  const page = await browser.newPage();
+
+  const generateLambda = (ruleset) => {
+    return async (page) => {
+      const rtn = [];
+      for (let i = 0; i < ruleset.length; i++) {
+        console.log("I", i);
+        const rule = ruleset[i];
+        const name = rule[0];
+        const args = rule.slice(1);
+        if (name === "sleep") {
+          rtn.push(sleep(...args));
+        } else {
+          console.log(`Executing ${name} with args ${args}`);
+          console.log("FN", fns[name].toString());
+          console.log("args", args);
+          rtn.push(await fns[name](page, ...args));
+        }
+      }
+      return rtn;
+    };
+  };
+
+  //TODO: Make this determinisitic, find a better way to do escaping
+  const scanPageDefs = (href) => {
+    const regexps = Object.keys(pageDefs);
+    console.log(href);
+    return regexps
+      .filter((r) => new RegExp(r, "g").test(href))
+      .map((match) => ({ name: match, ruleSet: pageDefs[match] }));
+  };
+
+  /* The Core Scraping Functions */
+
+  //We follow the convention that all optional arguments for the function in browse are passed into an object as the first argument in node. (This allows infinite arity functions) all non-parenthesized arguments are then passed in as an array which is the second arguemnt.
+
+  const pageDef = ({ optionalArgs: { render, cache, ttl }, requiredArgs }) => {
+    const hrefRegex = requiredArgs[0];
+    const rulesets = requiredArgs.slice(1);
+
+    if (rulesets.length > 1) {
+      console.log("We only support one ruleset for now");
+      return;
+    }
+
+    //We now have a rule for this href Regex so we push it
+    console.log("Rulesets", rulesets);
+    pageDefs[hrefRegex] = generateLambda(rulesets[0]);
+  };
+
+  const visit = async (page, href, newTab = true) => {
+    const newPage = await browser.newPage();
+    await newPage.goto(href);
+    const matchingDefs = scanPageDefs(href);
+    console.log("rules", matchingDefs);
+
+    //Really this should be a promise race or something similar
+    // For now we just take the first rule
+    const results = await Promise.all(
+      matchingDefs.map(async (def, i) => {
+        console.log("ruleset lambda", def.ruleSet.toString());
+        console.log("i", i);
+        if (i === 0) return await def.ruleSet(newPage);
+        return false;
+      })
+    );
+    return results;
+  };
+
+  const wait = async (page, value) => await page.waitForSelector(value);
+  const click = async (page, value) => await page.click(value);
+
+  const _eval = async (page, value, async = false) => {
+    console.log("_eval");
+    const fnWrapper = (value) => {
+      return `
+        ${async ? "async" : ""} () => {
+	  ${value}
+	}
+      `;
+    };
+
+    return await page.evaluate(eval(fnWrapper(value)));
+  };
+
+  const crawl = async (page, value) => {
+    const matching = await page.evaluate(
+      (value) =>
+        Array.from(document.querySelectorAll(value), (elem) => elem.href),
+      value
+    );
+
+    const pages = await Promise.all(
+      matching.map(async (href) => visit(page, href))
+    );
+    return pages;
+
+    //    matching.forEach(elem => console.log(elem));
+  };
+
+  fns = {
+    visit,
+    wait,
+    click,
+    _eval,
+    crawl,
+  };
+
+  //I *think* this concept needs to be implemented at the js level because passing rulesets around isn't the same as passing lambdas around.
+  pageDef({
+    requiredArgs: [
+      // The url
+      "https://www.indiehackers.com/products?minRevenue=1&techSkills=code",
+      [
+        //The ruleset
+        ["wait", ".collapsible-filters--active"],
+        ["click", ".collapsible-filters--active"],
+        ["click", ".collapsible-filters__option--selected"],
+        ["sleep", 1000],
+        ["wait", ".product-card__link"],
+        [
+          "_eval",
+          `
+          await new Promise((resolve, reject) => {
+            const timer = setInterval(() => {
+              const height = document.body.scrollHeight - 600;
+              console.log(height);
+              if (height >= 4500) {
+                clearInterval(timer);
+                resolve();
+              }
+
+              window.scrollBy(0, height);
+            }, 200);
+          });
+        `,
+          true,
+        ],
+        ["crawl", ".product-card__link"],
+      ],
+    ],
+    optionalArgs: {},
+  });
+
+  pageDef({
+    requiredArgs: [
+      // The url
+      "https://www.indiehackers.com/product/(.+)",
+      [
+        //The ruleset
+        ["wait", ".user-header__username"],
+      ],
+    ],
+    optionalArgs: {},
+  });
+
+  const res = await visit(
+    page,
+    "https://www.indiehackers.com/products?minRevenue=1&techSkills=code"
+  );
+
+  console.log("Res", res);
+
+  console.log(pageDefs);
+
+  /* An Example Implemented */
+  /*
+  ;(async () => {
+    await page.goto('https://www.indiehackers.com/products?minRevenue=1&techSkills=code');
+    await wait (`.collapsible-filters--active`);
+    await click (`.collapsible-filters--active`);
+    await click (`.collapsible-filters__option--selected`);
+    await sleep(1000);
+    await wait (`.product-card__link`);
+
+    console.log("evaluating");
+    await _eval (`
+      await new Promise((resolve, reject) => {
+        const timer = setInterval(() => {
+          const height = document.body.scrollHeight - 600;
+          console.log(height);
+          if (height >= 4500) {
+            clearInterval(timer);
+            resolve();
+          }
+
+          window.scrollBy(0, height);
+        }, 200);
+      });
+    `, true);
+
+
+    await crawl (`.product-card__link`);
+
+    await sleep(100000)
+    await browser.close();
+  })();*/
+})();

@@ -19,10 +19,22 @@
   },
   "dependencies": {
     "@yarnpkg/pnpify": "^2.0.0-rc.22",
+    "chromedriver": "84.0.1",
     "husky": "^4.2.5",
     "prettier": "2.0.5",
     "pretty-quick": "2.0.1",
+    "puppeteer": "^5.2.1",
+    "puppeteer-core": "5.2.1",
+    "selenium-webdriver": "4.0.0-alpha.7",
+    "supports-color": "7.1.0",
     "tslib": "^1.11.1",
     "typescript": "3.9.7"
+  },
+  "devDependencies": {
+    "@types/chromedriver": "81.0.0",
+    "@types/puppeteer": "3.0.1",
+    "@types/puppeteer-core": "2.0.0",
+    "@types/selenium-webdriver": "4.0.9",
+    "@types/supports-color": "5.3.0"
   }
 }
