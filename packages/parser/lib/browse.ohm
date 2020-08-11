@@ -2,7 +2,7 @@ Browse {
 
   Program
     = Rules
-    | lineTerminator*
+    | (space | lineTerminator)*
   
   /**************\
    ** Preamble ** 
@@ -11,8 +11,7 @@ Browse {
   sourceCharacter = any
 
   // Override Ohm's built-in definition of space.
-  space := whitespace
-
+  space := whitespace | comment
   whitespace = "\t"
              | "\x0B"    -- verticalTab
              | "\x0C"    -- formFeed
@@ -150,7 +149,7 @@ Browse {
                  | characterEscapeSequence  // Must come last.
   characterEscapeSequence = singleEscapeCharacter
                           | nonEscapeCharacter
-  singleEscapeCharacter = "'" | "`" | "|" | "\"" | "\\" | "b" | "f" | "n" | "r" | "t" | "v" | space
+  singleEscapeCharacter = "'" | "`" | "|" | "\"" | "\\" | "b" | "f" | "n" | "r" | "t" | "v" | whitespace
   nonEscapeCharacter = ~(escapeCharacter | lineTerminator) sourceCharacter
   escapeCharacter = singleEscapeCharacter | decimalDigit | "x" | "u"
   octalEscapeSequence = zeroToThree octalDigit octalDigit    -- whole
@@ -206,8 +205,8 @@ Browse {
   static = "static" ~wordPart
   yield = "yield" ~wordPart
 
-  sep = ";" lineTerminator*   -- semi
-      | lineTerminator+       -- noSemi
+  sep = ";" (space | lineTerminator)*             -- semi
+      | lineTerminator (space | lineTerminator)*  -- noSemi
     
   /*****************\
    ** Expressions **
@@ -261,7 +260,7 @@ Browse {
   Rule
     = word (Expr)*
   
-  Rules = lineTerminator* Rule (sep Rule)* sep?
+  Rules = (space | lineTerminator)* Rule (sep Rule)* sep?
 
   RuleSet 
   	= "{" Rules "}"		-- withRules

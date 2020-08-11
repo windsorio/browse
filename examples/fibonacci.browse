@@ -1,10 +1,21 @@
+# A Fibonacci functions
+
 fun fib {
+  # Bind "n" to the incoming value
   bind n
+
+  # Another comment
+
   if ($n <= 1) then {
+    # Base case
     return 1
   } else {
+    
+    # Recursion
     return (fib $n-1) + (fib $n - 2)
   }
 }
+
+# Run the program
 
 print (fib 5)
