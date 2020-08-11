@@ -3,12 +3,8 @@ fun fib {
   if ($n <= 1) then {
     return 1
   } else {
-    evalTo a fib $n-1
-    evalTo b fib $n - 2
-    return $a + $b
+    return (fib $n-1) + (fib $n - 2)
   }
 }
 
-evalTo answer fib 5
-
-print $answer
+print (fib 5)

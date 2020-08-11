@@ -50,18 +50,6 @@ module.exports = ({ evalRuleSet, getNewScope }) => ({
       console.log(scope);
       return null;
     },
-    evalTo: (scope) => (id, name, ...args) => {
-      let fn;
-      try {
-        fn = resolveFn(name, scope);
-      } catch (e) {}
-      if (!fn) {
-        throw new Error(`Function '${name}' is not defined`);
-      }
-      const val = fn(scope)(...args);
-      const retVal = set(scope)(id, val);
-      return retVal;
-    },
     if: (scope) => (cond, then, thenRS, el, elseRS) => {
       if (then !== "then") {
         throw new Error("Second argument to \"if\" should be the word 'then'");

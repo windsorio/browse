@@ -44,6 +44,7 @@ semantics.addAttribute("errors", {
 
 // prettier-ignore
 semantics.addAttribute('asLisp', {
+  PriExpr_ruleExpr:  function(_l, e, _r) { return ["eval", e.asLisp]; }, 
   PriExpr_paren:  function(_l, e, _r) { return ["group", e.asLisp]; }, 
 
   UnaryExpr_not:  function(_, e)      { return ["!", e.asLisp]; },
@@ -92,6 +93,12 @@ semantics.addAttribute('asLisp', {
 });
 
 semantics.addAttribute("asAST", {
+  PriExpr_ruleExpr: function (_l, e, _r) {
+    return {
+      type: "RuleExpr",
+      expr: e.asAST,
+    };
+  },
   PriExpr_paren: function (_l, e, _r) {
     return {
       type: "Paren",
@@ -304,6 +311,7 @@ semantics.addAttribute("asAST", {
 
 // prettier-ignore
 semantics.addOperation('interpret()', {
+  PriExpr_ruleExpr:    function(_l, e, _r) { return e.interpret(); }, 
   PriExpr_paren:    function(_l, e, _r) { return e.interpret(); }, 
 
   UnaryExpr_not:    function(_, e)      { return !e.interpret(); },

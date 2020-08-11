@@ -24,6 +24,10 @@ const evalExpr = (expr, scope) => {
       return expr.value;
     case "Ident":
       return resolveVar(expr.name, scope);
+    case "RuleSet":
+      return expr;
+    case "RuleExpr":
+      return evalRule(expr.expr, scope);
     case "UnaryExpr":
       switch (expr.op) {
         case "!":
@@ -33,8 +37,6 @@ const evalExpr = (expr, scope) => {
         default:
           throw new Error(`Invalid unary operator '${op}'`);
       }
-    case "RuleSet":
-      return expr;
     case "BinExpr":
       const l = evalExpr(expr.left, scope);
       const r = evalExpr(expr.right, scope);

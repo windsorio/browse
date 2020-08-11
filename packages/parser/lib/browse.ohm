@@ -214,7 +214,9 @@ Browse {
   \*****************/
 
   PriExpr
-    =  "(" Expr ")"	-- paren
+    =  
+    | "(" Rule ")"	-- ruleExpr
+    | "(" Expr ")"	-- paren
     | literal
     | RuleSet
     | identifier
