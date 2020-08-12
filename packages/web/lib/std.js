@@ -20,6 +20,38 @@ module.exports = ({ evalAsyncRuleSet, getNewScope }) => ({
       await resolveMeta("page", scope).click(value);
       return true;
     },
+    //This is purely for CLI. Calling info prints out the info for all functions.
+    //Calling info with a function name prints out the definition for that function
+    info: (scope) => (value) => {
+      const fnDescriptions = {
+        click:
+          "Takes in a selector and clicks the argument indicated by the selector",
+        info:
+          "Prints out info about all of the functions if given no arguemnts. If given an argument, prints out info about the function whose name was passed",
+        page:
+          "Defines a page definition which matches on the regex passed in as the first argument, and which executes the rule set passed in as the second argument on every matching page",
+        press: "Presses the given key",
+        type: "Types the given string one character at a time",
+        visit: "Open a new tab with the given url",
+        wait:
+          "If pased a number, waits for that many ms. If passed a selector, waits for that selector to be renderered",
+      };
+      if (!value) {
+        Object.keys(fnDescriptions).forEach((key) => {
+          console.log(`(${key}): ${fnDescriptions[key]}`);
+          console.log("");
+        });
+      } else {
+        if (fnDescriptions[value]) {
+          console.log(fnDescriptions[value]);
+        } else {
+          throw new Error(
+            `Function ${value} does not exist in the info description`
+          );
+        }
+      }
+      return true;
+    },
     page: (scope) => (hrefRegex, ...rulesets) => {
       if (rulesets.length > 1) {
         console.log("We only support one ruleset for now");
