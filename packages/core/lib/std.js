@@ -1,10 +1,13 @@
-const { resolveFn, resolveVar, resolveVarScope } = require("./scope");
-const { stringify } = require("./utils");
+const {
+  resolveFn,
+  resolveFnScope,
+  resolveVar,
+  resolveVarScope,
+} = require("./scope");
+const { help, stringify } = require("./utils");
 
+const get = (scope) => (name) => resolveVar(name, scope);
 const set = (scope) => (name, value) => {
-  if (scope.vars[name]) {
-    throw new Error(`Variable '${name}' is already defined`);
-  }
   scope.vars[name] = value;
   return value;
 };
@@ -15,18 +18,37 @@ const set = (scope) => (name, value) => {
 module.exports = ({ evalRuleSet, getNewScope }) => ({
   parent: null, // This is the root
   vars: {},
+  internal: {},
   fns: {
-    set,
-    update: (scope) => (name, value) => {
-      const existingScope = resolveVarScope(name, scope);
-      existingScope.vars[name] = value;
-      return value;
+    help: (scope) => (key) => {
+      // Find the lowest scope that actually has the 'help' function
+      const helpScope = resolveFnScope("help", scope);
+      help({
+        resolveFn,
+        scope: helpScope,
+        key,
+        functions: {
+          help:
+            "Prints out help information about all the available functions. Pass an argument to get information on a specific function",
+          get:
+            "<key> - Get the value of the variable 'key'. When using this rule as an expression - i.e. (get var), you may use the shorthand '$var' instead",
+          set: "<key> <value> - Set the variable 'key' to the value 'value'",
+          print: "<...vals> - Print values to stdout",
+          fun: `<name> <body> - Define a new function 'name'. The 'body' has access to two additional functions, 'bind' and 'return' to take arguments and return a value
+                    bind <...keys> - for each value passed into the function, store it as a variable using the names passed by 'keys'
+                    return <value> - return the value`,
+          if: `<condition> then <then> else <else> - If 'condition' is truthy, evaluate the 'then' RuleSet, else evaluate the 'else' rule set`,
+          scope: "Internal: debug functions to print the current JS scope",
+        },
+      });
+      return null;
     },
+    get,
+    set,
     print: (_) => (...args) => {
       console.log(...args.map(stringify));
       return null;
     },
-    return: (_) => (v) => v,
     fun: (scope) => (name, body) => {
       let existingFn;
       try {
@@ -36,12 +58,13 @@ module.exports = ({ evalRuleSet, getNewScope }) => ({
         throw new Error(`Function '${name}' is already defined`);
       }
       scope.fns[name] = (fnScope) => (...args) => {
-        // Setup Bind Function
+        // Setup bind and return functions
         const newScope = getNewScope(fnScope);
         newScope.fns.bind = (bindScope) => (...names) => {
           names.forEach((name, i) => set(bindScope)(name, args[i] || null));
           return null;
         };
+        newScope.fns.return = (_) => (v) => (v === undefined ? null : v);
         return evalRuleSet(body, newScope);
       };
       return scope.fns[name];
