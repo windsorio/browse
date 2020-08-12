@@ -50,11 +50,7 @@ const getWebScope = (parent) => ({
       return null;
     },
     visit: (scope) => async (href) => {
-      let browser;
-      try {
-        // TODO: def is defined so we don't have to error catch
-        browser = resolveInternal("browser", scope);
-      } catch (e) {}
+      let browser = resolveInternal("browser", scope);
       if (!browser) {
         browser = scope.internal.browser = await puppeteer.launch({
           headless: false,
