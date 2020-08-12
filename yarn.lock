@@ -72,6 +72,16 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@browselang/web@workspace:packages/web":
+  version: 0.0.0-use.local
+  resolution: "@browselang/web@workspace:packages/web"
+  dependencies:
+    "@types/puppeteer": 3.0.1
+    ava: 3.11.1
+    puppeteer: 5.2.1
+  languageName: unknown
+  linkType: soft
+
 "@concordance/react@npm:^2.0.0":
   version: 2.0.0
   resolution: "@concordance/react@npm:2.0.0"
@@ -862,7 +872,7 @@ __metadata:
     husky: ^4.2.5
     prettier: 2.0.5
     pretty-quick: 2.0.1
-    puppeteer: 5.2.1
+    puppeteer: ^5.2.1
     puppeteer-core: 5.2.1
     selenium-webdriver: 4.0.0-alpha.7
     supports-color: 7.1.0
@@ -3659,7 +3669,7 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"puppeteer@npm:5.2.1":
+"puppeteer@npm:5.2.1, puppeteer@npm:^5.2.1":
   version: 5.2.1
   resolution: "puppeteer@npm:5.2.1"
   dependencies:

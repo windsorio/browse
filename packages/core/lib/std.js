@@ -9,6 +9,13 @@ const set = (scope) => (name, value) => {
   return value;
 };
 
+const get = (scope) => (name) => {
+  if (!scope.vars[name]) {
+    throw new Error(`Variable '${name}' is not defined`);
+  }
+  return resolveVar(name, scope);
+};
+
 /**
  * The root scope that contains all the basic/standard functions and variables
  */
@@ -17,6 +24,7 @@ module.exports = ({ evalRuleSet, getNewScope }) => ({
   vars: {},
   fns: {
     set,
+    get,
     update: (scope) => (name, value) => {
       const existingScope = resolveVarScope(name, scope);
       existingScope.vars[name] = value;

@@ -33,6 +33,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       {
         "name": "@browselang/parser",
         "reference": "workspace:packages/parser"
+      },
+      {
+        "name": "@browselang/web",
+        "reference": "workspace:packages/web"
       }
     ],
     "enableTopLevelFallback": true,
@@ -41,6 +45,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       ["@browselang/cli", ["workspace:packages/cli"]],
       ["@browselang/core", ["workspace:packages/core"]],
       ["@browselang/parser", ["workspace:packages/parser"]],
+      ["@browselang/web", ["workspace:packages/web"]],
       ["browse", ["workspace:."]]
     ],
     "fallbackPool": [
@@ -71,6 +76,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       [
         "@browselang/parser",
         "workspace:packages/parser"
+      ],
+      [
+        "@browselang/web",
+        "workspace:packages/web"
       ],
       [
         "@concordance/react",
@@ -1984,6 +1993,18 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@browselang/parser", "workspace:packages/parser"],
             ["ava", "npm:3.11.1"],
             ["ohm-js", "npm:0.14.0"]
+          ],
+          "linkType": "SOFT",
+        }]
+      ]],
+      ["@browselang/web", [
+        ["workspace:packages/web", {
+          "packageLocation": "./packages/web/",
+          "packageDependencies": [
+            ["@browselang/web", "workspace:packages/web"],
+            ["@types/puppeteer", "npm:3.0.1"],
+            ["ava", "npm:3.11.1"],
+            ["puppeteer", "npm:5.2.1"]
           ],
           "linkType": "SOFT",
         }]
