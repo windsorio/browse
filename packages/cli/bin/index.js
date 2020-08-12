@@ -87,10 +87,13 @@ if (argv.web) {
         process.stderr.write("\u001b[0m");
       } else {
         try {
-          await evalRuleSet({
-            type: "RuleSet",
-            rules: n.asAST,
-          });
+          await evalRuleSet(
+            {
+              type: "RuleSet",
+              rules: n.asAST,
+            },
+            scope
+          );
         } catch (e) {
           process.stderr.write("\u001b[31;1m");
           process.stderr.write(e.message);

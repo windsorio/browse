@@ -14,6 +14,7 @@ const getPageScope = (parent) => ({
   parent,
   vars: {},
   internal: {
+    page: null,
     data: {},
   },
   fns: {

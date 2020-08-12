@@ -6,6 +6,7 @@ const {
   resolveInternal,
   resolveFn,
   resolveFnScope,
+  resolveInternalScope,
 } = require("@browselang/core/lib/scope");
 const { help } = require("@browselang/core/lib/utils");
 
@@ -17,7 +18,7 @@ const getPageScope = require("./page");
 // My solution would be to implement a limited regex specifically for browse to drastically reduce collisions between regex characters and url characters. The few remaining collisions could be escaped.
 // Alternatively we could define a regex transformer where ' *' for instance would be replaced with (%20)* and then we could use escape with traditional regex
 const genRegex = (string) =>
-  new RegExp(escapeRegExp(string.replace(/[\-?^${}|[\]\\]/g, "\\$&")), "g");
+  new RegExp(string.replace(/[\-?^${}|[\]\\]/g, "\\$&"), "g");
 
 /**
  * A scope containing all the web-scraping functions and variables
@@ -30,7 +31,6 @@ const getWebScope = (parent) => ({
     browser: null,
     // Page definitions
     pageDefs: {},
-    page: null,
   },
   fns: {
     help: (scope) => (key) => {
@@ -58,22 +58,25 @@ const getWebScope = (parent) => ({
       return null;
     },
     visit: (scope) => async (href) => {
-      let browser = resolveInternal("browser", scope);
+      const nearestWebScope = resolveInternalScope("browser", scope);
+      const nearestPageScope = resolveInternalScope("page", scope);
+
+      let browser = nearestWebScope.internal.browser;
       if (!browser) {
-        browser = scope.internal.browser = await puppeteer.launch({
+        browser = nearestWebScope.internal.browser = await puppeteer.launch({
           headless: false,
         });
       }
 
-      const page = scope.internal.page || (await browser.newPage());
-      scope.internal.page = page;
+      const page = nearestPageScope.internal.page || (await browser.newPage());
+      nearestPageScope.internal.page = page;
       await page.goto(href);
 
       // Check if any pageDefs exist and execute them if found
       try {
         let match = null;
         resolveInternal("pageDefs", scope, (defs) => {
-          if (match) return false; // match already found
+          if (match || !defs) return false; // match already found
 
           // TODO: Make this determinisitic, find a better way to do escaping
           // Scan the page definitions for all regex that match the href
@@ -88,10 +91,10 @@ const getWebScope = (parent) => ({
         });
 
         if (match) {
-          // Generate an empty scope (so that the user can shadow the page functions)
-          //    that inherits from the page scope (with the page functions)
-          //      that inherits from the current scope
-          const pageScope = getNewScope(getPageScope(scope));
+          // Generate a new page scope with the same page
+          const pageScope = getPageScope(scope);
+          pageScope.internal.page = await browser.newPage();
+          await pageScope.internal.page.goto(href);
 
           // TODO: support multple matching definitions
           // Really this should be a promise race or something similar
@@ -99,6 +102,9 @@ const getWebScope = (parent) => ({
           await evalRuleSet(match.ruleSet, pageScope);
 
           // TODO: check if the url has changed? If so, recurse and execute and necessary `pageDef` functions
+
+          // Finally, close the page
+          pageScope.internal.page.close();
         }
       } catch (e) {}
 

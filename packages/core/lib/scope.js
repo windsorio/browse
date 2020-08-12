@@ -68,6 +68,7 @@ const resolveVarScope = (name, scope) => {
  * Recurseivlely find an internal variable matching the name by walking up the scope/environment inheritance chain
  * @param {string} name The variable name
  * @param {Scope} scope The scope to use
+ * @param {any => boolean} predicate An optional predicate with which to test the resolved value
  */
 const resolveInternal = (name, scope, predicate = () => true) => {
   if (!scope) {
@@ -76,7 +77,24 @@ const resolveInternal = (name, scope, predicate = () => true) => {
   if (scope.internal[name] !== undefined && predicate(scope.internal[name])) {
     return scope.internal[name];
   } else {
-    return resolveInternal(name, scope.parent);
+    return resolveInternal(name, scope.parent, predicate);
+  }
+};
+
+/**
+ * Recurseivlely find an internal variable matching the name by walking up the scope/environment inheritance chain
+ * and return the scope instead of the value itself
+ * @param {string} name The variable name
+ * @param {Scope} scope The scope to use
+ */
+const resolveInternalScope = (name, scope) => {
+  if (!scope) {
+    throw new Error(`Internal:: Internal Variable '${name}' is not defined`);
+  }
+  if (scope.internal[name] !== undefined) {
+    return scope;
+  } else {
+    return resolveInternalScope(name, scope.parent);
   }
 };
 
@@ -86,4 +104,5 @@ module.exports = {
   resolveFnScope,
   resolveVarScope,
   resolveInternal,
+  resolveInternalScope,
 };
