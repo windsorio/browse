@@ -33,6 +33,14 @@ module.exports = ({ evalAsyncRuleSet, getNewScope }) => ({
       await resolveMeta("page", scope).keyboard.press(value);
       return value;
     },
+    type: (scope) => async (value) => {
+      const keys = [...value];
+      for (let i = 0; i < keys.length; i++) {
+        const key = keys[i];
+        await resolveMeta("page", scope).keyboard.press(key);
+      }
+      return value;
+    },
     visit: (scope) => async (href) => {
       try {
         //TODO: Def isDefined so we don't have to error catch
