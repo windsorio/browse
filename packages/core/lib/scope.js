@@ -69,11 +69,11 @@ const resolveVarScope = (name, scope) => {
  * @param {string} name The variable name
  * @param {Scope} scope The scope to use
  */
-const resolveInternal = (name, scope) => {
+const resolveInternal = (name, scope, predicate = () => true) => {
   if (!scope) {
     throw new Error(`Internal:: Internal Variable '${name}' is not defined`);
   }
-  if (scope.internal[name] !== undefined) {
+  if (scope.internal[name] !== undefined && predicate(scope.internal[name])) {
     return scope.internal[name];
   } else {
     return resolveInternal(name, scope.parent);

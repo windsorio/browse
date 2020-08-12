@@ -11,6 +11,14 @@ const { help } = require("@browselang/core/lib/utils");
 
 const getPageScope = require("./page");
 
+// TODO: We need to figure out how we're going to do regex as part of a URL where a lot of the characters are meant to be literals.
+// Alredy tried 'escape' and the like. The issue is that, for instance, 'space' being converted to multiple characters actually significantly effects the regex matching. For now we will ignore most regex characters.
+// Exluding (*, +, ., (, and ) )
+// My solution would be to implement a limited regex specifically for browse to drastically reduce collisions between regex characters and url characters. The few remaining collisions could be escaped.
+// Alternatively we could define a regex transformer where ' *' for instance would be replaced with (%20)* and then we could use escape with traditional regex
+const genRegex = (string) =>
+  new RegExp(escapeRegExp(string.replace(/[\-?^${}|[\]\\]/g, "\\$&")), "g");
+
 /**
  * A scope containing all the web-scraping functions and variables
  */
@@ -56,51 +64,44 @@ const getWebScope = (parent) => ({
           headless: false,
         });
       }
-      const pageDefs = resolveInternal("pageDefs", scope);
-
-      // const escapeRegExp = string => string.replace(/[.*+\-?^${}()|[\]\\]/g, '\\$&');
-      // TODO: We need to figure out how we're going to do regex as part of a URL where a lot of the characters are meant to be literals.
-      // Alredy tried 'escape' and the like. The issue is that, for instance, 'space' being converted to multiple characters actually significantly effects the regex matching. For now we will ignore most regex characters.
-      // Exluding (*, +, ., (, and ) )
-      // My solution would be to implement a limited regex specifically for browse to drastically reduce collisions between regex characters and url characters. The few remaining collisions could be escaped.
-      //
-      // Alternatively we could define a regex transformer where ' *' for instance would be replaced with (%20)* and then we could use escape with traditional regex
-      const escapeRegExp = (string) =>
-        string.replace(/[\-?^${}|[\]\\]/g, "\\$&");
-
-      // TODO: Make this determinisitic, find a better way to do escaping
-      // Scan the page definitions for all regex that match the href
-      const scanPageDefs = (href) => {
-        const regexps = Object.keys(pageDefs);
-        return regexps
-          .filter((r) => new RegExp(escapeRegExp(r), "g").test(href))
-          .map((match) => ({
-            name: match,
-            ruleSet: pageDefs[match],
-          }));
-      };
 
       const page = scope.internal.page || (await browser.newPage());
       scope.internal.page = page;
       await page.goto(href);
 
-      const matchingDefs = scanPageDefs(href);
+      // Check if any pageDefs exist and execute them if found
+      try {
+        let match = null;
+        resolveInternal("pageDefs", scope, (defs) => {
+          if (match) return false; // match already found
 
-      // TODO: support multple matching definitions
-      // Really this should be a promise race or something similar
-      // For now we just take the first RuleSet
-      await Promise.all(
-        matchingDefs.map(async (def, i) => {
-          if (i === 0) {
-            // Generate an empty scope (so that the user can shadow the page functions)
-            //    that inherits from the page scope (with the page functions)
-            //      that inherits from the current scope
-            const pageScope = getNewScope(getPageScope(scope));
-            return evalRuleSet(def.ruleSet, pageScope);
+          // TODO: Make this determinisitic, find a better way to do escaping
+          // Scan the page definitions for all regex that match the href
+          match = Object.keys(defs).find((r) => genRegex(r).test(href)) || null;
+          if (match) {
+            match = {
+              name: match,
+              ruleSet: defs[match],
+            };
           }
-          return;
-        })
-      );
+          return !!match;
+        });
+
+        if (match) {
+          // Generate an empty scope (so that the user can shadow the page functions)
+          //    that inherits from the page scope (with the page functions)
+          //      that inherits from the current scope
+          const pageScope = getNewScope(getPageScope(scope));
+
+          // TODO: support multple matching definitions
+          // Really this should be a promise race or something similar
+          // For now we just use the first RuleSet
+          await evalRuleSet(match.ruleSet, pageScope);
+
+          // TODO: check if the url has changed? If so, recurse and execute and necessary `pageDef` functions
+        }
+      } catch (e) {}
+
       return href;
     },
   },
