@@ -35,6 +35,6 @@
     "ava": "3.11.1"
   },
   "dependencies": {
-    "puppeteer": "5.2.1"
+    "puppeteer": "^5.2.1"
   }
 }
