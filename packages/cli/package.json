@@ -37,6 +37,7 @@
   "dependencies": {
     "@browselang/core": "workspace:packages/core",
     "@browselang/parser": "workspace:packages/parser",
+    "@browselang/web": "workspace:packages/web",
     "ohm-js": "0.14.0",
     "yargs": "15.4.1"
   },

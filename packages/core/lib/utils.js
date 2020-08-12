@@ -18,4 +18,26 @@ const stringify = (jsValue) => {
   return String(jsValue);
 };
 
-module.exports = { stringify };
+/**
+ * Display a help message using the given function descriptions, and then recursively trigger parent help functions
+ * @param {{[fn: string]: string}} functions An object with a description for each function
+ */
+const help = ({ resolveFn, scope, functions, key }) => {
+  if (!key) {
+    Object.keys(functions).forEach((key) => {
+      console.log(`${key.padEnd(20)} -\t${functions[key]}\n`);
+    });
+  } else {
+    if (functions[key]) {
+      console.log(`${key.padEnd(20)} -\t${functions[key]}\n`);
+      return;
+    }
+  }
+  if (scope.parent) {
+    try {
+      resolveFn("help", scope.parent)(scope.parent)(key);
+    } catch (e) {}
+  }
+};
+
+module.exports = { stringify, help };

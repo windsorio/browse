@@ -1,6 +1,12 @@
-const { resolveFn, resolveVar, resolveVarScope } = require("./scope");
-const { stringify } = require("./utils");
+const {
+  resolveFn,
+  resolveFnScope,
+  resolveVar,
+  resolveVarScope,
+} = require("./scope");
+const { help, stringify } = require("./utils");
 
+const get = (scope) => (name) => resolveVar(name, scope);
 const set = (scope) => (name, value) => {
   if (scope.vars[name]) {
     throw new Error(`Variable '${name}' is already defined`);
@@ -9,20 +15,28 @@ const set = (scope) => (name, value) => {
   return value;
 };
 
-const get = (scope) => (name) => {
-  if (!scope.vars[name]) {
-    throw new Error(`Variable '${name}' is not defined`);
-  }
-  return resolveVar(name, scope);
-};
-
 /**
  * The root scope that contains all the basic/standard functions and variables
  */
 module.exports = ({ evalRuleSet, getNewScope }) => ({
   parent: null, // This is the root
   vars: {},
+  internal: {},
   fns: {
+    help: (scope) => (key) => {
+      // Find the lowest scope that actually has the 'help' function
+      const helpScope = resolveFnScope("help", scope);
+      help({
+        resolveFn,
+        scope: helpScope,
+        key,
+        functions: {
+          help:
+            "Prints out help information about all the available functions. Pass an argument to get information on a specific function",
+        },
+      });
+      return null;
+    },
     set,
     get,
     update: (scope) => (name, value) => {

@@ -4,8 +4,8 @@ const test = require("ava");
 
 const { evalRule, getNewScope } = require("..");
 
-test("print", (t) => {
-  evalRule(
+test("print", async (t) => {
+  await evalRule(
     {
       type: "Rule",
       fn: { type: "Word", name: "print" },

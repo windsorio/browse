@@ -1,4 +1,4 @@
-# `@browselang/core`
+# `@browselang/web`
 
 > TODO: description
 

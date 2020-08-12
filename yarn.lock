@@ -47,6 +47,7 @@ __metadata:
   dependencies:
     "@browselang/core": "workspace:packages/core"
     "@browselang/parser": "workspace:packages/parser"
+    "@browselang/web": "workspace:packages/web"
     "@types/yargs": 15.0.5
     ohm-js: 0.14.0
     yargs: 15.4.1
@@ -76,9 +77,16 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@browselang/web@workspace:packages/web"
   dependencies:
+    "@browselang/core": "workspace:packages/core"
+    "@types/chromedriver": 81.0.0
     "@types/puppeteer": 3.0.1
+    "@types/puppeteer-core": 2.0.0
+    "@types/selenium-webdriver": 4.0.9
     ava: 3.11.1
-    puppeteer: 5.2.1
+    chromedriver: 84.0.1
+    puppeteer: ^5.2.1
+    puppeteer-core: 5.2.1
+    selenium-webdriver: 4.0.0-alpha.7
   languageName: unknown
   linkType: soft
 
@@ -284,13 +292,6 @@ __metadata:
   version: 4.0.9
   resolution: "@types/selenium-webdriver@npm:4.0.9"
   checksum: c537a09453eb9d292692b9e7d0e91188ac18386abc9c065689df03bbe1a6a9ee63369dc0db7c1bc5afe4fc9d22ada62f57a6006c5182480798d173d3df03c311
-  languageName: node
-  linkType: hard
-
-"@types/supports-color@npm:5.3.0":
-  version: 5.3.0
-  resolution: "@types/supports-color@npm:5.3.0"
-  checksum: c17da52676c6a97639314ad22b7215b2991a786ece9738426e1203fac9780358138d3546faca0efd7f9a35c9c2f3d19591460127317c64953fea8ed8c64f347d
   languageName: node
   linkType: hard
 
@@ -862,20 +863,10 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "browse@workspace:."
   dependencies:
-    "@types/chromedriver": 81.0.0
-    "@types/puppeteer": 3.0.1
-    "@types/puppeteer-core": 2.0.0
-    "@types/selenium-webdriver": 4.0.9
-    "@types/supports-color": 5.3.0
     "@yarnpkg/pnpify": ^2.0.0-rc.22
-    chromedriver: 84.0.1
     husky: ^4.2.5
     prettier: 2.0.5
     pretty-quick: 2.0.1
-    puppeteer: ^5.2.1
-    puppeteer-core: 5.2.1
-    selenium-webdriver: 4.0.0-alpha.7
-    supports-color: 7.1.0
     tslib: ^1.11.1
     typescript: 3.9.7
   languageName: unknown
@@ -3669,7 +3660,7 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"puppeteer@npm:5.2.1, puppeteer@npm:^5.2.1":
+"puppeteer@npm:^5.2.1":
   version: 5.2.1
   resolution: "puppeteer@npm:5.2.1"
   dependencies:
@@ -4314,7 +4305,7 @@ resolve@^1.10.0:
   languageName: node
   linkType: hard
 
-"supports-color@npm:7.1.0, supports-color@npm:^7.1.0":
+"supports-color@npm:*, supports-color@npm:^7.1.0":
   version: 7.1.0
   resolution: "supports-color@npm:7.1.0"
   dependencies:

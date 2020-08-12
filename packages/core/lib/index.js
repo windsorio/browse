@@ -12,11 +12,12 @@ const getNewScope = (parent) => {
   return {
     fns: {},
     vars: {},
+    internal: {},
     parent,
   };
 };
 
-const evalExpr = (expr, scope) => {
+const evalExpr = async (expr, scope) => {
   switch (expr.type) {
     case "Paren":
       return evalExpr(expr.expr, scope);
@@ -31,15 +32,15 @@ const evalExpr = (expr, scope) => {
     case "UnaryExpr":
       switch (expr.op) {
         case "!":
-          return !evalExpr(expr.expr, scope);
+          return !(await evalExpr(expr.expr, scope));
         case "-":
-          return -evalExpr(expr.expr, scope);
+          return -(await evalExpr(expr.expr, scope));
         default:
           throw new Error(`Invalid unary operator '${op}'`);
       }
     case "BinExpr":
-      const l = evalExpr(expr.left, scope);
-      const r = evalExpr(expr.right, scope);
+      const l = await evalExpr(expr.left, scope);
+      const r = await evalExpr(expr.right, scope);
       switch (expr.op) {
         case "*":
           return l * r;
@@ -77,22 +78,23 @@ const evalExpr = (expr, scope) => {
  * Evaluate the `rule` in the given `scope`
  * @param {Rule} rule The rule to evaluate
  * @param {Scope} scope The scope in which to evaluate the rule
+ * @returns JS return value or retVal. Can be a promise
  */
-const evalRule = (rule, scope) => {
+const evalRule = async (rule, scope) => {
   assert(rule.type === "Rule");
   const { fn, args } = rule;
   assert(fn.type === "Word");
 
-  let resolvedArgs;
+  const resolvedArgs = [];
   if (args) {
-    // first resolve expressions
-    resolvedArgs = args.map((e) => evalExpr(e, scope));
+    for (const arg of args) {
+      resolvedArgs.push(await evalExpr(arg, scope));
+    }
   }
-  const retVal = resolveFn(fn.name, scope)(scope)(...resolvedArgs);
-  return retVal;
+  return resolveFn(fn.name, scope)(scope)(...resolvedArgs);
 };
 
-const evalRuleSet = (ruleSet, parent) => {
+const evalRuleSet = async (ruleSet, parent) => {
   assert(ruleSet.type === "RuleSet");
 
   if (!parent) {
@@ -107,9 +109,9 @@ const evalRuleSet = (ruleSet, parent) => {
     return null;
   }
   const lastRule = rules.pop();
-  rules.forEach((rule) => {
-    evalRule(rule, scope);
-  });
+  for (const rule of rules) {
+    await evalRule(rule, scope);
+  }
   return evalRule(lastRule, scope);
 };
 

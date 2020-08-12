@@ -2,7 +2,7 @@
 
 const test = require("ava");
 
-const { evalAsyncRule, evalAsyncRuleSet, getNewScope } = require("..");
+const { evalAsyncRuleSet, getNewScope } = require("..");
 
 /*test("visit", async (t) => {
   await evalAsyncRule(
