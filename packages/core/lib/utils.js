@@ -25,11 +25,11 @@ const stringify = (jsValue) => {
 const help = ({ resolveFn, scope, functions, key }) => {
   if (!key) {
     Object.keys(functions).forEach((key) => {
-      console.log(`${key.padEnd(20)} -\t${functions[key]}\n`);
+      console.log(`${key.padEnd(10)} -\t${functions[key]}\n`);
     });
   } else {
     if (functions[key]) {
-      console.log(`${key.padEnd(20)} -\t${functions[key]}\n`);
+      console.log(`${key.padEnd(10)} -\t${functions[key]}\n`);
       return;
     }
   }

@@ -39,9 +39,6 @@ if (argv.web) {
       output: process.stdout,
     });
 
-    // const webScope = getWebScope();
-    // webScope.parent.parent = scope.parent;
-
     const rep = () => {
       rl.question("> ", async (stmt) => {
         const r = parser.grammar.match(stmt, "Rule");

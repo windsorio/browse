@@ -2,28 +2,14 @@
 
 const test = require("ava");
 
-const { evalAsyncRuleSet, getNewScope } = require("..");
-
-/*test("visit", async (t) => {
-  await evalAsyncRule(
-    {
-      type: "Rule",
-      fn: { type: "Word", name: "visit" },
-      args: [
-        { type: "Literal", value: "https://en.wikipedia.org/wiki/%22Hello,_World!%22_program" },
-      ],
-    },
-    getNewScope()
-  );
-  t.pass();
-});*/
+const { evalRuleSet, getNewScope } = require("@browselang/core");
+const getWebScope = require("..");
 
 const press = (key) => ({
   type: "Rule",
   fn: { type: "Word", name: "press" },
   args: [{ type: "Literal", value: key }],
 });
-
 const wait = (value) => ({
   type: "Rule",
   fn: { type: "Word", name: "wait" },
@@ -112,12 +98,12 @@ test("page", async (t) => {
     args: [{ type: "Literal", value: "https://tinder.com" }],
   };
 
-  const res = await evalAsyncRuleSet(
+  const res = await evalRuleSet(
     {
       type: "RuleSet",
       rules: [page, visit],
     },
-    getNewScope()
+    getWebScope(getNewScope())
   );
   console.log(res);
   t.pass();

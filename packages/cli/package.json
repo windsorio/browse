@@ -8,9 +8,6 @@
   ],
   "author": "Windsor Team <oss@windsor.io>",
   "homepage": "https://github.com/windsorio/browse#readme",
-  "scripts": {
-    "web-cli": "yarn node --no-warnings bin/web_cli.js"
-  },
   "license": "MIT",
   "main": "lib/index.js",
   "bin": {

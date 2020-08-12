@@ -78,7 +78,7 @@ const evalExpr = async (expr, scope) => {
  * Evaluate the `rule` in the given `scope`
  * @param {Rule} rule The rule to evaluate
  * @param {Scope} scope The scope in which to evaluate the rule
- * @returns JS return value or retVal. Can be a promise
+ * @returns JS return value from the rule. Can be a promise
  */
 const evalRule = async (rule, scope) => {
   assert(rule.type === "Rule");
@@ -87,6 +87,7 @@ const evalRule = async (rule, scope) => {
 
   const resolvedArgs = [];
   if (args) {
+    // Should be evaluated in series, let to right. Cannot do Promise.all here
     for (const arg of args) {
       resolvedArgs.push(await evalExpr(arg, scope));
     }

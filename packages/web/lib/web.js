@@ -84,10 +84,9 @@ const getWebScope = (parent) => ({
           }));
       };
 
-      const newPage = await browser.newPage();
-      scope.internal.page = newPage;
-
-      await newPage.goto(href);
+      const page = scope.internal.page || (await browser.newPage());
+      scope.internal.page = page;
+      await page.goto(href);
 
       const matchingDefs = scanPageDefs(href);
 
