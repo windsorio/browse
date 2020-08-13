@@ -21,8 +21,9 @@ const parser = require("@browselang/parser");
 const {
   evalRule,
   getNewScope,
-  stringify,
   evalRuleSet,
+  stringify,
+  stringifyError,
 } = require("@browselang/core");
 
 let scope = getNewScope();
@@ -46,10 +47,9 @@ if (argv.web) {
           const n = parser.semantics(r);
           if (n.errors.length > 0) {
             process.stderr.write(
-              "\u001b[31;1m" +
-                "Parse Error: " +
-                n.errors[0].message +
-                "\u001b[0m"
+              stringifyError(new Error(n.errors[0].message), {
+                color: process.stderr.isTTY,
+              })
             );
           } else {
             try {
@@ -57,12 +57,19 @@ if (argv.web) {
               process.stdout.write("\u001b[32m" + out + "\u001b[0m");
             } catch (e) {
               process.stderr.write(
-                "\u001b[31;1m" + "Runtime Error: " + e.message + "\u001b[0m"
+                stringifyError(e, {
+                  document: "repl",
+                  color: process.stderr.isTTY,
+                })
               );
             }
           }
         } else {
-          process.stderr.write("\u001b[31;1m" + r.shortMessage + "\u001b[0m");
+          process.stderr.write(
+            stringifyError(new Error(r.shortMessage), {
+              color: process.stderr.isTTY,
+            })
+          );
         }
         process.stdout.write("\n");
         rep();
@@ -70,7 +77,8 @@ if (argv.web) {
     };
     rep();
   } else {
-    const code = fs.readFileSync(path.resolve(process.cwd(), script), "utf8");
+    const document = path.resolve(process.cwd(), script);
+    const code = fs.readFileSync(document, "utf8");
     if (!code) {
       console.log(`Could not find any browse code at ${script}`);
     }
@@ -79,12 +87,14 @@ if (argv.web) {
     if (r.succeeded()) {
       const n = parser.semantics(r);
       if (n.errors.length > 0) {
-        process.stderr.write("\u001b[31;1m");
         n.errors.forEach((err) => {
-          process.stderr.write(err[0].message);
+          process.stderr.write(
+            stringifyError(new Error(err.message), {
+              color: process.stderr.isTTY,
+            })
+          );
           process.stderr.write("\n");
         });
-        process.stderr.write("\u001b[0m");
       } else {
         try {
           await evalRuleSet(
@@ -95,16 +105,26 @@ if (argv.web) {
             scope
           );
         } catch (e) {
-          process.stderr.write("\u001b[31;1m");
-          process.stderr.write(e.message);
-          process.stderr.write("\u001b[0m");
+          process.stderr.write(
+            stringifyError(e, {
+              /*
+              TODO: Support multi-file stack traces (across imports)
+              BODY: document should be extracted from the AST so we can support multi-file stack traces
+              */
+              document,
+              snippet: true,
+              color: process.stderr.isTTY,
+            })
+          );
           process.stderr.write("\n");
         }
       }
     } else {
-      process.stderr.write("\u001b[31;1m");
-      process.stderr.write(r.shortMessage);
-      process.stderr.write("\u001b[0m");
+      process.stderr.write(
+        stringifyError(new Error(r.shortMessage), {
+          color: process.stderr.isTTY,
+        })
+      );
       process.stderr.write("\n");
     }
   }

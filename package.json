@@ -6,7 +6,8 @@
   "license": "MIT",
   "scripts": {
     "format:prettier": "pretty-quick",
-    "format": "yarn format:prettier"
+    "format": "yarn format:prettier",
+    "browse": "yarn node packages/cli/bin/index.js"
   },
   "workspaces": [
     "packages/*"

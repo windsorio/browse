@@ -1,5 +1,9 @@
 page https://windsor.io {
+  click input
   wait 2000
+  click input
+  type test@windsor.io
+  click `.signup-button`
 }
 
 visit https://windsor.io

@@ -1,46 +1,61 @@
+const { BrowseError } = require("./error");
+
 /**
- * Recurseivlely find a function matching the name by walking up the scope/environment inheritance chain
- * @param {string} name The function/rule name
+ * Recursively find a function matching the name by walking up the scope/environment inheritance chain
+ * @param {string | Word} name The function/rule name or Word AST node
  * @param {Scope} scope The scope to use
  */
 const resolveFn = (name, scope) => {
+  const varName = typeof name === "string" ? name : name.name;
   if (!scope) {
-    throw new Error(`Function '${name}' is not defined`);
+    throw new BrowseError({
+      message: `Function '${varName}' is not defined`,
+      node: typeof name === "string" ? null : name,
+    });
   }
-  if (scope.fns[name]) {
-    return scope.fns[name];
-  } else {
-    return resolveFn(name, scope.parent);
+  if (scope.fns[varName]) {
+    return scope.fns[varName];
   }
+
+  return resolveFn(name, scope.parent);
 };
 
 /**
- * Recurseivlely find a variable matching the name by walking up the scope/environment inheritance chain
- * @param {string} name The variable name
+ * Recursively find a variable matching the name by walking up the scope/environment inheritance chain
+ * @param {string | Ident} name The variable name
  * @param {Scope} scope The scope to use
  */
 const resolveVar = (name, scope) => {
+  const varName = typeof name === "string" ? name : name.name;
   if (!scope) {
-    throw new Error(`Variable '${name}' is not defined`);
+    throw new BrowseError({
+      message: `Variable '${varName}' is not defined`,
+      node: typeof name === "string" ? null : name,
+    });
   }
-  if (scope.vars[name] !== undefined) {
-    return scope.vars[name];
-  } else {
-    return resolveVar(name, scope.parent);
+
+  if (scope.vars[varName] !== undefined) {
+    return scope.vars[varName];
   }
+
+  return resolveVar(name, scope.parent);
 };
 
 /**
- * Recurseivlely find a function matching the name by walking up the scope/environment inheritance
+ * Recursively find a function matching the name by walking up the scope/environment inheritance
  * chain and return the containing scope, not the function
- * @param {string} name The function name
+ * @param {string | Word} name The function name
  * @param {Scope} scope The scope to use
  */
 const resolveFnScope = (name, scope) => {
+  const varName = typeof name === "string" ? name : name.name;
   if (!scope) {
-    throw new Error(`Function '${name}' is not defined`);
+    throw new BrowseError({
+      message: `Function '${varName}' is not defined`,
+      node: typeof name === "string" ? null : name,
+    });
   }
-  if (scope.fns[name]) {
+  if (scope.fns[varName]) {
     return scope;
   } else {
     return resolveFnScope(name, scope.parent);
@@ -48,16 +63,20 @@ const resolveFnScope = (name, scope) => {
 };
 
 /**
- * Recurseivlely find a variable matching the name by walking up the scope/environment inheritance
+ * Recursively find a variable matching the name by walking up the scope/environment inheritance
  * chain and return the containing scope, not the value
- * @param {string} name The variable name
+ * @param {string | Ident} name The variable name
  * @param {Scope} scope The scope to use
  */
 const resolveVarScope = (name, scope) => {
+  const varName = typeof name === "string" ? name : name.name;
   if (!scope) {
-    throw new Error(`Variable '${name}' is not defined`);
+    throw new BrowseError({
+      message: `Variable '${varName}' is not defined`,
+      node: typeof name === "string" ? null : name,
+    });
   }
-  if (scope.vars[name]) {
+  if (scope.vars[varName]) {
     return scope;
   } else {
     return resolveVarScope(name, scope.parent);
@@ -65,7 +84,7 @@ const resolveVarScope = (name, scope) => {
 };
 
 /**
- * Recurseivlely find an internal variable matching the name by walking up the scope/environment inheritance chain
+ * Recursively find an internal variable matching the name by walking up the scope/environment inheritance chain
  * @param {string} name The variable name
  * @param {Scope} scope The scope to use
  * @param {any => boolean} predicate An optional predicate with which to test the resolved value
@@ -82,7 +101,7 @@ const resolveInternal = (name, scope, predicate = () => true) => {
 };
 
 /**
- * Recurseivlely find an internal variable matching the name by walking up the scope/environment inheritance chain
+ * Recursively find an internal variable matching the name by walking up the scope/environment inheritance chain
  * and return the scope instead of the value itself
  * @param {string} name The variable name
  * @param {Scope} scope The scope to use

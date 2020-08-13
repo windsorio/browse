@@ -1968,7 +1968,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./packages/core/",
           "packageDependencies": [
             ["@browselang/core", "workspace:packages/core"],
-            ["ava", "npm:3.11.1"]
+            ["ava", "npm:3.11.1"],
+            ["ohm-js", "npm:0.14.0"]
           ],
           "linkType": "SOFT",
         }]
