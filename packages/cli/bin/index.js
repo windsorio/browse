@@ -21,8 +21,9 @@ const parser = require("@browselang/parser");
 const {
   evalRule,
   getNewScope,
-  stringify,
   evalRuleSet,
+  stringify,
+  stringifyError,
 } = require("@browselang/core");
 
 let scope = getNewScope();
@@ -57,7 +58,10 @@ if (argv.web) {
               process.stdout.write("\u001b[32m" + out + "\u001b[0m");
             } catch (e) {
               process.stderr.write(
-                "\u001b[31;1m" + "Runtime Error: " + e.message + "\u001b[0m"
+                stringifyError(e, {
+                  document: "repl",
+                  color: process.stderr.isTTY,
+                })
               );
             }
           }
@@ -70,7 +74,8 @@ if (argv.web) {
     };
     rep();
   } else {
-    const code = fs.readFileSync(path.resolve(process.cwd(), script), "utf8");
+    const document = path.resolve(process.cwd(), script);
+    const code = fs.readFileSync(document, "utf8");
     if (!code) {
       console.log(`Could not find any browse code at ${script}`);
     }
@@ -95,9 +100,17 @@ if (argv.web) {
             scope
           );
         } catch (e) {
-          process.stderr.write("\u001b[31;1m");
-          process.stderr.write(e.message);
-          process.stderr.write("\u001b[0m");
+          process.stderr.write(
+            stringifyError(e, {
+              /*
+              TODO: 
+              BODY: document should be extracted from the AST so we can support multi-file stack traces
+              */
+              document,
+              snippet: true,
+              color: process.stderr.isTTY,
+            })
+          );
           process.stderr.write("\n");
         }
       }

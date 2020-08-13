@@ -4,6 +4,7 @@ const getSTD = require("./std");
 const assert = require("assert");
 const { stringify } = require("./utils");
 const { resolveFn, resolveVar } = require("./scope");
+const { BrowseError, stringifyError } = require("./error");
 
 const getNewScope = (parent) => {
   if (!parent) {
@@ -24,7 +25,7 @@ const evalExpr = async (expr, scope) => {
     case "Literal":
       return expr.value;
     case "Ident":
-      return resolveVar(expr.name, scope);
+      return resolveVar(expr, scope);
     case "RuleSet":
       return expr;
     case "RuleExpr":
@@ -36,7 +37,10 @@ const evalExpr = async (expr, scope) => {
         case "-":
           return -(await evalExpr(expr.expr, scope));
         default:
-          throw new Error(`Invalid unary operator '${op}'`);
+          throw new BrowseError({
+            message: `Invalid unary operator '${expr.op}'`,
+            node: expr,
+          });
       }
     case "BinExpr":
       const l = await evalExpr(expr.left, scope);
@@ -65,12 +69,26 @@ const evalExpr = async (expr, scope) => {
         case "==":
           return l === r;
         case "!==":
-          throw new Error(`'!==' is not supported. Use '!=' instead`);
+          throw new BrowseError({
+            message: `'!==' is not supported. Use '!=' instead`,
+            node: expr,
+          });
         case "===":
-          throw new Error(`'===' is not supported. Use '==' instead`);
+          throw new BrowseError({
+            message: `'===' is not supported. Use '==' instead`,
+            node: expr,
+          });
         default:
-          throw new Error(`Invalid binary operator '${op}'`);
+          throw new BrowseError({
+            message: `Invalid unary operator '${expr.op}'`,
+            node: expr,
+          });
       }
+    default:
+      throw new BrowseError({
+        message: `Invalid Expression Type'${expr.type}'`,
+        node: expr,
+      });
   }
 };
 
@@ -92,7 +110,11 @@ const evalRule = async (rule, scope) => {
       resolvedArgs.push(await evalExpr(arg, scope));
     }
   }
-  return resolveFn(fn.name, scope)(scope)(...resolvedArgs);
+  return Promise.resolve(resolveFn(fn, scope)(scope)(...resolvedArgs)).catch(
+    (err) => {
+      throw BrowseError.from(err, fn);
+    }
+  );
 };
 
 const evalRuleSet = async (ruleSet, parent) => {
@@ -111,9 +133,15 @@ const evalRuleSet = async (ruleSet, parent) => {
   }
   const lastRule = rules.pop();
   for (const rule of rules) {
-    await evalRule(rule, scope);
+    try {
+      await evalRule(rule, scope);
+    } catch (err) {
+      throw BrowseError.from(err, ruleSet);
+    }
   }
-  return evalRule(lastRule, scope);
+  return evalRule(lastRule, scope).catch((err) => {
+    throw BrowseError.from(err, ruleSet);
+  });
 };
 
 module.exports = {
@@ -121,4 +149,5 @@ module.exports = {
   evalRule,
   evalRuleSet,
   stringify,
+  stringifyError,
 };

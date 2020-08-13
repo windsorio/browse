@@ -18,3 +18,31 @@ test("print", async (t) => {
   );
   t.pass();
 });
+
+test("Unknown Operator", async (t) => {
+  await evalRule(
+    {
+      type: "Rule",
+      fn: { type: "Word", name: "print" },
+      args: [
+        {
+          type: "UnaryExpr",
+          op: "~",
+          expr: null,
+        },
+      ],
+    },
+    getNewScope()
+  );
+});
+
+test("undefined variable", async (t) => {
+  await evalRule(
+    {
+      type: "Rule",
+      fn: { type: "Word", name: "print" },
+      args: [{ type: "Ident", name: "x" }],
+    },
+    getNewScope()
+  );
+});
