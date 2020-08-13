@@ -91,6 +91,8 @@ const getWebScope = (parent) => ({
         });
       } catch (e) {}
 
+      console.log("Visit Matches", match);
+
       if (match) {
         // Generate a new page scope with the same page
         const pageScope = getPageScope(scope);
@@ -100,6 +102,7 @@ const getWebScope = (parent) => ({
         // TODO: support multple matching definitions
         // Really this should be a promise race or something similar
         // For now we just use the first RuleSet
+        console.log("Evaluating", match.ruleSet);
         await evalRuleSet(match.ruleSet, pageScope);
 
         // TODO: check if the url has changed? If so, recurse and execute and necessary `pageDef` functions
