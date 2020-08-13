@@ -110,11 +110,16 @@ const evalRule = async (rule, scope) => {
       resolvedArgs.push(await evalExpr(arg, scope));
     }
   }
-  return Promise.resolve(resolveFn(fn, scope)(scope)(...resolvedArgs)).catch(
-    (err) => {
-      throw BrowseError.from(err, fn);
-    }
-  );
+  try {
+    // It's possible for the fn call itself to throw in the case that it's not async
+    // This try...catch will handle that, and also any errors from a rejected promise
+    const promise = Promise.resolve(
+      resolveFn(fn, scope)(scope)(...resolvedArgs)
+    );
+    return await promise;
+  } catch (err) {
+    throw BrowseError.from(err, fn);
+  }
 };
 
 const evalRuleSet = async (ruleSet, parent) => {

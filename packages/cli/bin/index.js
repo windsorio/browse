@@ -47,10 +47,9 @@ if (argv.web) {
           const n = parser.semantics(r);
           if (n.errors.length > 0) {
             process.stderr.write(
-              "\u001b[31;1m" +
-                "Parse Error: " +
-                n.errors[0].message +
-                "\u001b[0m"
+              stringifyError(new Error(n.errors[0].message), {
+                color: process.stderr.isTTY,
+              })
             );
           } else {
             try {
@@ -66,7 +65,11 @@ if (argv.web) {
             }
           }
         } else {
-          process.stderr.write("\u001b[31;1m" + r.shortMessage + "\u001b[0m");
+          process.stderr.write(
+            stringifyError(new Error(r.shortMessage), {
+              color: process.stderr.isTTY,
+            })
+          );
         }
         process.stdout.write("\n");
         rep();
@@ -84,12 +87,14 @@ if (argv.web) {
     if (r.succeeded()) {
       const n = parser.semantics(r);
       if (n.errors.length > 0) {
-        process.stderr.write("\u001b[31;1m");
         n.errors.forEach((err) => {
-          process.stderr.write(err[0].message);
+          process.stderr.write(
+            stringifyError(new Error(err.message), {
+              color: process.stderr.isTTY,
+            })
+          );
           process.stderr.write("\n");
         });
-        process.stderr.write("\u001b[0m");
       } else {
         try {
           await evalRuleSet(
@@ -103,7 +108,7 @@ if (argv.web) {
           process.stderr.write(
             stringifyError(e, {
               /*
-              TODO: 
+              TODO: Support multi-file stack traces (across imports)
               BODY: document should be extracted from the AST so we can support multi-file stack traces
               */
               document,
@@ -115,9 +120,11 @@ if (argv.web) {
         }
       }
     } else {
-      process.stderr.write("\u001b[31;1m");
-      process.stderr.write(r.shortMessage);
-      process.stderr.write("\u001b[0m");
+      process.stderr.write(
+        stringifyError(new Error(r.shortMessage), {
+          color: process.stderr.isTTY,
+        })
+      );
       process.stderr.write("\n");
     }
   }

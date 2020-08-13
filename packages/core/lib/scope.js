@@ -65,7 +65,7 @@ const resolveFnScope = (name, scope) => {
 /**
  * Recursively find a variable matching the name by walking up the scope/environment inheritance
  * chain and return the containing scope, not the value
- * @param {string} name The variable name
+ * @param {string | Ident} name The variable name
  * @param {Scope} scope The scope to use
  */
 const resolveVarScope = (name, scope) => {

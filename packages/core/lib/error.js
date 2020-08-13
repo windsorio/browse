@@ -11,15 +11,16 @@ class BrowseError extends Error {
     this.name = "BrowseError";
     this.node = node;
     this.message = message;
-    this.stack = [];
+    this.astStack = [];
     if (node) {
-      this.stack.push({ node, source: node.source });
+      this.astStack.push({ node, source: node.source });
     }
   }
 
   static from(err, node = null) {
     if (err instanceof BrowseError) {
-      err.stack.push({
+      err.node = err.node || node;
+      err.astStack.push({
         node,
         source: node ? node.source : null,
       });
@@ -56,7 +57,7 @@ function stringifyError(err, opts = {}) {
 
     if (!opts.short) {
       opts.color && (msg += DIM);
-      err.stack.forEach(({ node, source }, i) => {
+      err.astStack.forEach(({ node, source }, i) => {
         let nodeName = "<...>";
         if (node) {
           switch (node.type) {
@@ -77,7 +78,7 @@ function stringifyError(err, opts = {}) {
 
           msg += `\tat ${nodeName} (${docment}:${pos.lineNum}:${pos.colNum})`;
         } else {
-          if (i < err.stack.length - 1) {
+          if (i < err.astStack.length - 1) {
             // This only needs to appear in between the stack trace
             // it's useless if it's the last line
             msg += `\tat ${nodeName} (${docment})`;
