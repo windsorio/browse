@@ -1,9 +1,4 @@
-const {
-  resolveFn,
-  resolveFnScope,
-  resolveVar,
-  resolveVarScope,
-} = require("./scope");
+const { resolveFn, resolveFnScope, resolveVar } = require("./scope");
 const { help, stringify } = require("./utils");
 
 const get = (scope) => (name) => resolveVar(name, scope);

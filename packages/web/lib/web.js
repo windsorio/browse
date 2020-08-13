@@ -1,7 +1,7 @@
 "use strict";
 
 const puppeteer = require("puppeteer");
-const { getNewScope, evalRuleSet } = require("@browselang/core");
+const { evalRuleSet } = require("@browselang/core");
 const {
   resolveInternal,
   resolveFn,
@@ -73,8 +73,8 @@ const getWebScope = (parent) => ({
       await page.goto(href);
 
       // Check if any pageDefs exist and execute them if found
+      let match = null;
       try {
-        let match = null;
         resolveInternal("pageDefs", scope, (defs) => {
           if (match || !defs) return false; // match already found
 
@@ -89,24 +89,24 @@ const getWebScope = (parent) => ({
           }
           return !!match;
         });
-
-        if (match) {
-          // Generate a new page scope with the same page
-          const pageScope = getPageScope(scope);
-          pageScope.internal.page = await browser.newPage();
-          await pageScope.internal.page.goto(href);
-
-          // TODO: support multple matching definitions
-          // Really this should be a promise race or something similar
-          // For now we just use the first RuleSet
-          await evalRuleSet(match.ruleSet, pageScope);
-
-          // TODO: check if the url has changed? If so, recurse and execute and necessary `pageDef` functions
-
-          // Finally, close the page
-          pageScope.internal.page.close();
-        }
       } catch (e) {}
+
+      if (match) {
+        // Generate a new page scope with the same page
+        const pageScope = getPageScope(scope);
+        pageScope.internal.page = await browser.newPage();
+        await pageScope.internal.page.goto(href);
+
+        // TODO: support multple matching definitions
+        // Really this should be a promise race or something similar
+        // For now we just use the first RuleSet
+        await evalRuleSet(match.ruleSet, pageScope);
+
+        // TODO: check if the url has changed? If so, recurse and execute and necessary `pageDef` functions
+
+        // Finally, close the page
+        pageScope.internal.page.close();
+      }
 
       return href;
     },
