@@ -97,12 +97,14 @@ semantics.addAttribute("asAST", {
     return {
       type: "RuleExpr",
       expr: e.asAST,
+      source: this.source,
     };
   },
   PriExpr_paren: function (_l, e, _r) {
     return {
       type: "Paren",
       expr: e.asAST,
+      source: this.source,
     };
   },
 
@@ -111,6 +113,7 @@ semantics.addAttribute("asAST", {
       type: "UnaryExpr",
       op: "!",
       expr: e.asAST,
+      source: this.source,
     };
   },
   UnaryExpr_neg: function (_, e) {
@@ -118,6 +121,7 @@ semantics.addAttribute("asAST", {
       type: "UnaryExpr",
       op: "-",
       expr: e.asAST,
+      source: this.source,
     };
   },
 
@@ -127,6 +131,7 @@ semantics.addAttribute("asAST", {
       op: "*",
       left: l.asAST,
       right: r.asAST,
+      source: this.source,
     };
   },
   MultExpr_div: function (l, _, r) {
@@ -135,6 +140,7 @@ semantics.addAttribute("asAST", {
       op: "/",
       left: l.asAST,
       right: r.asAST,
+      source: this.source,
     };
   },
   MultExpr_mod: function (l, _, r) {
@@ -143,6 +149,7 @@ semantics.addAttribute("asAST", {
       op: "%",
       left: l.asAST,
       right: r.asAST,
+      source: this.source,
     };
   },
   AddExpr_add: function (l, _, r) {
@@ -151,6 +158,7 @@ semantics.addAttribute("asAST", {
       op: "+",
       left: l.asAST,
       right: r.asAST,
+      source: this.source,
     };
   },
   AddExpr_sub: function (l, _, r) {
@@ -159,6 +167,7 @@ semantics.addAttribute("asAST", {
       op: "-",
       left: l.asAST,
       right: r.asAST,
+      source: this.source,
     };
   },
   CompExpr_ge: function (l, _, r) {
@@ -167,6 +176,7 @@ semantics.addAttribute("asAST", {
       op: ">=",
       left: l.asAST,
       right: r.asAST,
+      source: this.source,
     };
   },
   CompExpr_le: function (l, _, r) {
@@ -175,6 +185,7 @@ semantics.addAttribute("asAST", {
       op: "<=",
       left: l.asAST,
       right: r.asAST,
+      source: this.source,
     };
   },
   CompExpr_gt: function (l, _, r) {
@@ -183,6 +194,7 @@ semantics.addAttribute("asAST", {
       op: ">",
       left: l.asAST,
       right: r.asAST,
+      source: this.source,
     };
   },
   CompExpr_lt: function (l, _, r) {
@@ -191,6 +203,7 @@ semantics.addAttribute("asAST", {
       op: "<",
       left: l.asAST,
       right: r.asAST,
+      source: this.source,
     };
   },
   EqExpr_ne: function (l, _, r) {
@@ -199,6 +212,7 @@ semantics.addAttribute("asAST", {
       op: "!=",
       left: l.asAST,
       right: r.asAST,
+      source: this.source,
     };
   },
   EqExpr_eq: function (l, _, r) {
@@ -207,6 +221,7 @@ semantics.addAttribute("asAST", {
       op: "==",
       left: l.asAST,
       right: r.asAST,
+      source: this.source,
     };
   },
 
@@ -215,6 +230,7 @@ semantics.addAttribute("asAST", {
       type: "Rule",
       fn: w.asAST,
       args: es.asAST,
+      source: this.source,
     };
   },
   Rules: function (_nl, first, _rs, rest, _s) {
@@ -224,12 +240,14 @@ semantics.addAttribute("asAST", {
     return {
       type: "RuleSet",
       rules: r.asAST,
+      source: this.source,
     };
   },
   RuleSet_empty(_l, _r) {
     return {
       type: "RuleSet",
       rules: [],
+      source: this.source,
     };
   },
 
@@ -237,18 +255,21 @@ semantics.addAttribute("asAST", {
     return {
       type: "Literal",
       value: null,
+      source: this.source,
     };
   },
   booleanLiteral: function (_) {
     return {
       type: "Literal",
       value: this.sourceString === "true" ? true : false,
+      source: this.source,
     };
   },
   numericLiteral: function (_) {
     return {
       type: "Literal",
       value: Number(this.sourceString),
+      source: this.source,
     };
   },
 
@@ -256,30 +277,35 @@ semantics.addAttribute("asAST", {
     return {
       type: "Literal",
       value: c.sourceString,
+      source: this.source,
     };
   },
   stringLiteral_singleQuote: function (l, c, _r) {
     return {
       type: "Literal",
       value: c.sourceString,
+      source: this.source,
     };
   },
   stringLiteral_cssSelector: function (l, c, _r) {
     return {
       type: "Literal",
       value: c.sourceString,
+      source: this.source,
     };
   },
   stringLiteral_javascript: function (l, c, _r) {
     return {
       type: "Literal",
       value: c.sourceString,
+      source: this.source,
     };
   },
   stringLiteral_implicit: function (_f, _r) {
     return {
       type: "Literal",
       value: this.sourceString,
+      source: this.source,
     };
   },
 
@@ -287,12 +313,14 @@ semantics.addAttribute("asAST", {
     return {
       type: "Word",
       name: this.sourceString,
+      source: this.source,
     };
   },
   identifier: function (_, _name) {
     return {
       type: "Ident",
       name: _name.sourceString,
+      source: this.source,
     };
   },
 
