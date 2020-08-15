@@ -16,6 +16,24 @@ const isDocker = require("is-docker");
 
 const getPageScope = require("./page");
 
+const newBrowser = async () => {
+  return await puppeteer.launch({
+  headless: true,
+  ...(isDocker()
+    ? {
+        args: [
+          // Required for Docker version of Puppeteer
+          "--no-sandbox",
+          "--disable-setuid-sandbox",
+          // This will write shared memory files into /tmp instead of /dev/shm,
+          // because Docker’s default for /dev/shm is 64MB
+          "--disable-dev-shm-usage",
+        ],
+      }
+    : {}),
+  });
+}
+
 /**
  * A scope containing all the web-scraping functions and variables
  */
@@ -78,36 +96,12 @@ const getBrowserScope = (parent) => ({
       resolveInternal("pageDefs", scope)[finalPattern] = {
         matcher: new UrlPattern(finalPattern),
         ruleSet: rulesets[0],
+        parent: scope,
       };
       return null;
     },
+    //On visit, the current scope doesn't matter, only the scope of the rule that was matched
     visit: (scope) => async (href) => {
-      const nearestWebScope = resolveInternalScope("browser", scope);
-      const nearestPageScope = resolveInternalScope("page", scope);
-
-      let browser = nearestWebScope.internal.browser;
-      if (!browser) {
-        browser = nearestWebScope.internal.browser = await puppeteer.launch({
-          headless: true,
-          ...(isDocker()
-            ? {
-                args: [
-                  // Required for Docker version of Puppeteer
-                  "--no-sandbox",
-                  "--disable-setuid-sandbox",
-                  // This will write shared memory files into /tmp instead of /dev/shm,
-                  // because Docker’s default for /dev/shm is 64MB
-                  "--disable-dev-shm-usage",
-                ],
-              }
-            : {}),
-        });
-      }
-
-      const page = nearestPageScope.internal.page || (await browser.newPage());
-      nearestPageScope.internal.page = page;
-      await page.goto(href);
-
       // Check if any pageDefs exist and execute them if found
       let match = null;
       try {
@@ -116,11 +110,12 @@ const getBrowserScope = (parent) => ({
 
           // TODO: Make this determinisitic
           for (const key in defs) {
-            const { matcher, ruleSet } = defs[key];
+            const { matcher, ruleSet, parent } = defs[key];
             const matchObj = matcher.match(href.split("?")[0]);
             if (matchObj) {
               const urlObj = url.parse(href);
               match = {
+                parent,
                 ruleSet,
                 path: matchObj,
                 query: urlObj.query || null,
@@ -133,8 +128,33 @@ const getBrowserScope = (parent) => ({
       } catch (e) {}
 
       if (match) {
+        const nearestBrowserScope = resolveInternalScope(
+          "browser",
+          match.parent
+        );
+        const nearestPageScope = resolveInternalScope("page", match.parent);
+
+	let browser = nearestBrowserScope.internal.browser;;
+
+        if (!browser) {
+          browser = nearestBrowserScope.internal.browser = await newBrowser();
+        }
+
+        const page =
+          nearestPageScope.internal.page || (await browser.newPage());
+
+        nearestPageScope.internal.page = page;
+        try {
+          await page.goto(href);
+        } catch (e) {
+          throw new BrowseError({
+            message: `Failed to goto url ${href}:: ${e.message}`,
+            node: null,
+          });
+        }
+
         // Generate a new page scope with the same page
-        const pageScope = getPageScope(scope);
+        const pageScope = getPageScope(match.parent);
         // inject args and "url" as variables
         Object.assign(pageScope.vars, match.path, {
           url: href,
@@ -144,7 +164,15 @@ const getBrowserScope = (parent) => ({
 
         // Navigate to the page
         pageScope.internal.page = await browser.newPage();
-        await pageScope.internal.page.goto(href);
+
+        try {
+          await pageScope.internal.page.goto(href);
+        } catch (e) {
+          throw new BrowseError({
+            message: `Failed to goto url ${href}`,
+            node: null,
+          });
+        }
 
         // TODO: support multple matching definitions
         await evalRuleSet(match.ruleSet, pageScope);
@@ -164,6 +192,32 @@ const getBrowserScope = (parent) => ({
 
         // Finally, close the page
         pageScope.internal.page.close();
+      } else {
+        //If there were no matches, we just go to the href from the current scope. (NOTE: I still don't like this solution because it special cases 'no matches'. This can be an issue, for instance, when crawling to a bunch of urls that don't match a page call. Instead
+        const nearestBrowserScope = resolveInternalScope("browser", scope);
+        const nearestPageScope = resolveInternalScope("page", scope);
+
+        let browser = nearestBrowserScope.internal.browser;
+        if (!browser) {
+          browser = nearestBrowserScope.internal.browser = await puppeteer.launch(
+            {
+              headless: false,
+            }
+          );
+        }
+
+        const page =
+          nearestPageScope.internal.page || (await browser.newPage());
+
+        nearestPageScope.internal.page = page;
+        try {
+          await page.goto(href);
+        } catch (e) {
+          throw new BrowseError({
+            message: `Failed to goto url ${href}`,
+            node: null,
+          });
+        }
       }
 
       return href;

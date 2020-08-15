@@ -121,7 +121,9 @@ if (argv.web) {
             },
             scope
           );
+          console.log("Rule set evaluated");
         } catch (e) {
+          console.log(e);
           process.stderr.write(
             stringifyError(e, {
               /*

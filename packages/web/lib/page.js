@@ -5,6 +5,7 @@ const {
   resolveFn,
   resolveFnScope,
 } = require("@browselang/core/lib/scope");
+const { evalRule } = require("@browselang/core");
 const { help } = require("@browselang/core/lib/utils");
 
 /**
@@ -39,6 +40,20 @@ const getPageScope = (parent) => ({
       return null;
     },
     "@string": (scope) => async (key, selector) => {
+      const value = await scope.internal.page.$eval(
+        selector,
+        (el) => el.textContent
+      );
+      if (value === null) {
+        throw new BrowseError({
+          message: `Element given to @string call had no text content (Did you mean to use @string?)`,
+          node: null,
+        });
+      }
+      scope.internal.data[key] = value;
+      return value;
+    },
+    "@string?": (scope) => async (key, selector) => {
       const value = await scope.internal.page.$eval(
         selector,
         (el) => el.textContent
@@ -83,10 +98,7 @@ const getPageScope = (parent) => ({
       return value;
     },
     "@url": (scope) => async (key, selector) => {
-      const value = await scope.internal.page.$eval(
-        selector,
-        (el) => el.href || el.textContent
-      );
+      const value = await scope.internal.page.$eval(selector, (el) => el.href);
       if (value === null) {
         console.warn(
           `WARNING:: No value found for @url call with key ${key}, the value will be set to null`
@@ -103,13 +115,21 @@ const getPageScope = (parent) => ({
       await page.click(selector);
       return true;
     },
-    screenshot: (scope) => async (fname) => {
+    config: (scope) => async () => {},
+    crawl: (scope) => async (selector) => {
       const page = resolveInternal("page", scope);
-      if (!page) {
-        return false;
-      }
-      await page.screenshot({ path: fname });
-      return true;
+      const urls = await page.$$eval(selector, (elArr) =>
+        elArr.map((el) => el.href).filter(Boolean)
+      );
+
+      const ruleNodes = urls.map((url) => ({
+        type: "Rule",
+        fn: { type: "Word", name: "visit" },
+        args: [{ type: "Literal", value: url }],
+      }));
+
+      await Promise.all(ruleNodes.map((ruleNode) => evalRule(ruleNode, scope)));
+      return value;
     },
     press: (scope) => async (key) => {
       const page = resolveInternal("page", scope);
@@ -117,6 +137,14 @@ const getPageScope = (parent) => ({
         return false;
       }
       await page.keyboard.press(key);
+      return true;
+    },
+    screenshot: (scope) => async (fname) => {
+      const page = resolveInternal("page", scope);
+      if (!page) {
+        return false;
+      }
+      await page.screenshot({ path: fname });
       return true;
     },
     type: (scope) => async (...values) => {
