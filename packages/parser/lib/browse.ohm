@@ -51,7 +51,7 @@ Browse {
   word (a word) = ~reservedWord wordName
   wordName = wordStart wordPart*
 
-  wordStart = letter | "_" 
+  wordStart = letter | "_" | "@"
             | "\\" unicodeEscapeSequence -- escaped
   wordPart = wordStart | unicodeCombiningMark
             | unicodeDigit | unicodeConnectorPunctuation
