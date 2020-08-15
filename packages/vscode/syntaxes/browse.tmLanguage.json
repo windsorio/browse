@@ -1,0 +1,227 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "browse",
+  "patterns": [
+    {
+      "include": "#comments"
+    },
+    {
+      "include": "#rule-continuation"
+    },
+    {
+      "include": "#rule"
+    }
+  ],
+  "repository": {
+    "rule-continuation": {
+      "match": "[})\\|]([^;{\\n]*)",
+      "captures": {
+        "1": {
+          "patterns": [
+            {
+              "include": "#comments"
+            },
+            {
+              "include": "#nil"
+            },
+            {
+              "include": "#bool"
+            },
+            {
+              "include": "#number"
+            },
+            {
+              "include": "#identifier"
+            },
+            {
+              "include": "#strings"
+            },
+            {
+              "include": "#operators"
+            }
+          ]
+        }
+      }
+    },
+    "rule": {
+      "match": "([a-zA-Z_@][a-zA-Z_@\\?\\d]*)([^;{\\n]*)",
+      "captures": {
+        "1": {
+          "name": "entity.name.function",
+          "patterns": [
+            {
+              "include": "#builtins"
+            }
+          ]
+        },
+        "2": {
+          "patterns": [
+            {
+              "include": "#comments"
+            },
+            {
+              "include": "#nil"
+            },
+            {
+              "include": "#bool"
+            },
+            {
+              "include": "#number"
+            },
+            {
+              "include": "#identifier"
+            },
+            {
+              "include": "#strings"
+            },
+            {
+              "include": "#operators"
+            }
+          ]
+        }
+      }
+    },
+    "operators": {
+      "name": "keyword.operator.browse",
+      "match": "\\!|-|\\*|/|%|\\+|>=|<=|>|<|\\!=|=="
+    },
+    "builtins": {
+      "patterns": [
+        {
+          "name": "keyword.control.browse",
+          "match": "\\b(if|for|fun|return|bind)\\b"
+        },
+        {
+          "name": "storage.type.browse",
+          "match": "\\b(set|get)\\b"
+        },
+        {
+          "name": "keyword.other.browse",
+          "match": "\\b(print|help|scope)\\b"
+        }
+      ]
+    },
+
+    "nil": {
+      "name": "constant.language.browse",
+      "match": "\\bnil\\b"
+    },
+    "bool": {
+      "name": "constant.language.browse",
+      "match": "\\b(true|false)\\b"
+    },
+    "number": {
+      "name": "constant.numeric.browse",
+      "match": "(\\d+\\.\\d*|\\.?\\d+)(e[+-]?\\d+)?"
+    },
+
+    "identifier": {
+      "name": "variable.other.browse",
+      "match": "\\$[a-zA-Z_@][a-zA-Z_@\\?\\d]*"
+    },
+
+    "strings": {
+      "patterns": [
+        {
+          "include": "#dstrings"
+        },
+        {
+          "include": "#sstrings"
+        },
+        {
+          "include": "#cssselector"
+        },
+        {
+          "include": "#multilinestring"
+        },
+        {
+          "include": "#implicitstring"
+        }
+      ]
+    },
+    "dstrings": {
+      "name": "string.quoted.single.browse",
+      "begin": "'",
+      "end": "'",
+      "patterns": [
+        {
+          "include": "#escape"
+        }
+      ]
+    },
+    "sstrings": {
+      "name": "string.quoted.double.browse",
+      "begin": "\"",
+      "end": "\"",
+      "patterns": [
+        {
+          "include": "#escape"
+        }
+      ]
+    },
+    "cssselector": {
+      "name": "string.quoted.other.browse",
+      "begin": "`",
+      "end": "`",
+      "patterns": [
+        {
+          "include": "source.css#selector"
+        },
+        {
+          "include": "#escape"
+        }
+      ]
+    },
+    "multilinestring": {
+      "begin": "\\|",
+      "end": "\\|",
+      "name": "string.quoted.other.browse",
+      "patterns": [
+        {
+          "include": "#escape"
+        }
+      ]
+    },
+    "implicitstring": {
+      "name": "string.unquoted.browse",
+      "begin": "[a-zA-Z]",
+      "end": "[ ;\\n]",
+      "patterns": [
+        {
+          "include": "#escape"
+        }
+      ]
+    },
+    "escape": {
+      "name": "constant.character.escape.browse",
+      "match": "\\\\(u....|x..|\\d{2, 3}|.)"
+    },
+
+    "comments": {
+      "patterns": [
+        {
+          "begin": "(^[ \\t]+)?(?=#)",
+          "beginCaptures": {
+            "1": {
+              "name": "punctuation.whitespace.comment.leading"
+            }
+          },
+          "end": "(?!\\G)",
+          "patterns": [
+            {
+              "begin": "#",
+              "beginCaptures": {
+                "0": {
+                  "name": "comment.line"
+                }
+              },
+              "end": "\\n",
+              "name": "comment.line.number-sign"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "scopeName": "source.browse"
+}
