@@ -35,6 +35,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         "reference": "workspace:packages/parser"
       },
       {
+        "name": "browse-vscode",
+        "reference": "workspace:packages/vscode"
+      },
+      {
         "name": "@browselang/web",
         "reference": "workspace:packages/web"
       }
@@ -46,7 +50,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       ["@browselang/core", ["workspace:packages/core"]],
       ["@browselang/parser", ["workspace:packages/parser"]],
       ["@browselang/web", ["workspace:packages/web"]],
-      ["browse", ["workspace:."]]
+      ["browse", ["workspace:."]],
+      ["browse-vscode", ["workspace:packages/vscode"]]
     ],
     "fallbackPool": [
       [
@@ -360,6 +365,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       [
         "braces",
         "npm:3.0.2"
+      ],
+      [
+        "browse-vscode",
+        "workspace:packages/vscode"
       ],
       [
         "buffer",
@@ -1527,7 +1536,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       ],
       [
         "resolve-from",
-        "npm:5.0.0"
+        "npm:4.0.0"
       ],
       [
         "responselike",
@@ -2880,6 +2889,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["pretty-quick", "virtual:ba367005dcc9e642f796e835097ee3914c50b5006fc81536b5959222ce2d330fa4f015850afa3048322d4f62f170d2e2a22164b26fa2fb88c9d85009081bd469#npm:2.0.1"],
             ["tslib", "npm:1.13.0"],
             ["typescript", "patch:typescript@npm%3A3.9.7#builtin<compat/typescript>::version=3.9.7&hash=5b02a2"]
+          ],
+          "linkType": "SOFT",
+        }]
+      ]],
+      ["browse-vscode", [
+        ["workspace:packages/vscode", {
+          "packageLocation": "./packages/vscode/",
+          "packageDependencies": [
+            ["browse-vscode", "workspace:packages/vscode"]
           ],
           "linkType": "SOFT",
         }]

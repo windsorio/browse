@@ -138,7 +138,7 @@ Browse {
                         | lineContinuation                                -- lineContinuation
   javascriptCharacter = ~("|" | "\\") sourceCharacter 					          -- nonEscaped
                         | "\\" escapeSequence                             -- escaped
-  implicitStringStart = ~"$" letter
+  implicitStringStart = ~"$" ~"@" letter
   implicitStringPart
                     = ~(whitespace | ";" | "\\" | lineTerminator) sourceCharacter 	  -- nonEscaped
                     | "\\" escapeSequence                                 -- escaped

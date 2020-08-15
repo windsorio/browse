@@ -1,0 +1,54 @@
+{
+  "name": "browse-vscode",
+  "displayName": "browse",
+  "private": true,
+  "description": "Add VSCode support for the browse language",
+  "icon": "images/square.png",
+  "version": "0.0.3",
+  "preview": true,
+  "publisher": "pranaygp",
+  "author": "Windsor Team <oss@windsor.io>",
+  "homepage": "https://github.com/windsorio/browse#readme",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/windsorio/browse"
+  },
+  "bugs": {
+    "url": "https://github.com/windsorio/browse/issues"
+  },
+  "engines": {
+    "vscode": "^1.48.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "keywords": [
+    "browse",
+    "browselang",
+    "syntax highlighting",
+    "multi-root ready"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "browse",
+        "extensions": [
+          ".browse"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "browse",
+        "scopeName": "source.browse",
+        "path": "./syntaxes/browse.tmLanguage.json",
+        "embeddedLanguages": {
+          "meta.embedded.block.css": "css",
+          "meta.embedded.block.javascript": "javascript"
+        }
+      }
+    ]
+  }
+}
