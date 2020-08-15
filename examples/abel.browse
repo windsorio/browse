@@ -1,0 +1,22 @@
+set start https://www.thegazette.co.uk/all-notices/notice?text=&categorycode-all=all&noticetypes=&location-postcode-1=&location-distance-1=1&location-local-authority-1=&numberOfLocationSearches=1&start-publish-date=01%2F01%2F1665&end-publish-date=01%2F12%2F1800&edition=&london-issue=&edinburgh-issue=&belfast-issue=&sort-by=&results-page-size=10
+
+page $start {
+  crawl `article div header h3.title a`
+  crawl `li.next a`
+}
+
+page https://www.thegazette.co.uk/:_/issue/:_/page/:page {
+  config {
+    set output "/home/abel/notices/" + $page + ".txt"
+  }
+
+  @string title `h1.title`
+  @string? date `dd time`
+  @number issue `#issue-number`
+}
+
+visit $start
+
+for { set i 2; test i < 5; set i $i+1 } {
+  visit https://www.thegazette.co.uk/London/issue/ + $i + "/page/2"
+}
