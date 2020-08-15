@@ -88,6 +88,7 @@ __metadata:
     puppeteer: ^5.2.1
     puppeteer-core: 5.2.1
     selenium-webdriver: 4.0.0-alpha.7
+    url-pattern: 1.0.3
   languageName: unknown
   linkType: soft
 
@@ -4614,6 +4615,13 @@ typescript@3.9.7:
   dependencies:
     prepend-http: ^2.0.0
   checksum: 334817036b300c35023798b8ceac23ea61b51f231a867112e3a85778d65191a3ccb67e7b69b608d45433d55da392cf0d72cd3c85f2542f6ec34733e455c229d5
+  languageName: node
+  linkType: hard
+
+"url-pattern@npm:1.0.3":
+  version: 1.0.3
+  resolution: "url-pattern@npm:1.0.3"
+  checksum: 55e1c22dbebfa67329e70159eda837b7c92df672ca4651931c1c9a205fde569b19656fbda35668eb2c0f0fab4c04f24af6850740092dc5d69eb897eeb439b000
   languageName: node
   linkType: hard
 

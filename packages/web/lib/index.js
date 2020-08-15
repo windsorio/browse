@@ -1,6 +1,6 @@
 "use strict";
 
 const getPageScope = require("./page");
-const getWebScope = require("./web");
+const getBrowserScope = require("./browser");
 
-module.exports = (parent) => getPageScope(getWebScope(parent));
+module.exports = (parent) => getPageScope(getBrowserScope(parent));

@@ -42,6 +42,7 @@
     "chromedriver": "84.0.1",
     "puppeteer": "^5.2.1",
     "puppeteer-core": "5.2.1",
-    "selenium-webdriver": "4.0.0-alpha.7"
+    "selenium-webdriver": "4.0.0-alpha.7",
+    "url-pattern": "1.0.3"
   }
 }

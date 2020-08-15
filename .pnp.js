@@ -1527,7 +1527,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       ],
       [
         "resolve-from",
-        "npm:4.0.0"
+        "npm:5.0.0"
       ],
       [
         "responselike",
@@ -1798,6 +1798,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         "npm:3.0.0"
       ],
       [
+        "url-pattern",
+        "npm:1.0.3"
+      ],
+      [
         "util-deprecate",
         "npm:1.0.2"
       ],
@@ -1999,7 +2003,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["chromedriver", "npm:84.0.1"],
             ["puppeteer", "npm:5.2.1"],
             ["puppeteer-core", "npm:5.2.1"],
-            ["selenium-webdriver", "npm:4.0.0-alpha.7"]
+            ["selenium-webdriver", "npm:4.0.0-alpha.7"],
+            ["url-pattern", "npm:1.0.3"]
           ],
           "linkType": "SOFT",
         }]
@@ -7052,6 +7057,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [
             ["url-parse-lax", "npm:3.0.0"],
             ["prepend-http", "npm:2.0.0"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["url-pattern", [
+        ["npm:1.0.3", {
+          "packageLocation": "./.yarn/cache/url-pattern-npm-1.0.3-de6c5ab8c2-55e1c22dbe.zip/node_modules/url-pattern/",
+          "packageDependencies": [
+            ["url-pattern", "npm:1.0.3"]
           ],
           "linkType": "HARD",
         }]

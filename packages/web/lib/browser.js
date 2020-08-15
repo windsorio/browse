@@ -1,5 +1,6 @@
 "use strict";
 
+const url = require("url");
 const puppeteer = require("puppeteer");
 const { evalRuleSet } = require("@browselang/core");
 const {
@@ -9,21 +10,15 @@ const {
   resolveInternalScope,
 } = require("@browselang/core/lib/scope");
 const { help } = require("@browselang/core/lib/utils");
+const UrlPattern = require("url-pattern");
+const { BrowseError } = require("@browselang/core/lib/error");
 
 const getPageScope = require("./page");
-
-// TODO: We need to figure out how we're going to do regex as part of a URL where a lot of the characters are meant to be literals.
-// Alredy tried 'escape' and the like. The issue is that, for instance, 'space' being converted to multiple characters actually significantly effects the regex matching. For now we will ignore most regex characters.
-// Exluding (*, +, ., (, and ) )
-// My solution would be to implement a limited regex specifically for browse to drastically reduce collisions between regex characters and url characters. The few remaining collisions could be escaped.
-// Alternatively we could define a regex transformer where ' *' for instance would be replaced with (%20)* and then we could use escape with traditional regex
-const genRegex = (string) =>
-  new RegExp(string.replace(/[\-?^${}|[\]\\]/g, "\\$&"), "g");
 
 /**
  * A scope containing all the web-scraping functions and variables
  */
-const getWebScope = (parent) => ({
+const getBrowserScope = (parent) => ({
   parent,
   vars: {},
   internal: {
@@ -48,13 +43,33 @@ const getWebScope = (parent) => ({
       });
       return null;
     },
-    page: (scope) => (hrefRegex, ...rulesets) => {
+    page: (scope) => (pattern, ...rulesets) => {
       if (rulesets.length > 1) {
         console.warn("Only one ruleset is currently supported");
       }
 
-      // We now have a rule for this href Regex so we push it
-      resolveInternal("pageDefs", scope)[hrefRegex] = rulesets[0];
+      const urlObj = url.parse(pattern);
+
+      if (!urlObj || !urlObj.host) {
+        throw new BrowseError({
+          message: `'${pattern}' is not a valid URL pattern`,
+          node: null,
+        });
+      }
+
+      let finalPattern = "http(s)\\://";
+      finalPattern += urlObj.host;
+      if (urlObj.port) {
+        finalPattern += "\\:" + urlObj.port;
+      }
+      if (urlObj.pathname) {
+        finalPattern += urlObj.pathname; // this can contain ":" which goes back into a new urlpattern
+      }
+
+      resolveInternal("pageDefs", scope)[finalPattern] = {
+        matcher: new UrlPattern(finalPattern),
+        ruleSet: rulesets[0],
+      };
       return null;
     },
     visit: (scope) => async (href) => {
@@ -78,14 +93,16 @@ const getWebScope = (parent) => ({
         resolveInternal("pageDefs", scope, (defs) => {
           if (match || !defs) return false; // match already found
 
-          // TODO: Make this determinisitic, find a better way to do escaping
-          // Scan the page definitions for all regex that match the href
-          match = Object.keys(defs).find((r) => genRegex(r).test(href)) || null;
-          if (match) {
-            match = {
-              name: match,
-              ruleSet: defs[match],
-            };
+          // TODO: Make this determinisitic
+          for (const key in defs) {
+            const { matcher, ruleSet } = defs[key];
+            const matchObj = matcher.match(href.split("?")[0]);
+            if (matchObj) {
+              match = {
+                ruleSet,
+                args: matchObj,
+              };
+            }
           }
           return !!match;
         });
@@ -94,15 +111,17 @@ const getWebScope = (parent) => ({
       if (match) {
         // Generate a new page scope with the same page
         const pageScope = getPageScope(scope);
+        // inject args and "url" as variables
+        Object.assign(pageScope, match.args, { url: href });
+
+        // Navigate to the page
         pageScope.internal.page = await browser.newPage();
         await pageScope.internal.page.goto(href);
 
         // TODO: support multple matching definitions
-        // Really this should be a promise race or something similar
-        // For now we just use the first RuleSet
         await evalRuleSet(match.ruleSet, pageScope);
 
-        // TODO: check if the url has changed? If so, recurse and execute and necessary `pageDef` functions
+        // TODO: check if the url has changed? If so, recurse and execute the necessary `page` rule
 
         // Finally, close the page
         pageScope.internal.page.close();
@@ -113,4 +132,4 @@ const getWebScope = (parent) => ({
   },
 });
 
-module.exports = getWebScope;
+module.exports = getBrowserScope;

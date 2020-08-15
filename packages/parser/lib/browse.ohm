@@ -53,8 +53,9 @@ Browse {
 
   wordStart = letter | "_" | "@"
             | "\\" unicodeEscapeSequence -- escaped
-  wordPart = wordStart | unicodeCombiningMark
-            | unicodeDigit | unicodeConnectorPunctuation
+  wordPart = wordStart | "?" 
+            | unicodeCombiningMark | unicodeDigit
+            | unicodeConnectorPunctuation
             | "\u200C" | "\u200D"
   letter += unicodeCategoryNl
   
