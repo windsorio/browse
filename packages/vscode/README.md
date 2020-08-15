@@ -1,4 +1,4 @@
-<img src="images/full.png" width=400 />
+<img src="./images/full.png" width=400 />
 
 This extension adds support for the Browse language to VSCode
 
