@@ -57,6 +57,14 @@ const getBrowserScope = (parent) => ({
         });
       }
 
+      // validate that the path does not contain :url
+      if (urlObj.pathname && /:(url|query|hash)/.test(urlObj.pathname)) {
+        throw new BrowseError({
+          message: `The pattern cannot contain :url, :query or :hash. $url, $query and $hash are automatically set when evaluating the page RuleSet`,
+          node: null,
+        });
+      }
+
       let finalPattern = "http(s)\\://";
       finalPattern += urlObj.host;
       if (urlObj.port) {
@@ -98,9 +106,12 @@ const getBrowserScope = (parent) => ({
             const { matcher, ruleSet } = defs[key];
             const matchObj = matcher.match(href.split("?")[0]);
             if (matchObj) {
+              const urlObj = url.parse(href);
               match = {
                 ruleSet,
-                args: matchObj,
+                path: matchObj,
+                query: urlObj.query || null,
+                hash: urlObj.hash || null,
               };
             }
           }
@@ -112,7 +123,11 @@ const getBrowserScope = (parent) => ({
         // Generate a new page scope with the same page
         const pageScope = getPageScope(scope);
         // inject args and "url" as variables
-        Object.assign(pageScope, match.args, { url: href });
+        Object.assign(pageScope.vars, match.path, {
+          url: href,
+          hash: match.hash,
+          query: match.query,
+        });
 
         // Navigate to the page
         pageScope.internal.page = await browser.newPage();
