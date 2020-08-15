@@ -3,14 +3,15 @@
   "displayName": "browse",
   "private": true,
   "description": "Add VSCode support for the browse language",
-  "version": "0.0.1",
+  "icon": "images/square.png",
+  "version": "0.0.2",
   "publisher": "pranaygp",
   "author": "Windsor Team <oss@windsor.io>",
   "homepage": "https://github.com/windsorio/browse#readme",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/windsorio/browse.git"
+    "url": "https://github.com/windsorio/browse"
   },
   "bugs": {
     "url": "https://github.com/windsorio/browse/issues"
@@ -20,6 +21,12 @@
   },
   "categories": [
     "Programming Languages"
+  ],
+  "keywords": [
+    "browse",
+    "browselang",
+    "syntax highlighting",
+    "multi-root ready"
   ],
   "contributes": {
     "languages": [
