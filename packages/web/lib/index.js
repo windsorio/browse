@@ -1,6 +1,9 @@
 "use strict";
 
 const getPageScope = require("./page");
-const getWebScope = require("./web");
+const { getWebScope, destroyWebScope } = require("./web");
 
-module.exports = (parent) => getPageScope(getWebScope(parent));
+module.exports = {
+  getWebScope: (parent) => getPageScope(getWebScope(parent)),
+  destroyWebScope,
+};

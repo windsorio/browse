@@ -113,7 +113,31 @@ const getWebScope = (parent) => ({
 
       return href;
     },
+    waitForSelectors: (scope) => async (ruleset) => {
+      console.log("Ruleset", ruleset);
+      const rules = [].concat(
+        ...ruleset.value.rules.map((rule) => {
+          if ("click" === rule.fn.name) {
+            const wait = {
+              type: "Rule",
+              fn: { type: "Word", name: "wait" },
+              args: [{ type: "Literal", value: rule.args.value }],
+            };
+            return [wait, rule];
+          }
+          return [rule];
+        })
+      );
+      console.log("RTN", rules);
+      return { type: "RuleSet", rules };
+    },
   },
 });
 
-module.exports = getWebScope;
+const destroyWebScope = (scope) => {
+  if (scope.internal.browser) {
+    scope.internal.browser.close();
+  }
+};
+
+module.exports = { getWebScope, destroyWebScope };

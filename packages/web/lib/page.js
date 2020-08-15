@@ -40,10 +40,17 @@ const getPageScope = (parent) => ({
       });
       return null;
     },
-    click: (scope) => async (selector) => {
+    click: (scope) => async (selector, wait = false) => {
       const page = resolveInternal("page", scope);
       if (!page) {
         return false;
+      }
+      console.log("Executing Click");
+      console.log("Wait:", wait);
+      if (wait) {
+        console.log("Waiting ...");
+        await page.waitFor(selector);
+        console.log("Waited");
       }
       await page.click(selector);
       return true;

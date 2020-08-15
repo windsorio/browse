@@ -81,11 +81,11 @@ const evalExpr = async (expr, scope) => {
  * @returns JS return value from the rule. Can be a promise
  */
 const evalRule = async (rule, scope) => {
-  console.log("Evaluating", rule);
   assert(rule.type === "Rule");
   const { fn, args } = rule;
   assert(fn.type === "Word");
 
+  console.log("Evaluating Rule", rule);
   const resolvedArgs = [];
   if (args) {
     // Should be evaluated in series, let to right. Cannot do Promise.all here
@@ -99,18 +99,12 @@ const evalRule = async (rule, scope) => {
 const evalRuleSet = async (ruleSet, parent) => {
   assert(ruleSet.type === "RuleSet");
 
-  console.log("Started Fn");
   if (!parent) {
     parent = getSTD({ evalRuleSet, getNewScope });
   }
 
-  console.log("Parent Set");
-
   const { rules: oRules } = ruleSet;
   const rules = [...oRules]; // Don't want to modify the original rules
-
-  console.log("Copied Rules");
-  console.log("Rules", rules);
 
   const scope = getNewScope(parent);
   if (!rules.length) {
