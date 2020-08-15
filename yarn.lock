@@ -865,7 +865,7 @@ __metadata:
   resolution: "browse@workspace:."
   dependencies:
     "@yarnpkg/pnpify": ^2.0.0-rc.22
-    husky: ^4.2.5
+    husky: 4.2.5
     prettier: 2.0.5
     pretty-quick: 2.0.1
     tslib: ^1.11.1
@@ -2204,7 +2204,7 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"husky@npm:^4.2.5":
+"husky@npm:4.2.5":
   version: 4.2.5
   resolution: "husky@npm:4.2.5"
   dependencies:
