@@ -38,6 +38,18 @@ const getPageScope = (parent) => ({
       });
       return null;
     },
+    "@string": (scope) => async (key, selector) => {
+      const value = await data.internal.page.select(selector);
+      scope.internal.data[key] = value;
+    },
+    "@number": (scope) => async (key, selector) => {
+      const value = await data.internal.page.select(selector);
+      scope.internal.data[key] = value;
+    },
+    "@url": (scope) => async (key, selector) => {
+      const value = await data.internal.page.select(selector);
+      scope.internal.data[key] = value;
+    },
     click: (scope) => async (selector) => {
       const page = resolveInternal("page", scope);
       if (!page) {

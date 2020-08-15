@@ -150,6 +150,17 @@ const getBrowserScope = (parent) => ({
         await evalRuleSet(match.ruleSet, pageScope);
 
         // TODO: check if the url has changed? If so, recurse and execute the necessary `page` rule
+        const data = pageScope.internal.data;
+        if (Object.keys(data).length) {
+          if (data.url) {
+            console.warn(
+              "WARNING:: Setting the url key using a data function will override the default url key (See docs <https://....>)"
+            );
+          }
+          data.url = href;
+          console.log(JSON.stringify(data));
+        }
+        // TODO: check if the url has changed? If so, recurse and execute and necessary `pageDef` functions
 
         // Finally, close the page
         pageScope.internal.page.close();
