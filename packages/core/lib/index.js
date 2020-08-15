@@ -8,7 +8,7 @@ const { BrowseError, stringifyError } = require("./error");
 
 const getNewScope = (parent) => {
   if (!parent) {
-    parent = getSTD({ evalRuleSet, getNewScope });
+    parent = getSTD({ evalRule, evalRuleSet, getNewScope });
   }
   return {
     fns: {},
@@ -126,7 +126,7 @@ const evalRuleSet = async (ruleSet, parent) => {
   assert(ruleSet.type === "RuleSet");
 
   if (!parent) {
-    parent = getSTD({ evalRuleSet, getNewScope });
+    parent = getSTD({ evalRule, evalRuleSet, getNewScope });
   }
 
   const { rules: oRules } = ruleSet;

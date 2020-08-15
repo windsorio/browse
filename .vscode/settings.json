@@ -10,5 +10,6 @@
   "editor.detectIndentation": false,
   "editor.tabSize": 2,
   "python.formatting.provider": "black",
-  "typescript.enablePromptUseWorkspaceTsdk": true
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "python.pythonPath": "/usr/local/bin/python3"
 }

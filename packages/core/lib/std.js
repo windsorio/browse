@@ -10,7 +10,7 @@ const set = (scope) => (name, value) => {
 /**
  * The root scope that contains all the basic/standard functions and variables
  */
-module.exports = ({ evalRuleSet, getNewScope }) => ({
+module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
   parent: null, // This is the root
   vars: {},
   internal: {},
@@ -90,10 +90,66 @@ module.exports = ({ evalRuleSet, getNewScope }) => ({
         }
       }
 
+      const bodyScope = getNewScope(scope);
       if (cond) {
-        return evalRuleSet(thenRS, scope);
+        return evalRuleSet(thenRS, bodyScope);
       } else {
-        return evalRuleSet(elseRS, scope);
+        return evalRuleSet(elseRS, bodyScope);
+      }
+    },
+    for: (scope) => async (iterator, body) => {
+      if (!iterator || iterator.type !== "RuleSet") {
+        throw new Error(
+          'Second argument to "for" should be a RuleSet containing the iteration criteria'
+        );
+      }
+      if (!body || body.type !== "RuleSet") {
+        throw new Error(
+          'Third argument to "for" should be a RuleSet containing the body of the loop'
+        );
+      }
+
+      const loopScope = getNewScope(scope);
+      loopScope.fns.test = (_) => (expr) => (!!expr ? true : false);
+
+      // Prepare the iterator
+      const iteratorRules = [...iterator.rules];
+      const firstRule = iteratorRules.shift();
+      const lastRule = iteratorRules.pop();
+
+      // run the initialization rule
+      try {
+        await evalRule(firstRule, loopScope);
+      } catch (err) {
+        throw BrowseError.from(err, iterator);
+      }
+
+      while (true) {
+        let finished = false;
+        // run the iterator tests
+        for (const rule of iteratorRules) {
+          let result;
+          try {
+            result = await evalRule(rule, loopScope);
+          } catch (err) {
+            throw BrowseError.from(err, iterator);
+          }
+          if (rule.fn.name === "test" && !result) {
+            finished = true; // ends the loop
+          }
+        }
+
+        if (finished) break;
+
+        // Run the body
+        await evalRuleSet(body, loopScope);
+
+        // Run the post-iteration rule
+        try {
+          await evalRule(lastRule, loopScope);
+        } catch (err) {
+          throw BrowseError.from(err, iterator);
+        }
       }
     },
   },

@@ -4,8 +4,11 @@
 
 const fs = require("fs");
 const path = require("path");
-const { argv } = require("yargs")
+const yargs = require("yargs");
+
+const { argv } = yargs
   .alias("v", "version")
+  .completion("completion", "Generate a completion script for bash or zsh")
   .command("$0 [script]", "Run browse", (yargs) => {
     yargs.option("web", {
       type: "boolean",
@@ -14,8 +17,12 @@ const { argv } = require("yargs")
   })
   .help("h")
   .alias("h", "help");
-
 const { script } = argv;
+
+if (script === "completion") {
+  yargs.showCompletionScript();
+  process.exit(0);
+}
 
 const parser = require("@browselang/parser");
 const {

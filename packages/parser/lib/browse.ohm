@@ -65,7 +65,7 @@ Browse {
   keyword = break    | do        | instanceof | typeof
           | case     | new        | var
           | catch    | finally   | void
-          | continue | for       | switch     | while
+          | continue | switch     | while
           | debugger | function  | this       | with
           | default  | throw
           | delete   | in        | try
