@@ -6,7 +6,7 @@ const {
   resolveFnScope,
   resolveInternalScope,
 } = require("@browselang/core/lib/scope");
-const { evalRule } = require("@browselang/core");
+const { evalRule, evalRuleSet } = require("@browselang/core");
 const { help } = require("@browselang/core/lib/utils");
 
 /**
@@ -18,6 +18,7 @@ const getPageScope = (parent) => ({
   internal: {
     page: null,
     data: {},
+    config: {},
   },
   fns: {
     help: (scope) => (key) => {
@@ -126,7 +127,31 @@ const getPageScope = (parent) => ({
       await page.click(selector);
       return true;
     },
-    config: (scope) => async () => {},
+    config: (scope) => async (ruleset) => {
+      console.log("Setting Config");
+      //Override the set behavior
+      const oldSet = scope.fns.set;
+      scope.fns.set = (scope) => (name, value) => {
+        const nearestPageScope = resolveInternalScope("page", scope);
+        if (nearestPageScope) {
+          nearestPageScope.internal.config[name] = value;
+        } else {
+          throw new BrowseError({
+            message: `config was called outside a page scope`,
+            node: null,
+          });
+        }
+      };
+      //Evaluate the ruleset
+      await evalRuleSet(ruleset, scope);
+      if (oldSet !== undefined) {
+        scope.fns.set = oldSet;
+      } else {
+        delete scope.fns.set;
+      }
+      const nearestPageScope = resolveInternalScope("page", scope);
+      return nearestPageScope.internal.config;
+    },
     crawl: (scope) => async (selector) => {
       const page = resolveInternal("page", scope);
       const urls = await page.$$eval(selector, (elArr) =>

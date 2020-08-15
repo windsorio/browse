@@ -1,4 +1,5 @@
 "use strict";
+const fs = require("fs-extra");
 
 const url = require("url");
 const puppeteer = require("puppeteer");
@@ -106,7 +107,6 @@ const getBrowserScope = (parent) => ({
       };
       return null;
     },
-    //On visit, the current scope doesn't matter, only the scope of the rule that was matched
     visit: (scope) => async (href) => {
       // Check if any pageDefs exist and execute them if found
       let match = null;
@@ -135,7 +135,7 @@ const getBrowserScope = (parent) => ({
 
       if (match) {
         /*
-         * Get the nearest lexical browers/page scopes
+         * Get the nearest lexical browers scope
          */
         const nearestBrowserScope = resolveInternalScope(
           "browser",
@@ -184,15 +184,37 @@ const getBrowserScope = (parent) => ({
             );
           }
           data.url = href;
-          console.log(JSON.stringify(data));
+          let out;
+          try {
+            //TODO, resolve should return a boolean so we don't have to try catch. users of resolve should throw the errors
+            const config = resolveInternal(
+              "config",
+              newPageScope,
+              (config) => !!config.output
+            );
+            out = config.output;
+            console.log("Got Config");
+          } catch (e) {
+            out = console.log;
+            console.log("Didn't get Config", e);
+          }
+
+          if (typeof out === "string") {
+            //TODO: Keep open, only close when out of scope
+            fs.ensureFileSync(out);
+
+            const fd = fs.openSync(out, "a");
+            fs.appendFileSync(out, JSON.stringify(data) + "\n");
+            fs.closeSync(fd);
+          } else {
+            out(JSON.stringify(data));
+          }
         }
         // TODO: check if the url has changed? If so, recurse and execute and necessary `pageDef` functions
 
         // Finally, close the page
         newPageScope.internal.page.close();
       } else {
-        console.log("No match");
-
         //Get the nearest browser scope from the callstack (not lexically)
         //NOTE: We might want to change this when we have multiple browser scopes
         const nearestBrowserScope = resolveInternalScope("browser", scope);
