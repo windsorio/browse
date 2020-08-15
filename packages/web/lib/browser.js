@@ -33,6 +33,12 @@ const newBrowser = async () => {
     : {}),
   });
 }
+const go = async (page, href) => {
+  return page.goto(href, {
+    timeout: 25000,
+    waitUntil: "networkidle2",
+  });
+};
 
 /**
  * A scope containing all the web-scraping functions and variables
@@ -128,24 +134,37 @@ const getBrowserScope = (parent) => ({
       } catch (e) {}
 
       if (match) {
+        /*
+         * Get the nearest lexical browers/page scopes
+         */
         const nearestBrowserScope = resolveInternalScope(
           "browser",
           match.parent
         );
-        const nearestPageScope = resolveInternalScope("page", match.parent);
 
-	let browser = nearestBrowserScope.internal.browser;;
-
+        //If there is no browser create one
+        let browser = nearestBrowserScope.internal.browser;
         if (!browser) {
           browser = nearestBrowserScope.internal.browser = await newBrowser();
         }
 
-        const page =
-          nearestPageScope.internal.page || (await browser.newPage());
+        //Create a new page scope in the same scope that the page rule was created in
+        const newPageScope = getPageScope(match.parent);
 
-        nearestPageScope.internal.page = page;
+        //Give the new page scope a fresh tab
+        const page = await browser.newPage();
+        newPageScope.internal.page = page;
+
+        // inject args and "url" as variables into the new page scope
+        Object.assign(newPageScope.vars, match.path, {
+          url: href,
+          hash: match.hash,
+          query: match.query,
+        });
+
+        //Navigate to the url
         try {
-          await page.goto(href);
+          await go(page, href);
         } catch (e) {
           throw new BrowseError({
             message: `Failed to goto url ${href}:: ${e.message}`,
@@ -153,32 +172,11 @@ const getBrowserScope = (parent) => ({
           });
         }
 
-        // Generate a new page scope with the same page
-        const pageScope = getPageScope(match.parent);
-        // inject args and "url" as variables
-        Object.assign(pageScope.vars, match.path, {
-          url: href,
-          hash: match.hash,
-          query: match.query,
-        });
-
-        // Navigate to the page
-        pageScope.internal.page = await browser.newPage();
-
-        try {
-          await pageScope.internal.page.goto(href);
-        } catch (e) {
-          throw new BrowseError({
-            message: `Failed to goto url ${href}`,
-            node: null,
-          });
-        }
-
         // TODO: support multple matching definitions
-        await evalRuleSet(match.ruleSet, pageScope);
+        await evalRuleSet(match.ruleSet, newPageScope);
 
         // TODO: check if the url has changed? If so, recurse and execute the necessary `page` rule
-        const data = pageScope.internal.data;
+        const data = newPageScope.internal.data;
         if (Object.keys(data).length) {
           if (data.url) {
             console.warn(
@@ -191,12 +189,16 @@ const getBrowserScope = (parent) => ({
         // TODO: check if the url has changed? If so, recurse and execute and necessary `pageDef` functions
 
         // Finally, close the page
-        pageScope.internal.page.close();
+        newPageScope.internal.page.close();
       } else {
-        //If there were no matches, we just go to the href from the current scope. (NOTE: I still don't like this solution because it special cases 'no matches'. This can be an issue, for instance, when crawling to a bunch of urls that don't match a page call. Instead
-        const nearestBrowserScope = resolveInternalScope("browser", scope);
-        const nearestPageScope = resolveInternalScope("page", scope);
+        console.log("No match");
 
+        //Get the nearest browser scope from the callstack (not lexically)
+        //NOTE: We might want to change this when we have multiple browser scopes
+        const nearestBrowserScope = resolveInternalScope("browser", scope);
+
+        //If the nearest browser scope doesn't exist, then create a browser at the top level
+        //NOTE: This is pretty dependent on the current scope structure
         let browser = nearestBrowserScope.internal.browser;
         if (!browser) {
           browser = nearestBrowserScope.internal.browser = await puppeteer.launch(
@@ -206,12 +208,17 @@ const getBrowserScope = (parent) => ({
           );
         }
 
-        const page =
-          nearestPageScope.internal.page || (await browser.newPage());
+        //Create a new page scope from the nearest browser scope (based on call stack)
+        //NOTE:: Might want to change this later
+        const newPageScope = getPageScope(nearestBrowserScope);
 
-        nearestPageScope.internal.page = page;
+        //Give the new page scope a fresh tab
+        const page = await browser.newPage();
+        newPageScope.internal.page = page;
+
+        //Navigate to the fresh page
         try {
-          await page.goto(href);
+          await go(page, href);
         } catch (e) {
           throw new BrowseError({
             message: `Failed to goto url ${href}`,

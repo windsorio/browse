@@ -4,6 +4,7 @@ const {
   resolveInternal,
   resolveFn,
   resolveFnScope,
+  resolveInternalScope,
 } = require("@browselang/core/lib/scope");
 const { evalRule } = require("@browselang/core");
 const { help } = require("@browselang/core/lib/utils");
@@ -40,7 +41,7 @@ const getPageScope = (parent) => ({
       return null;
     },
     "@string": (scope) => async (key, selector) => {
-      const value = await scope.internal.page.$eval(
+      const value = await resolveInternal("page", scope).$eval(
         selector,
         (el) => el.textContent
       );
@@ -50,11 +51,12 @@ const getPageScope = (parent) => ({
           node: null,
         });
       }
-      scope.internal.data[key] = value;
+      const nearestPageScope = resolveInternalScope("page", scope);
+      nearestPageScope.internal.data[key] = value;
       return value;
     },
     "@string?": (scope) => async (key, selector) => {
-      const value = await scope.internal.page.$eval(
+      const value = await resolveInternal("page", scope).$eval(
         selector,
         (el) => el.textContent
       );
@@ -63,24 +65,28 @@ const getPageScope = (parent) => ({
           `WARNING:: No value found for @string call with key ${key}, the value will be set to null`
         );
       }
-      scope.internal.data[key] = value;
+      const nearestPageScope = resolveInternalScope("page", scope);
+      nearestPageScope.internal.data[key] = value;
       return value;
     },
     "@number": (scope) => async (key, selector) => {
-      const value = await scope.internal.page.$eval(selector, (el) => {
-        if (el.textContent || el.innerText) {
-          let num = null;
-          if (el.textContent) {
-            num = Number(el.textContent);
+      const value = await resolveInternal("page", scope).$eval(
+        selector,
+        (el) => {
+          if (el.textContent || el.innerText) {
+            let num = null;
+            if (el.textContent) {
+              num = Number(el.textContent);
+            }
+            if (!num && el.innerText) {
+              num = Number(el.innerText);
+            }
+            return num;
+          } else {
+            return null;
           }
-          if (!num && el.innerText) {
-            num = Number(el.innerText);
-          }
-          return num;
-        } else {
-          return null;
         }
-      });
+      );
 
       if (value === null) {
         console.warn(
@@ -94,17 +100,22 @@ const getPageScope = (parent) => ({
         );
         return false;
       }
-      scope.internal.data[key] = value;
+      const nearestPageScope = resolveInternalScope("page", scope);
+      nearestPageScope.internal.data[key] = value;
       return value;
     },
     "@url": (scope) => async (key, selector) => {
-      const value = await scope.internal.page.$eval(selector, (el) => el.href);
+      const value = await resolveInternal("page", scope).$eval(
+        selector,
+        (el) => el.href
+      );
       if (value === null) {
         console.warn(
           `WARNING:: No value found for @url call with key ${key}, the value will be set to null`
         );
       }
-      scope.internal.data[key] = value;
+      const nearestPageScope = resolveInternalScope("page", scope);
+      nearestPageScope.internal.data[key] = value;
       return value;
     },
     click: (scope) => async (selector) => {
@@ -128,8 +139,10 @@ const getPageScope = (parent) => ({
         args: [{ type: "Literal", value: url }],
       }));
 
-      await Promise.all(ruleNodes.map((ruleNode) => evalRule(ruleNode, scope)));
-      return value;
+      const values = await Promise.all(
+        ruleNodes.map((ruleNode) => evalRule(ruleNode, scope))
+      );
+      return values;
     },
     press: (scope) => async (key) => {
       const page = resolveInternal("page", scope);
