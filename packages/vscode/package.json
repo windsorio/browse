@@ -1,6 +1,7 @@
 {
   "name": "browse-vscode",
   "displayName": "browse",
+  "private": true,
   "description": "Add VSCode support for the browse language",
   "version": "0.0.1",
   "publisher": "pranaygp",

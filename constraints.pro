@@ -27,8 +27,8 @@ gen_enforced_field(WorkspaceCwd, 'repository.url', 'git+https://github.com/winds
 gen_enforced_field(WorkspaceCwd, 'bugs.url', 'https://github.com/windsorio/browse/issues') :-
   workspace_ident(WorkspaceCwd, Name),
   \+ workspace_field_test(WorkspaceCwd, 'private', 'true').
-gen_enforced_field(WorkspaceCwd, 'engines', null) :-
-  workspace_ident(WorkspaceCwd, Name).
+% gen_enforced_field(WorkspaceCwd, 'engines', null) :-
+%  workspace_ident(WorkspaceCwd, Name).
 
 % % Scripts
 % gen_enforced_field(WorkspaceCwd, 'scripts.lint', '<some script>') :-
