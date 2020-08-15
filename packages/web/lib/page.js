@@ -39,16 +39,61 @@ const getPageScope = (parent) => ({
       return null;
     },
     "@string": (scope) => async (key, selector) => {
-      const value = await data.internal.page.select(selector);
+      const value = await scope.internal.page.$eval(
+        selector,
+        (el) => el.textContent
+      );
+      if (value === null) {
+        console.warn(
+          `WARNING:: No value found for @string call with key ${key}, the value will be set to null`
+        );
+      }
       scope.internal.data[key] = value;
+      return value;
     },
     "@number": (scope) => async (key, selector) => {
-      const value = await data.internal.page.select(selector);
+      const value = await scope.internal.page.$eval(selector, (el) => {
+        if (el.textContent || el.innerText) {
+          let num = null;
+          if (el.textContent) {
+            num = Number(el.textContent);
+          }
+          if (!num && el.innerText) {
+            num = Number(el.innerText);
+          }
+          return num;
+        } else {
+          return null;
+        }
+      });
+
+      if (value === null) {
+        console.warn(
+          `WARNING:: No value found for @number call with key ${key}, the value will be set to null`
+        );
+      }
+      if (isNaN(value)) {
+        //TODO: Use browse error?
+        console.error(
+          "ERROR:: Called @number on an element whose text couldn't be parsed as a number"
+        );
+        return false;
+      }
       scope.internal.data[key] = value;
+      return value;
     },
     "@url": (scope) => async (key, selector) => {
-      const value = await data.internal.page.select(selector);
+      const value = await scope.internal.page.$eval(
+        selector,
+        (el) => el.href || el.textContent
+      );
+      if (value === null) {
+        console.warn(
+          `WARNING:: No value found for @url call with key ${key}, the value will be set to null`
+        );
+      }
       scope.internal.data[key] = value;
+      return value;
     },
     click: (scope) => async (selector) => {
       const page = resolveInternal("page", scope);

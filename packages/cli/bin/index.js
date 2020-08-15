@@ -49,6 +49,16 @@ if (argv.web) {
 
     const rep = () => {
       rl.question("> ", async (stmt) => {
+        if (stmt === "quit") {
+          const data = scope.internal.data;
+          if (Object.keys(data).length) {
+            data.url = await scope.internal.page.url();
+            console.log(JSON.stringify(data));
+          }
+          rl.close();
+          scope.parent.internal.browser.close();
+          return;
+        }
         const r = parser.grammar.match(stmt, "Rule");
         if (r.succeeded()) {
           const n = parser.semantics(r);
