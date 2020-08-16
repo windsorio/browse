@@ -117,7 +117,6 @@ const getPageScope = (parent) => ({
       return true;
     },
     config: (scope) => async (ruleset) => {
-      console.log("Setting Config");
       //Override the set behavior
       const oldSet = scope.fns.set;
       const nearestPageScope = resolveInternalScope("page", scope);

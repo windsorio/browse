@@ -118,7 +118,6 @@ const getBrowserScope = (parent) => ({
           // TODO: Make this determinisitic
           for (const key in defs) {
             const { matcher, ruleSet, parent } = defs[key];
-            console.log(matcher, href);
             const matchObj = matcher.match(href.split("?")[0]);
             if (matchObj) {
               const urlObj = url.parse(href);
@@ -136,7 +135,6 @@ const getBrowserScope = (parent) => ({
       } catch (e) {}
 
       if (match) {
-        console.log("Match");
         /*
          * Get the nearest lexical browers scope
          */
@@ -206,7 +204,6 @@ const getBrowserScope = (parent) => ({
         // Finally, close the page
         newPageScope.internal.page.close();
       } else {
-        console.log("No match");
         //Get the nearest browser scope from the callstack (not lexically)
         //NOTE: We might want to change this when we have multiple browser scopes
         const nearestBrowserScope = resolveInternalScope("browser", scope);
