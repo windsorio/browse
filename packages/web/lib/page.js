@@ -8,6 +8,7 @@ const {
 } = require("@browselang/core/lib/scope");
 const { evalRule, evalRuleSet } = require("@browselang/core");
 const { help } = require("@browselang/core/lib/utils");
+const fs = require("fs-extra");
 
 /**
  * A scope accessible within a page RuleSet
@@ -131,10 +132,17 @@ const getPageScope = (parent) => ({
       console.log("Setting Config");
       //Override the set behavior
       const oldSet = scope.fns.set;
+      const nearestPageScope = resolveInternalScope("page", scope);
       scope.fns.set = (scope) => (name, value) => {
-        const nearestPageScope = resolveInternalScope("page", scope);
         if (nearestPageScope) {
           nearestPageScope.internal.config[name] = value;
+          if (name === "output") {
+            //For output files, we create the file and any directories and then open up a file descriptor
+            fs.ensureFileSync(value);
+            nearestPageScope.internal.config.writeStream = fs.createWriteStream(
+              value
+            );
+          }
         } else {
           throw new BrowseError({
             message: `config was called outside a page scope`,
@@ -144,12 +152,14 @@ const getPageScope = (parent) => ({
       };
       //Evaluate the ruleset
       await evalRuleSet(ruleset, scope);
+
+      //reset or remove the set fn
       if (oldSet !== undefined) {
         scope.fns.set = oldSet;
       } else {
         delete scope.fns.set;
       }
-      const nearestPageScope = resolveInternalScope("page", scope);
+
       return nearestPageScope.internal.config;
     },
     crawl: (scope) => async (selector) => {

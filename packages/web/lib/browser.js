@@ -1,4 +1,5 @@
 "use strict";
+//TODO: To minimize dependencies I should just write this
 const fs = require("fs-extra");
 
 const url = require("url");
@@ -184,7 +185,6 @@ const getBrowserScope = (parent) => ({
             );
           }
           data.url = href;
-          let out;
           try {
             //TODO, resolve should return a boolean so we don't have to try catch. users of resolve should throw the errors
             const config = resolveInternal(
@@ -192,26 +192,15 @@ const getBrowserScope = (parent) => ({
               newPageScope,
               (config) => !!config.output
             );
-            out = config.output;
-            console.log("Got Config");
+            config.writeStream.write(JSON.stringify(data) + "\n", {
+              flags: "a",
+            });
+            config.writeStream.end("");
           } catch (e) {
-            out = console.log;
-            console.log("Didn't get Config", e);
-          }
-
-          if (typeof out === "string") {
-            //TODO: Keep open, only close when out of scope
-            fs.ensureFileSync(out);
-
-            const fd = fs.openSync(out, "a");
-            fs.appendFileSync(out, JSON.stringify(data) + "\n");
-            fs.closeSync(fd);
-          } else {
-            out(JSON.stringify(data));
+            console.log(JSON.stringify(data));
           }
         }
         // TODO: check if the url has changed? If so, recurse and execute and necessary `pageDef` functions
-
         // Finally, close the page
         newPageScope.internal.page.close();
       } else {
