@@ -5,6 +5,7 @@ const {
   resolveFn,
   resolveFnScope,
   resolveInternalScope,
+  validateScope,
 } = require("@browselang/core/lib/scope");
 const { evalRule, evalRuleSet } = require("@browselang/core");
 const { help } = require("@browselang/core/lib/utils");
@@ -15,6 +16,7 @@ const dataFunction = (jsProcessing, optional = false) => (scope) => async (
   key,
   selector
 ) => {
+  validateScope((scope) => scope.internal.isPage, scope, true);
   const value = await resolveInternal("page", scope).$eval(
     selector,
     jsProcessing
@@ -59,6 +61,8 @@ const getPageScope = (parent) => ({
     ...Object.assign({}, ...Object.keys(keys).map((key) => ({ [key]: key }))),
   },
   internal: {
+    //To tell if you're in a page scope
+    isPage: true,
     page: null,
     data: {},
     config: {},
@@ -73,7 +77,7 @@ const getPageScope = (parent) => ({
         key,
         functions: {
           config:
-            "Takes in a ruleset and overrides the set function so that any sets within the ruleset set config variables",
+            "Takes in a ruleSet and overrides the set function so that any sets within the ruleSet set config variables",
           click:
             "Takes in a selector and clicks the argument indicated by the selector",
           "@string":
@@ -109,6 +113,7 @@ const getPageScope = (parent) => ({
     "@url": dataFunction(getUrl),
     "@url": dataFunction(getUrl, true),
     click: (scope) => async (selector) => {
+      validateScope((scope) => scope.internal.isPage, scope, true);
       const page = resolveInternal("page", scope);
       if (!page) {
         return false;
@@ -116,7 +121,8 @@ const getPageScope = (parent) => ({
       await page.click(selector);
       return true;
     },
-    config: (scope) => async (ruleset) => {
+    config: (scope) => async (ruleSet) => {
+      validateScope((scope) => scope.internal.isPage, scope, true);
       //Override the set behavior
       const oldSet = scope.fns.set;
       const nearestPageScope = resolveInternalScope("page", scope);
@@ -137,8 +143,8 @@ const getPageScope = (parent) => ({
           });
         }
       };
-      //Evaluate the ruleset
-      await evalRuleSet(ruleset, scope);
+      //Evaluate the ruleSet
+      await evalRuleSet(ruleSet, scope);
 
       //reset or remove the set fn
       if (oldSet !== undefined) {
@@ -150,6 +156,7 @@ const getPageScope = (parent) => ({
       return nearestPageScope.internal.config;
     },
     crawl: (scope) => async (selector) => {
+      validateScope((scope) => scope.internal.isPage, scope, true);
       const page = resolveInternal("page", scope);
       const urls = await page.$$eval(selector, (elArr) =>
         elArr.map((el) => el.href).filter(Boolean)
@@ -167,6 +174,7 @@ const getPageScope = (parent) => ({
       return values;
     },
     press: (scope) => async (key) => {
+      validateScope((scope) => scope.internal.isPage, scope, true);
       const page = resolveInternal("page", scope);
       if (!page) {
         return false;
@@ -183,6 +191,7 @@ const getPageScope = (parent) => ({
       return true;
     },
     type: (scope) => async (...values) => {
+      validateScope((scope) => scope.internal.isPage, scope, true);
       const page = resolveInternal("page", scope);
       if (!page) {
         return false;
@@ -195,6 +204,7 @@ const getPageScope = (parent) => ({
       return values.join(" ");
     },
     wait: (scope) => async (value) => {
+      validateScope((scope) => scope.internal.isPage, scope, true);
       const page = resolveInternal("page", scope);
       if (!page) {
         return false;

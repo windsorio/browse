@@ -117,6 +117,24 @@ const resolveInternalScope = (name, scope) => {
   }
 };
 
+/**
+ * Recursively find an internal variable matching the name by walking up the scope/environment inheritance chain
+ * and return the scope instead of the value itself
+ * @param {scope => boolean} f the function used to check if we're in a scope
+ * @param {Scope} scope The scope to use
+ */
+const validateScope = (f, scope, withError = false) => {
+  const inScope = f(scope);
+  if (inScope) return true;
+  if (scope.parent) {
+    return validateScope(f, scope.parent);
+  }
+  if (!scope && withError) {
+    throw new Error(`Internal:: Internal Variable '${name}' is not defined`);
+  }
+  return false;
+};
+
 module.exports = {
   resolveFn,
   resolveVar,
@@ -124,4 +142,5 @@ module.exports = {
   resolveVarScope,
   resolveInternal,
   resolveInternalScope,
+  validateScope,
 };
