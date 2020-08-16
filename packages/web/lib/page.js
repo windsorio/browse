@@ -7,15 +7,14 @@ const {
   resolveInternalScope,
   validateScope,
 } = require("@browselang/core/lib/scope");
-const { evalRule, evalRuleSet } = require("@browselang/core");
+const { evalRule, evalRuleSet, getNewScope } = require("@browselang/core");
 const { help } = require("@browselang/core/lib/utils");
 const fs = require("fs-extra");
 const { keys } = require("./constants");
 
-const dataFunction = (jsProcessing, optional = false) => (scope) => async (
-  key,
-  selector
-) => {
+const dataStorageFn = (jsProcessing, type, optional = false) => (
+  scope
+) => async (key, selector) => {
   validateScope((scope) => scope.internal.isPage, scope, true);
   const value = await resolveInternal("page", scope).$eval(
     selector,
@@ -23,7 +22,7 @@ const dataFunction = (jsProcessing, optional = false) => (scope) => async (
   );
   if (value === null && !optional) {
     throw new BrowseError({
-      message: `Element given to @string call had no text content (Did you mean to use @string?)`,
+      message: `Element given to @${type} call had no content of the correct type. If this is allowable, try using @${type}?`,
       node: null,
     });
   }
@@ -32,7 +31,8 @@ const dataFunction = (jsProcessing, optional = false) => (scope) => async (
   return value;
 };
 
-const getString = (el) => el.textContent;
+//Undefined is not understood by browse. Best practice is to always return null rather than undefined to make function conversion to browse easier later
+const getString = (el) => el.textContent || el.innerText || null;
 
 const getNumber = (el) => {
   if (el.textContent || el.innerText) {
@@ -50,7 +50,7 @@ const getNumber = (el) => {
   }
 };
 
-const getUrl = (el) => el.href;
+const getUrl = (el) => el.href || null;
 
 /**
  * A scope accessible within a page RuleSet
@@ -58,6 +58,7 @@ const getUrl = (el) => el.href;
 const getPageScope = (parent) => ({
   parent,
   vars: {
+    //The key in the keys map corresponds to the value we should pass in to the press function.
     ...Object.assign({}, ...Object.keys(keys).map((key) => ({ [key]: key }))),
   },
   internal: {
@@ -106,12 +107,12 @@ const getPageScope = (parent) => ({
       });
       return null;
     },
-    "@string": dataFunction(getString),
-    "@string?": dataFunction(getString, true),
-    "@number": dataFunction(getNumber),
-    "@number?": dataFunction(getNumber, true),
-    "@url": dataFunction(getUrl),
-    "@url": dataFunction(getUrl, true),
+    "@string": dataStorageFn(getString, "string"),
+    "@string?": dataStorageFn(getString, "string", true),
+    "@number": dataStorageFn(getNumber, "number"),
+    "@number?": dataStorageFn(getNumber, "number", true),
+    "@url": dataStorageFn(getUrl, "url"),
+    "@url": dataStorageFn(getUrl, "url", true),
     click: (scope) => async (selector) => {
       validateScope((scope) => scope.internal.isPage, scope, true);
       const page = resolveInternal("page", scope);
@@ -123,35 +124,25 @@ const getPageScope = (parent) => ({
     },
     config: (scope) => async (ruleSet) => {
       validateScope((scope) => scope.internal.isPage, scope, true);
-      //Override the set behavior
-      const oldSet = scope.fns.set;
+      //Since config applies to pages, this should set the config for the nearest page
       const nearestPageScope = resolveInternalScope("page", scope);
-      scope.fns.set = (scope) => (name, value) => {
-        if (nearestPageScope) {
-          nearestPageScope.internal.config[name] = value;
-          if (name === "output") {
-            //For output files, we create the file and any directories and then open up a file descriptor
-            fs.ensureFileSync(value);
-            nearestPageScope.internal.config.writeStream = fs.createWriteStream(
-              value
-            );
-          }
-        } else {
-          throw new BrowseError({
-            message: `config was called outside a page scope`,
-            node: null,
-          });
+
+      const configScope = getNewScope(nearestPageScope);
+
+      //Override the set behavior
+      configScope.fns.set = (scope) => (name, value) => {
+        //Note: a benefit of validate scope, there is no need to check nearestPageScope, we know we're in a page scope
+        nearestPageScope.internal.config[name] = value;
+        if (name === "output") {
+          //For output files, we create the file and any directories and then open up a write stream
+          fs.ensureFileSync(value);
+          nearestPageScope.internal.config.writeStream = fs.createWriteStream(
+            value
+          );
         }
       };
       //Evaluate the ruleSet
-      await evalRuleSet(ruleSet, scope);
-
-      //reset or remove the set fn
-      if (oldSet !== undefined) {
-        scope.fns.set = oldSet;
-      } else {
-        delete scope.fns.set;
-      }
+      await evalRuleSet(ruleSet, configScope);
 
       return nearestPageScope.internal.config;
     },

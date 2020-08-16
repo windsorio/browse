@@ -36,10 +36,10 @@ const newBrowser = async () => {
     : {}),
   });
 }
+//Centralize control of goto function
 const go = async (page, href) => {
   return page.goto(href, {
     timeout: 25000,
-    //    waitUntil: "networkidle2",
   });
 };
 
@@ -69,7 +69,7 @@ const getBrowserScope = (parent) => ({
   parent,
   vars: {},
   internal: {
-    //To tell if we're in a browsers scope
+    //To tell if we're in a browser scope
     isBrowser: true,
     // A single browser for now
     browser: null,
@@ -181,7 +181,6 @@ const getBrowserScope = (parent) => ({
               query: match.query,
             });
 
-            // TODO: support multple matching definitions
             await evalRuleSet(ruleSet, newPageScope);
 
             // TODO: check if the url has changed? If so, recurse and execute the necessary `page` rule
@@ -193,18 +192,19 @@ const getBrowserScope = (parent) => ({
                 );
               }
               data.url = href;
-              try {
-                //TODO, resolve should return a boolean so we don't have to try catch. users of resolve should throw the errors
-                const config = resolveInternal(
-                  "config",
-                  newPageScope,
-                  (config) => !!config.output
-                );
+              //Grabs the nearest config where output is defined, else return false
+              const config = resolveInternal(
+                "config",
+                newPageScope,
+                (config) => !!config.output,
+                false
+              );
+              if (config) {
                 config.writeStream.write(JSON.stringify(data) + "\n", {
                   flags: "a",
                 });
                 config.writeStream.end("");
-              } catch (e) {
+              } else {
                 console.log(JSON.stringify(data));
               }
             }

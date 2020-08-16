@@ -89,9 +89,16 @@ const resolveVarScope = (name, scope) => {
  * @param {Scope} scope The scope to use
  * @param {any => boolean} predicate An optional predicate with which to test the resolved value
  */
-const resolveInternal = (name, scope, predicate = () => true) => {
+const resolveInternal = (
+  name,
+  scope,
+  predicate = () => true,
+  withError = true
+) => {
   if (!scope) {
-    throw new Error(`Internal:: Internal Variable '${name}' is not defined`);
+    if (withError)
+      throw new Error(`Internal:: Internal Variable '${name}' is not defined`);
+    return false;
   }
   if (scope.internal[name] !== undefined && predicate(scope.internal[name])) {
     return scope.internal[name];
@@ -118,8 +125,7 @@ const resolveInternalScope = (name, scope) => {
 };
 
 /**
- * Recursively find an internal variable matching the name by walking up the scope/environment inheritance chain
- * and return the scope instead of the value itself
+ * Recursively check if our scope meets certain conditions (usually used with isBrowser, isPage, or isRepl)
  * @param {scope => boolean} f the function used to check if we're in a scope
  * @param {Scope} scope The scope to use
  */

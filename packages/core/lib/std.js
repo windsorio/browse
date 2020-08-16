@@ -6,8 +6,6 @@ const set = (scope) => (name, value) => {
   scope.vars[name] = value;
   return value;
 };
-const sleep = (scope) => async (ms) =>
-  new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
  * The root scope that contains all the basic/standard functions and variables
@@ -43,7 +41,8 @@ module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
     },
     get,
     set,
-    sleep,
+    sleep: (scope) => async (ms) =>
+      new Promise((resolve) => setTimeout(resolve, ms)),
     print: (_) => (...args) => {
       console.log(...args.map(stringify));
       return null;
