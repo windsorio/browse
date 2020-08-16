@@ -99,7 +99,6 @@ const evalExpr = async (expr, scope) => {
  * @returns JS return value from the rule. Can be a promise
  */
 const evalRule = async (rule, scope) => {
-  console.log("Executing", rule);
   assert(rule.type === "Rule");
   const { fn, args } = rule;
   assert(fn.type === "Word");

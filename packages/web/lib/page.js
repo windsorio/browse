@@ -11,6 +11,45 @@ const { help } = require("@browselang/core/lib/utils");
 const fs = require("fs-extra");
 const { keys } = require("./constants");
 
+const dataFunction = (jsProcessing, optional = false) => (scope) => async (
+  key,
+  selector
+) => {
+  const value = await resolveInternal("page", scope).$eval(
+    selector,
+    jsProcessing
+  );
+  if (value === null && !optional) {
+    throw new BrowseError({
+      message: `Element given to @string call had no text content (Did you mean to use @string?)`,
+      node: null,
+    });
+  }
+  const nearestPageScope = resolveInternalScope("page", scope);
+  nearestPageScope.internal.data[key] = value;
+  return value;
+};
+
+const getString = (el) => el.textContent;
+
+const getNumber = (el) => {
+  if (el.textContent || el.innerText) {
+    let num = null;
+    if (el.textContent) {
+      num = Number(el.textContent);
+    }
+    if (!num && el.innerText) {
+      num = Number(el.innerText);
+    }
+    if (isNaN(num)) return null;
+    return num;
+  } else {
+    return null;
+  }
+};
+
+const getUrl = (el) => el.href;
+
 /**
  * A scope accessible within a page RuleSet
  */
@@ -63,84 +102,12 @@ const getPageScope = (parent) => ({
       });
       return null;
     },
-    "@string": (scope) => async (key, selector) => {
-      const value = await resolveInternal("page", scope).$eval(
-        selector,
-        (el) => el.textContent
-      );
-      if (value === null) {
-        throw new BrowseError({
-          message: `Element given to @string call had no text content (Did you mean to use @string?)`,
-          node: null,
-        });
-      }
-      const nearestPageScope = resolveInternalScope("page", scope);
-      nearestPageScope.internal.data[key] = value;
-      return value;
-    },
-    "@string?": (scope) => async (key, selector) => {
-      const value = await resolveInternal("page", scope).$eval(
-        selector,
-        (el) => el.textContent
-      );
-      if (value === null) {
-        console.warn(
-          `WARNING:: No value found for @string call with key ${key}, the value will be set to null`
-        );
-      }
-      const nearestPageScope = resolveInternalScope("page", scope);
-      nearestPageScope.internal.data[key] = value;
-      return value;
-    },
-    "@number": (scope) => async (key, selector) => {
-      const value = await resolveInternal("page", scope).$eval(
-        selector,
-        (el) => {
-          if (el.textContent || el.innerText) {
-            let num = null;
-            if (el.textContent) {
-              num = Number(el.textContent);
-            }
-            if (!num && el.innerText) {
-              num = Number(el.innerText);
-            }
-            return num;
-          } else {
-            return null;
-          }
-        }
-      );
-
-      if (value === null) {
-        console.warn(
-          `WARNING:: No value found for @number call with key ${key}, the value will be set to null`
-        );
-      }
-      if (isNaN(value)) {
-        //TODO: Use browse error?
-        console.error(
-          "ERROR:: Called @number on an element whose text couldn't be parsed as a number"
-        );
-        return false;
-      }
-      const nearestPageScope = resolveInternalScope("page", scope);
-      nearestPageScope.internal.data[key] = value;
-      return value;
-    },
-    "@url": (scope) => async (key, selector) => {
-      const value = await resolveInternal("page", scope).$eval(
-        selector,
-        (el) => el.href
-      );
-      if (value === null) {
-        console.warn(
-          `WARNING:: No value found for @url call with key ${key}, the value will be set to null`
-        );
-      }
-      const nearestPageScope = resolveInternalScope("page", scope);
-      nearestPageScope.internal.data[key] = value;
-      return value;
-    },
+    "@string": dataFunction(getString),
+    "@string?": dataFunction(getString, true),
+    "@number": dataFunction(getNumber),
+    "@number?": dataFunction(getNumber, true),
+    "@url": dataFunction(getUrl),
+    "@url": dataFunction(getUrl, true),
     click: (scope) => async (selector) => {
       const page = resolveInternal("page", scope);
       if (!page) {
