@@ -87,7 +87,7 @@ const getBrowserScope = (parent) => ({
       let browser = nearestWebScope.internal.browser;
       if (!browser) {
         browser = nearestWebScope.internal.browser = await puppeteer.launch({
-          headless: false,
+          headless: true,
         });
       }
 
