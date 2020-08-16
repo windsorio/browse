@@ -33,11 +33,29 @@ const getPageScope = (parent) => ({
         scope: helpScope,
         key,
         functions: {
+          config:
+            "Takes in a ruleset and overrides the set function so that any sets within the ruleset set config variables",
           click:
             "Takes in a selector and clicks the argument indicated by the selector",
+          "@string":
+            "<key> <selector>: Sets a key on the data object in nearest page scope to a string value specified by selector",
+          "@string?":
+            "<key> <selector>: Sets a key on the data object in nearest page scope to a string value specified by selector or null if there is no string value",
+          "@number":
+            "<key> <selector>: Sets a key on the data object in nearest page scope to a numeric value specified by selector",
+          "@number?":
+            "<key> <selector>: Sets a key on the data object in nearest page scope to a numeric value specified by selector or null if there is no numeric value",
+          "@url":
+            "<key> <selector>: Sets a key on the data object in nearest page scope to the href value at the selector",
+          "@url?":
+            "<key> <selector>: Sets a key on the data object in nearest page scope to the href value at the selector or to null if there is no href value",
+          info:
+            "Prints out info about all of the functions if given no arguemnts. If given an argument, prints out info about the function whose name was passed",
+          page:
+            "Defines a page definition which matches on the regex passed in as the first argument, and which executes the rule set passed in as the second argument on every matching page",
+          press: "Presses the given key",
           screenshot:
             "Takes a path to a file as an argument, and saves a screenshot of the current page to that file",
-          press: "Presses the given key",
           type: "Types the given string one character at a time",
           wait:
             "If pased a number, waits for that many ms. If passed a selector, waits for that selector to be renderered",
