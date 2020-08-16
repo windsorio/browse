@@ -6,6 +6,8 @@ const set = (scope) => (name, value) => {
   scope.vars[name] = value;
   return value;
 };
+const sleep = (scope) => async (ms) =>
+  new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
  * The root scope that contains all the basic/standard functions and variables
@@ -28,6 +30,7 @@ module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
           get:
             "<key> - Get the value of the variable 'key'. When using this rule as an expression - i.e. (get var), you may use the shorthand '$var' instead",
           set: "<key> <value> - Set the variable 'key' to the value 'value'",
+          sleep: "<ms> - Sleep for the specifed amount of milliseconds",
           print: "<...vals> - Print values to stdout",
           fun: `<name> <body> - Define a new function 'name'. The 'body' has access to two additional functions, 'bind' and 'return' to take arguments and return a value
                     bind <...keys> - for each value passed into the function, store it as a variable using the names passed by 'keys'
@@ -40,6 +43,7 @@ module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
     },
     get,
     set,
+    sleep,
     print: (_) => (...args) => {
       console.log(...args.map(stringify));
       return null;

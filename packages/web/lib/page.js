@@ -9,13 +9,16 @@ const {
 const { evalRule, evalRuleSet } = require("@browselang/core");
 const { help } = require("@browselang/core/lib/utils");
 const fs = require("fs-extra");
+const { keys } = require("./constants");
 
 /**
  * A scope accessible within a page RuleSet
  */
 const getPageScope = (parent) => ({
   parent,
-  vars: {},
+  vars: {
+    ...Object.assign({}, ...Object.keys(keys).map((key) => ({ [key]: key }))),
+  },
   internal: {
     page: null,
     data: {},
