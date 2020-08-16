@@ -7,7 +7,7 @@ The Browse Language
 To install locally, simply run
 
 ```bash
-npm i -g browse
+npm i -g @browselang/cli
 ```
 
 # Usage
