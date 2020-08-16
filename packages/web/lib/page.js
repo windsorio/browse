@@ -48,6 +48,14 @@ const getPageScope = (parent) => ({
       await page.click(selector);
       return true;
     },
+    screenshot: (scope) => async (fname) => {
+      const page = resolveInternal("page", scope);
+      if (!page) {
+        return false;
+      }
+      await page.screenshot({ path: fname });
+      return true;
+    },
     press: (scope) => async (key) => {
       const page = resolveInternal("page", scope);
       if (!page) {

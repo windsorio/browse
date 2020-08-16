@@ -31,12 +31,14 @@
     "url": "https://github.com/windsorio/browse/issues"
   },
   "devDependencies": {
+    "@types/is-docker": "2.0.0",
     "@types/puppeteer": "3.0.1",
     "@types/puppeteer-core": "2.0.0",
     "ava": "3.11.1"
   },
   "dependencies": {
     "@browselang/core": "workspace:packages/core",
+    "is-docker": "2.1.1",
     "puppeteer": "5.2.1",
     "puppeteer-core": "5.2.1",
     "url-pattern": "1.0.3"

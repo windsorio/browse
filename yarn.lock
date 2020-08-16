@@ -79,9 +79,11 @@ __metadata:
   resolution: "@browselang/web@workspace:packages/web"
   dependencies:
     "@browselang/core": "workspace:packages/core"
+    "@types/is-docker": 2.0.0
     "@types/puppeteer": 3.0.1
     "@types/puppeteer-core": 2.0.0
     ava: 3.11.1
+    is-docker: 2.1.1
     puppeteer: 5.2.1
     puppeteer-core: 5.2.1
     url-pattern: 1.0.3
@@ -196,6 +198,15 @@ __metadata:
   version: 4.0.0
   resolution: "@types/http-cache-semantics@npm:4.0.0"
   checksum: e16fae56d4daea4ed678b4d5918b693b44ca12fb5e479b87d242d3a35bf3a014974dcf9ed7aba7e29149fdb6c3719f9987fca51b20ef10aa84b58f86553c2f74
+  languageName: node
+  linkType: hard
+
+"@types/is-docker@npm:2.0.0":
+  version: 2.0.0
+  resolution: "@types/is-docker@npm:2.0.0"
+  dependencies:
+    is-docker: "*"
+  checksum: 46a65addcdc4b74d1c0a6e0af8fb56bb07a2a9147bdb2f685d5390c2001611853383d7c1d253b92f7f95824b138d651952418f15515f8b80761824ae41c7ea9f
   languageName: node
   linkType: hard
 
@@ -2266,6 +2277,15 @@ fsevents@~2.1.2:
   bin:
     is-ci: bin.js
   checksum: 09083018edafd63221ff0506356f13c0aaf4b75a6435ea648bc67d07ddab199b2d5b9297de43d0821df1a14c18cd9f1edd1775a0166abfe37390843e79137213
+  languageName: node
+  linkType: hard
+
+"is-docker@npm:*, is-docker@npm:2.1.1":
+  version: 2.1.1
+  resolution: "is-docker@npm:2.1.1"
+  bin:
+    is-docker: cli.js
+  checksum: dc8e36fa63a246728e5dd4b3ab2d454f685d3dcc1fecbe62144a0c3bc1f5eef0cf67cb3af1b4a9d274dd18877b954b651c7ef0a483abae6a7a2baa8f987554ba
   languageName: node
   linkType: hard
 
