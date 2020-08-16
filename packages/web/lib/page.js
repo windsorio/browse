@@ -28,10 +28,8 @@ const getPageScope = (parent) => ({
         functions: {
           click:
             "Takes in a selector and clicks the argument indicated by the selector",
-          info:
-            "Prints out info about all of the functions if given no arguemnts. If given an argument, prints out info about the function whose name was passed",
-          page:
-            "Defines a page definition which matches on the regex passed in as the first argument, and which executes the rule set passed in as the second argument on every matching page",
+          screenshot:
+            "Takes a path to a file as an argument, and saves a screenshot of the current page to that file",
           press: "Presses the given key",
           type: "Types the given string one character at a time",
           wait:
@@ -46,6 +44,14 @@ const getPageScope = (parent) => ({
         return false;
       }
       await page.click(selector);
+      return true;
+    },
+    screenshot: (scope) => async (fname) => {
+      const page = resolveInternal("page", scope);
+      if (!page) {
+        return false;
+      }
+      await page.screenshot({ path: fname });
       return true;
     },
     press: (scope) => async (key) => {

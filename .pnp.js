@@ -131,6 +131,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         "npm:4.0.0"
       ],
       [
+        "@types/is-docker",
+        "npm:2.0.0"
+      ],
+      [
         "@types/keyv",
         "npm:3.1.1"
       ],
@@ -913,6 +917,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       [
         "is-ci",
         "npm:2.0.0"
+      ],
+      [
+        "is-docker",
+        "npm:2.1.1"
       ],
       [
         "is-error",
@@ -1932,9 +1940,11 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [
             ["@browselang/web", "workspace:packages/web"],
             ["@browselang/core", "workspace:packages/core"],
+            ["@types/is-docker", "npm:2.0.0"],
             ["@types/puppeteer", "npm:3.0.1"],
             ["@types/puppeteer-core", "npm:2.0.0"],
             ["ava", "npm:3.11.1"],
+            ["is-docker", "npm:2.1.1"],
             ["puppeteer", "npm:5.2.1"],
             ["puppeteer-core", "npm:5.2.1"],
             ["url-pattern", "npm:1.0.3"]
@@ -2064,6 +2074,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/@types-http-cache-semantics-npm-4.0.0-000c9dc8e0-e16fae56d4.zip/node_modules/@types/http-cache-semantics/",
           "packageDependencies": [
             ["@types/http-cache-semantics", "npm:4.0.0"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["@types/is-docker", [
+        ["npm:2.0.0", {
+          "packageLocation": "./.yarn/cache/@types-is-docker-npm-2.0.0-8ea659017f-46a65addcd.zip/node_modules/@types/is-docker/",
+          "packageDependencies": [
+            ["@types/is-docker", "npm:2.0.0"],
+            ["is-docker", "npm:2.1.1"]
           ],
           "linkType": "HARD",
         }]
@@ -4391,6 +4411,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [
             ["is-ci", "npm:2.0.0"],
             ["ci-info", "npm:2.0.0"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["is-docker", [
+        ["npm:2.1.1", {
+          "packageLocation": "./.yarn/cache/is-docker-npm-2.1.1-f58143f915-dc8e36fa63.zip/node_modules/is-docker/",
+          "packageDependencies": [
+            ["is-docker", "npm:2.1.1"]
           ],
           "linkType": "HARD",
         }]

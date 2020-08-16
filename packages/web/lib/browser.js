@@ -12,6 +12,7 @@ const {
 const { help } = require("@browselang/core/lib/utils");
 const UrlPattern = require("url-pattern");
 const { BrowseError } = require("@browselang/core/lib/error");
+const isDocker = require("is-docker");
 
 const getPageScope = require("./page");
 
@@ -88,6 +89,18 @@ const getBrowserScope = (parent) => ({
       if (!browser) {
         browser = nearestWebScope.internal.browser = await puppeteer.launch({
           headless: true,
+          ...(isDocker()
+            ? {
+                args: [
+                  // Required for Docker version of Puppeteer
+                  "--no-sandbox",
+                  "--disable-setuid-sandbox",
+                  // This will write shared memory files into /tmp instead of /dev/shm,
+                  // because Docker’s default for /dev/shm is 64MB
+                  "--disable-dev-shm-usage",
+                ],
+              }
+            : {}),
         });
       }
 
