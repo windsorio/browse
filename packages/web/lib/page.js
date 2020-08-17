@@ -43,8 +43,9 @@ const getString = (el) => el.textContent || el.innerText || null;
 
 const getNumber = (el) => {
   const text = el.textContent || el.innerText;
-  const num = text ? Number(text) : null;
-  return isNaN(num) ? null : num;
+  const num1 = el.textContext ? Number(el.textContent) : null;
+  const num2 = el.innerText ? Number(el.innerText) : null;
+  return isNaN(num1) ? (isNaN(num2) ? null : num2) : num1;
 };
 
 const getUrl = (el) => el.href || null;
