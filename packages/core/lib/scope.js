@@ -117,6 +117,17 @@ const resolveInternalScope = (name, scope) => {
   }
 };
 
+/**
+ * Recursively check if our scope meets certain conditions (usually used with isBrowser, isPage, or isRepl)
+ * @param {scope => boolean} f the function used to check if we're in a scope
+ * @param {Scope} scope The scope to use
+ */
+const validateScope = (f, scope) => {
+  if (!scope) return false;
+  if (f(scope)) return true;
+  return validateScope(f, scope.parent);
+};
+
 module.exports = {
   resolveFn,
   resolveVar,
@@ -124,4 +135,5 @@ module.exports = {
   resolveVarScope,
   resolveInternal,
   resolveInternalScope,
+  validateScope,
 };

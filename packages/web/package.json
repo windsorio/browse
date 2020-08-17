@@ -31,6 +31,8 @@
     "url": "https://github.com/windsorio/browse/issues"
   },
   "devDependencies": {
+    "@types/chromedriver": "81.0.0",
+    "@types/fs-extra": "9.0.1",
     "@types/is-docker": "2.0.0",
     "@types/puppeteer": "3.0.1",
     "@types/puppeteer-core": "2.0.0",
@@ -38,8 +40,10 @@
   },
   "dependencies": {
     "@browselang/core": "workspace:packages/core",
+    "chromedriver": "84.0.1",
+    "fs-extra": "9.0.1",
     "is-docker": "2.1.1",
-    "puppeteer": "5.2.1",
+    "puppeteer": "^5.2.1",
     "puppeteer-core": "5.2.1",
     "url-pattern": "1.0.3"
   }
