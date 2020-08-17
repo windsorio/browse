@@ -21,31 +21,31 @@ const getPageScope = require("./page");
 
 const newBrowser = async () => {
   return await puppeteer.launch({
-  headless: true,
-  ...(isDocker()
-    ? {
-        args: [
-          // Required for Docker version of Puppeteer
-          "--no-sandbox",
-          "--disable-setuid-sandbox",
-          // This will write shared memory files into /tmp instead of /dev/shm,
-          // because Docker’s default for /dev/shm is 64MB
-          "--disable-dev-shm-usage",
-        ],
-      }
-    : {}),
+    headless: true,
+    ...(isDocker()
+      ? {
+          args: [
+            // Required for Docker version of Puppeteer
+            "--no-sandbox",
+            "--disable-setuid-sandbox",
+            // This will write shared memory files into /tmp instead of /dev/shm,
+            // because Docker’s default for /dev/shm is 64MB
+            "--disable-dev-shm-usage",
+          ],
+        }
+      : {}),
   });
-}
+};
 const throws = (fn) => (...args) => {
   try {
     return { success: true, value: fn(...args) };
   } catch (e) {
-    return { success: false };
+    return { success: false, err: e };
   }
 };
 
-const strictValidateScope = (scope, message) => {
-  if (!validateScope((scope) => scope.internal.isPage, scope)) {
+const assertBrowserScope = (scope, message) => {
+  if (!validateScope((scope) => scope.internal.isBrowser, scope)) {
     throw new Error(message);
   }
 };
@@ -108,7 +108,7 @@ const getBrowserScope = (parent) => ({
       return null;
     },
     page: (scope) => (pattern, ...ruleSets) => {
-      strictValidateScope(scope, "Cannot call page outside of a Browser cope");
+      assertBrowserScope(scope, "Cannot call page outside of a Browser scope");
       const urlObj = url.parse(pattern);
 
       if (!urlObj || !urlObj.host) {
@@ -143,7 +143,7 @@ const getBrowserScope = (parent) => ({
       return null;
     },
     visit: (scope) => async (href) => {
-      strictValidateScope(scope, "Cannot call visit outside of a Browser cope");
+      assertBrowserScope(scope, "Cannot call visit outside of a Browser scope");
       // Check if any pageDefs exist and execute them if found
       let match = null;
       try {

@@ -56,7 +56,7 @@ if (argv.web) {
               data.url = await scope.internal.page.url();
               console.log(JSON.stringify(data));
             }
-            scope.parent.internal.browser.close();
+            await scope.parent.internal.browser.close();
           }
           rl.close();
           return;

@@ -8,7 +8,7 @@ const {
   validateScope,
 } = require("@browselang/core/lib/scope");
 
-const strictValidateScope = (scope, message) => {
+const assertPageScope = (scope, message) => {
   if (!validateScope((scope) => scope.internal.isPage, scope)) {
     throw new Error(message);
   }
@@ -22,7 +22,7 @@ const { keys } = require("./constants");
 const dataStorageFn = (jsProcessing, type, optional = false) => (
   scope
 ) => async (key, selector) => {
-  strictValidateScope(scope, `Cannot call @${type} outside of page context`);
+  assertPageScope(scope, `Cannot call @${type} outside of page context`);
   const value = await resolveInternal("page", scope).$eval(
     selector,
     jsProcessing
@@ -108,7 +108,7 @@ const getPageScope = (parent) => ({
     "@url": dataStorageFn(getUrl, "url"),
     "@url?": dataStorageFn(getUrl, "url", true),
     click: (scope) => async (selector) => {
-      strictValidateScope(scope, `Cannot call click outside of page context`);
+      assertPageScope(scope, `Cannot call click outside of page context`);
       const page = resolveInternal("page", scope);
       if (!page) {
         return false;
@@ -117,7 +117,7 @@ const getPageScope = (parent) => ({
       return true;
     },
     config: (scope) => async (ruleSet) => {
-      strictValidateScope(scope, `Cannot call config outside of page context`);
+      assertPageScope(scope, `Cannot call config outside of page context`);
       //Since config applies to pages, this should set the config for the nearest page
       const nearestPageScope = resolveInternalScope("page", scope);
 
@@ -141,7 +141,7 @@ const getPageScope = (parent) => ({
       return nearestPageScope.internal.config;
     },
     crawl: (scope) => async (selector) => {
-      strictValidateScope(scope, `Cannot call crawl outside of page context`);
+      assertPageScope(scope, `Cannot call crawl outside of page context`);
       const page = resolveInternal("page", scope);
       const urls = await page.$$eval(selector, (elArr) =>
         elArr.map((el) => el.href).filter(Boolean)
@@ -159,7 +159,7 @@ const getPageScope = (parent) => ({
       return values;
     },
     press: (scope) => async (key) => {
-      strictValidateScope(scope, `Cannot call press outside of page context`);
+      assertPageScope(scope, `Cannot call press outside of page context`);
       const page = resolveInternal("page", scope);
       if (!page) {
         return false;
@@ -176,7 +176,7 @@ const getPageScope = (parent) => ({
       return true;
     },
     type: (scope) => async (...values) => {
-      strictValidateScope(scope, `Cannot call type outside of page context`);
+      assertPageScope(scope, `Cannot call type outside of page context`);
       validateScope((scope) => scope.internal.isPage, scope, true);
       const page = resolveInternal("page", scope);
       if (!page) {
@@ -190,7 +190,7 @@ const getPageScope = (parent) => ({
       return values.join(" ");
     },
     wait: (scope) => async (value) => {
-      strictValidateScope(scope, `Cannot call wait outside of page context`);
+      assertPageScope(scope, `Cannot call wait outside of page context`);
       const page = resolveInternal("page", scope);
       if (!page) {
         return false;
