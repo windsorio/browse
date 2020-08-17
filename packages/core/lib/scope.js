@@ -89,16 +89,9 @@ const resolveVarScope = (name, scope) => {
  * @param {Scope} scope The scope to use
  * @param {any => boolean} predicate An optional predicate with which to test the resolved value
  */
-const resolveInternal = (
-  name,
-  scope,
-  predicate = () => true,
-  withError = true
-) => {
+const resolveInternal = (name, scope, predicate = () => true) => {
   if (!scope) {
-    if (withError)
-      throw new Error(`Internal:: Internal Variable '${name}' is not defined`);
-    return false;
+    throw new Error(`Internal:: Internal Variable '${name}' is not defined`);
   }
   if (scope.internal[name] !== undefined && predicate(scope.internal[name])) {
     return scope.internal[name];
@@ -129,16 +122,10 @@ const resolveInternalScope = (name, scope) => {
  * @param {scope => boolean} f the function used to check if we're in a scope
  * @param {Scope} scope The scope to use
  */
-const validateScope = (f, scope, withError = false) => {
-  const inScope = f(scope);
-  if (inScope) return true;
-  if (scope.parent) {
-    return validateScope(f, scope.parent);
-  }
-  if (!scope && withError) {
-    throw new Error(`Internal:: Internal Variable '${name}' is not defined`);
-  }
-  return false;
+const validateScope = (f, scope) => {
+  if (!scope) return false;
+  if (f(scope)) return true;
+  return validateScope(f, scope.parent);
 };
 
 module.exports = {

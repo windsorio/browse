@@ -50,13 +50,15 @@ if (argv.web) {
     const rep = () => {
       rl.question("> ", async (stmt) => {
         if (stmt === "quit") {
-          const data = scope.internal.data;
-          if (Object.keys(data).length) {
-            data.url = await scope.internal.page.url();
-            console.log(JSON.stringify(data));
+          if (argv.web) {
+            const data = scope.internal.data;
+            if (Object.keys(data).length) {
+              data.url = await scope.internal.page.url();
+              console.log(JSON.stringify(data));
+            }
+            scope.parent.internal.browser.close();
           }
           rl.close();
-          scope.parent.internal.browser.close();
           return;
         }
         const r = parser.grammar.match(stmt, "Rule");
@@ -122,7 +124,6 @@ if (argv.web) {
             scope
           );
         } catch (e) {
-          console.log(e);
           process.stderr.write(
             stringifyError(e, {
               /*

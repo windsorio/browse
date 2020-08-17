@@ -36,6 +36,20 @@ const newBrowser = async () => {
     : {}),
   });
 }
+const throws = (fn) => (...args) => {
+  try {
+    return { success: true, value: fn(...args) };
+  } catch (e) {
+    return { success: false };
+  }
+};
+
+const strictValidateScope = (scope, message) => {
+  if (!validateScope((scope) => scope.internal.isPage, scope)) {
+    throw new Error(message);
+  }
+};
+
 //Centralize control of goto function
 const go = async (page, href) => {
   return page.goto(href, {
@@ -86,15 +100,15 @@ const getBrowserScope = (parent) => ({
         key,
         functions: {
           page:
-            "Instantiates a page definition which matches on the regex passed in as the first argument, and which executes the rule set passed in as the second argument on every matching page",
+            "Instantiates a page definition which matches on the url-pattern passed in as the first argument, and which executes the rule set passed in as the second argument on every matching page",
           visit:
-            "Open a new tab/page with the given url and checks for matches on that URL. If there are matches the correspond ruleSets will be run. If there is no match, a new page will be opened in the browser scope",
+            "Open a new tab/page with the given url and checks for matches on that URL. If there are matches the corresponding ruleSets will be run. If there is no match The new tab/page is opened in the browser scope and no actions will be taken",
         },
       });
       return null;
     },
     page: (scope) => (pattern, ...ruleSets) => {
-      validateScope((scope) => scope.internal.isBrowser, scope, true);
+      strictValidateScope(scope, "Cannot call page outside of a Browser cope");
       const urlObj = url.parse(pattern);
 
       if (!urlObj || !urlObj.host) {
@@ -129,7 +143,7 @@ const getBrowserScope = (parent) => ({
       return null;
     },
     visit: (scope) => async (href) => {
-      validateScope((scope) => scope.internal.isBrowser, scope, true);
+      strictValidateScope(scope, "Cannot call visit outside of a Browser cope");
       // Check if any pageDefs exist and execute them if found
       let match = null;
       try {
@@ -188,27 +202,31 @@ const getBrowserScope = (parent) => ({
             if (Object.keys(data).length) {
               if (data.url) {
                 console.warn(
-                  "WARNING:: Setting the url key using a data function will override the default url key (See docs <https://....>)"
+                  "WARNING:: The key 'url' will always be overridden by the default url value (See docs <https://....>)"
                 );
               }
               data.url = href;
               //Grabs the nearest config where output is defined, else return false
-              const config = resolveInternal(
+              const { value: config, success } = throws(resolveInternal)(
                 "config",
                 newPageScope,
-                (config) => !!config.output,
-                false
+                (config) => !!config.output
               );
-              if (config) {
-                config.writeStream.write(JSON.stringify(data) + "\n", {
-                  flags: "a",
-                });
-                config.writeStream.end("");
+
+              if (success) {
+                if (config.writeStream) {
+                  config.writeStream.write(JSON.stringify(data) + "\n", {
+                    flags: "a",
+                  });
+                  config.writeStream.end("");
+                } else {
+                  fs.ensureFileSync(config.output);
+                  config.writeStream = fs.createWriteStream(config.output);
+                }
               } else {
                 console.log(JSON.stringify(data));
               }
             }
-            // TODO: check if the url has changed? If so, recurse and execute and necessary `pageDef` functions
             // Finally, close the page
             newPageScope.internal.page.close();
           })
@@ -216,8 +234,8 @@ const getBrowserScope = (parent) => ({
       } else {
         //Create a new page in the nearest browser scope and navigate to href
         await preparePage(nearestBrowserScope)(browser, href);
-        return href;
       }
+      return href;
     },
   },
 });

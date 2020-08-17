@@ -7,6 +7,13 @@ const {
   resolveInternalScope,
   validateScope,
 } = require("@browselang/core/lib/scope");
+
+const strictValidateScope = (scope, message) => {
+  if (!validateScope((scope) => scope.internal.isPage, scope)) {
+    throw new Error(message);
+  }
+};
+
 const { evalRule, evalRuleSet, getNewScope } = require("@browselang/core");
 const { help } = require("@browselang/core/lib/utils");
 const fs = require("fs-extra");
@@ -15,14 +22,14 @@ const { keys } = require("./constants");
 const dataStorageFn = (jsProcessing, type, optional = false) => (
   scope
 ) => async (key, selector) => {
-  validateScope((scope) => scope.internal.isPage, scope, true);
+  strictValidateScope(scope, `Cannot call @${type} outside of page context`);
   const value = await resolveInternal("page", scope).$eval(
     selector,
     jsProcessing
   );
   if (value === null && !optional) {
     throw new BrowseError({
-      message: `Element given to @${type} call had no content of the correct type. If this is allowable, try using @${type}?`,
+      message: `Element given to @${type} call had no content of the correct type. If this value is optional, try using @${type}?. This will set the value to null if a match isn't found`,
       node: null,
     });
   }
@@ -35,19 +42,9 @@ const dataStorageFn = (jsProcessing, type, optional = false) => (
 const getString = (el) => el.textContent || el.innerText || null;
 
 const getNumber = (el) => {
-  if (el.textContent || el.innerText) {
-    let num = null;
-    if (el.textContent) {
-      num = Number(el.textContent);
-    }
-    if (!num && el.innerText) {
-      num = Number(el.innerText);
-    }
-    if (isNaN(num)) return null;
-    return num;
-  } else {
-    return null;
-  }
+  const text = el.textContent || el.innerText;
+  const num = text ? Number(text) : null;
+  return isNaN(num) ? null : num;
 };
 
 const getUrl = (el) => el.href || null;
@@ -57,10 +54,7 @@ const getUrl = (el) => el.href || null;
  */
 const getPageScope = (parent) => ({
   parent,
-  vars: {
-    //The key in the keys map corresponds to the value we should pass in to the press function.
-    ...Object.assign({}, ...Object.keys(keys).map((key) => ({ [key]: key }))),
-  },
+  vars: {},
   internal: {
     //To tell if you're in a page scope
     isPage: true,
@@ -112,9 +106,9 @@ const getPageScope = (parent) => ({
     "@number": dataStorageFn(getNumber, "number"),
     "@number?": dataStorageFn(getNumber, "number", true),
     "@url": dataStorageFn(getUrl, "url"),
-    "@url": dataStorageFn(getUrl, "url", true),
+    "@url?": dataStorageFn(getUrl, "url", true),
     click: (scope) => async (selector) => {
-      validateScope((scope) => scope.internal.isPage, scope, true);
+      strictValidateScope(scope, `Cannot call click outside of page context`);
       const page = resolveInternal("page", scope);
       if (!page) {
         return false;
@@ -123,7 +117,7 @@ const getPageScope = (parent) => ({
       return true;
     },
     config: (scope) => async (ruleSet) => {
-      validateScope((scope) => scope.internal.isPage, scope, true);
+      strictValidateScope(scope, `Cannot call config outside of page context`);
       //Since config applies to pages, this should set the config for the nearest page
       const nearestPageScope = resolveInternalScope("page", scope);
 
@@ -147,7 +141,7 @@ const getPageScope = (parent) => ({
       return nearestPageScope.internal.config;
     },
     crawl: (scope) => async (selector) => {
-      validateScope((scope) => scope.internal.isPage, scope, true);
+      strictValidateScope(scope, `Cannot call crawl outside of page context`);
       const page = resolveInternal("page", scope);
       const urls = await page.$$eval(selector, (elArr) =>
         elArr.map((el) => el.href).filter(Boolean)
@@ -165,7 +159,7 @@ const getPageScope = (parent) => ({
       return values;
     },
     press: (scope) => async (key) => {
-      validateScope((scope) => scope.internal.isPage, scope, true);
+      strictValidateScope(scope, `Cannot call press outside of page context`);
       const page = resolveInternal("page", scope);
       if (!page) {
         return false;
@@ -182,6 +176,7 @@ const getPageScope = (parent) => ({
       return true;
     },
     type: (scope) => async (...values) => {
+      strictValidateScope(scope, `Cannot call type outside of page context`);
       validateScope((scope) => scope.internal.isPage, scope, true);
       const page = resolveInternal("page", scope);
       if (!page) {
@@ -195,7 +190,7 @@ const getPageScope = (parent) => ({
       return values.join(" ");
     },
     wait: (scope) => async (value) => {
-      validateScope((scope) => scope.internal.isPage, scope, true);
+      strictValidateScope(scope, `Cannot call wait outside of page context`);
       const page = resolveInternal("page", scope);
       if (!page) {
         return false;
