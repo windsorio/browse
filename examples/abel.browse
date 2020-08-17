@@ -15,7 +15,7 @@ page https://www.thegazette.co.uk/:ignore/issue/:ignore/page/:page {
   print_page_details
 
   config {
-    set output "/home/abel/notices/" + $page + ".txt"
+    set output "./notices/" + $page + ".json"
   }
 
   @string title `h1.title`

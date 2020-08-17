@@ -6,9 +6,10 @@ const url = require("url");
 const puppeteer = require("puppeteer");
 const { evalRuleSet } = require("@browselang/core");
 const {
-  resolveInternal,
   resolveFn,
   resolveFnScope,
+  resolveVar,
+  resolveInternal,
   resolveInternalScope,
   validateScope,
 } = require("@browselang/core/lib/scope");
@@ -19,11 +20,11 @@ const isDocker = require("is-docker");
 
 const getPageScope = require("./page");
 
-const newBrowser = async () => {
+const newBrowser = async (headless) => {
   return await puppeteer.launch({
-    headless: true,
     ...(isDocker()
       ? {
+          headless: false,
           args: [
             // Required for Docker version of Puppeteer
             "--no-sandbox",
@@ -33,7 +34,9 @@ const newBrowser = async () => {
             "--disable-dev-shm-usage",
           ],
         }
-      : {}),
+      : {
+          headless,
+        }),
   });
 };
 const throws = (fn) => (...args) => {
@@ -81,7 +84,9 @@ const preparePage = (parent) => async (browser, href) => {
  */
 const getBrowserScope = (parent) => ({
   parent,
-  vars: {},
+  vars: {
+    headless: true,
+  },
   internal: {
     //To tell if we're in a browser scope
     isBrowser: true,
@@ -172,13 +177,13 @@ const getBrowserScope = (parent) => ({
       //Get the nearest browser scope
       const nearestBrowserScope = resolveInternalScope("browser", scope);
 
+      const isHeadless = resolveVar("headless", scope);
+
       //If the nearest browser scope doesn't have a browser, create one
       let browser = nearestBrowserScope.internal.browser;
       if (!browser) {
-        browser = nearestBrowserScope.internal.browser = await puppeteer.launch(
-          {
-            headless: false,
-          }
+        browser = nearestBrowserScope.internal.browser = await newBrowser(
+          isHeadless
         );
       }
 
