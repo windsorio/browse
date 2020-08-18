@@ -1,0 +1,98 @@
+# Create a scope
+scope math {
+  vars {
+    PI 3.14
+    e 2.718
+  }
+  private { } # a.k.a internal
+  rules {
+    abs {
+      bind $x
+      # TODO: somehow eval Math.abs(x) in javascript and return that
+      return $x
+    }
+  }
+}
+
+##### OPTION 1 #####
+# We can extend the match scope to create additional rules that are
+# available whenever we're in a match scope
+extend math {
+  rules {
+    # Not the real implementation we use because Math.pow in JS is far
+    # more efficient but this serves as a good example, that's all
+    pow {
+      bind x y
+      if ($y == 0) then { return 1 }
+      
+      # We can even use the `abs` rule that's only available in the math scope
+      set recursed ( pow $x ( abs $y / 2 ) )
+
+      if ($y % 2 == 0) then {
+        return $recursed * $recursed
+      } else {
+        set v 
+        return $x * $recursed * $recursed
+      }
+    }
+  }
+}
+
+using math {
+  pow 2 8
+}
+
+#### OPTION 2 #####
+# Instead of extending a scope, which feels quite OOP, rules can do 2 new
+# things: 
+#   1. They can define which scope they are accessible in. This way, they still
+#      need to be independently imported, passed around, etc. However, they can
+#      only be evaluated in a context where the page scope is an ancestor. 
+#   2. Rules that take RuleSets as an argument and then evaluate them must
+#      define what scope each RuleSet will be evaluated under
+
+# 1.
+rule(scope=math) pow {
+  # ... same as above
+}
+
+# This would throw an error
+pow 2 8
+
+# However
+
+# 2. 
+rule(runtimes=[, math]) inMath {
+  bind someRandomArg nestedRuleSet
+  return evalRuleSet $nestedRuleSet
+}
+
+inMath ignoreThisString {
+  # In here, we have access to abs
+  abs 4.5
+
+  # Also, while the scope doesn't provide `pow`, we can still use the `pow` rule
+  # here because the rule itself is available in the lexical scope, and we are
+  # in a ruleset that is in the math scope
+  pow 2 8
+}
+
+
+# Known Limitations
+#  1. What about rules that rely on multiple scopes in their ancestory? For
+#     instance, `waitAndVisit`, a rule in the `page` scope that relies on `wait`
+#     (from the page scope) and `visit` (from the browser scope)
+#  2. When a rule accepts more than one RuleSet as an argument and plans to
+#     evaluate them, there are multiple ways the scopes can actually get used.
+#     For example, the `for` rule, which takes 2 rulesets, injects a `test` rule
+#     into the first RuleSet, but doesn't do that into the second RuleSet.
+#     However, both RuleSets need to share their variables so that `i`, defined
+#     by `set i 0` in the iterator RuleSet, is still accessible in the body
+#     RuleSet
+
+# An attempt to create the `waitAndVisit` rule described above and ideas to
+# solve these limitations
+
+rule(scope=[browser, ) waitAndVisit {
+  # ... same as above
+}
