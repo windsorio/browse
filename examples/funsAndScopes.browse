@@ -15,7 +15,7 @@ scope math {
 }
 
 ##### OPTION 1 #####
-# We can extend the match scope to create additional rules that are
+# We can extend the match scope directly and create additional rules that are
 # available whenever we're in a match scope
 extend math {
   rules {
@@ -93,6 +93,35 @@ inMath ignoreThisString {
 # An attempt to create the `waitAndVisit` rule described above and ideas to
 # solve these limitations
 
-rule(scope=[browser, ) waitAndVisit {
-  # ... same as above
+# providing multiple scopes that should be available for a rule to work
+rule(scope=[browser,page]) waitAndVisit {
+  # ...
 }
+
+# The definition for the page rule would list multiple runtimes for a RuleSet
+rule(runtimes=[,[browser,page]]) page {
+  bind pattern handler
+  # ...
+  evalRuleSet $handler
+  return nil
+}
+
+# now, if a scopes's rules actually rely on another scope, it can define that using `requred`
+scope advMath {
+  requires math
+  rules {
+    round {
+      bind $x
+      set $a (abs $x)
+      if ($x * 2 >= ($a * 2 + 1)) then {
+        return $a
+      } else {
+        return $a + 1
+      }
+    }
+  }
+}
+
+# any 
+
+# and function that actually defines runtimes, can specify multiple 
