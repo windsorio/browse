@@ -162,15 +162,25 @@ page https://windsor.io {
 ############################################
 ############################################
 
-# Defining the specific requirements for a rule. The specific rules will be
-# provided via dependency injection
+# 2 syntaxes
+#   1. A rule explicity defines its dependencies. browse injects those into the
+#      rule whenever the rule is evaluated. The caller doesn't need to do
+#      anything special, aside from having the needed rules and vars in its
+#      scope
+#   2. A rule that takes a RuleSet as a parameter explicity injects a scope into
+#      the RuleSet. This is why Rulesets like the one that are passed into page
+#      DON'T need to be explicit about its dependencies (that would be ugly)
+
+
+# Syntax 1:
 
 rule waitAndVisit {
-  # We're defining just the specifc requirements for any scope that wishes to
-  # evaluate this rule. It doesn't matter WHAT scope provides these (whether
-  # it's a page or otherwise), just that it exists
+  # We're defining the specifc requirements for this rule. Whenever this rule is
+  # evaluated, browse will ensure that the dependencies exist in the caller's
+  # scope before injecting them. It doesn't matter what scope provides these
+  # (whether it's a page or otherwise), just that it exists
   expects {
-    vars { }
+    vars { } # this line is not needed here, but I'm adding it for completeness
     rules {
       wait
       visit
@@ -179,9 +189,6 @@ rule waitAndVisit {
 
   bind ms url
   
-  # `expects` a language level feature (not just another rule), so we can
-  # statically guarentee at this point that two rules, called `wait` and `visit`
-  # are available
   wait $ms
   visit $url
 }
@@ -194,12 +201,62 @@ waitAndVisit 12 https://google.com
 rule wait {}
 rule visit {}
 
-# now, since the current scope matches the requirements, ew can use the rule
+# now, since the current scope matches the requirements, we can use the rule
 waitAndVisit 12 https://google.com
 
-# when waitAndVisit above is evaluated, the internal mechanics will 
+# when waitAndVisit above is evaluated, the internal mechanics will
 #   1. create a blank scope that inherits from `waitAndVisit`'s lexical scope
 #   2. inject `wait` and `visit` from the current call scope into the blank scope
 #   3. evaluate the rule
 
+page https://windsor.io {
+  waitAndVisit 12 https://google.com
+  # Using the same algorithm above, waitandVisit will now actually have access
+  # to the real wait and visit, and not the stubs
 
+  # ...but how come we didn't have to use `expects` inside THIS RuleSet. `visit`
+  # and `wait` are just implicity accessible here! 
+
+  # This is where the second syntax comes in. The definition of the `page` rule
+  # explicitly injected the scope when evaluating this RuleSet
+}
+
+# Let's see how that works with an example
+
+# We define a scope interface
+scopeInterface mockPageScopeInterface {
+  vars { url }
+  rules { wait; click }
+  extends browserInterface
+}
+
+rule mockPage {
+  bind pattern ruleSet:mockPageScopeInterface
+  # the above annotation tells us that `ruleSet` will implicitly have a scope
+  # matching the `mockPageScopeInterface`. It's really just useful for
+  # autocomplete, and the annotation can be remove by a compiler
+
+  # In fact, the interface is really just a static type annotation. The compiler
+  # can remove it before runtime. The `scopeInterface` rule should just be a
+  # noop
+
+  # This is the actual scope
+  set mockScope {
+    vars { url "mock" }
+    rules { 
+      wait { print "wait" }
+      click { print "click" }
+      visit { print "browser:visit" }
+      page { print "browser:page" }
+    }
+  }
+
+  # here is how we inject it before evaluating the RuleSet
+  evalInScope $mockScope $ruleSet
+}
+
+# Notice how in syntax 1, it's the job of a RULE to define what it wants
+# injected into it when executed and in syntax 2, a rule that evaluates a
+# RULESET imperatively controls the scope in which the RuleSet is executed. This
+# allows the creation of the powerful rules that browse is famous for, where a
+# number of implicit vars/rules are just available
