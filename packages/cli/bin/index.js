@@ -125,6 +125,7 @@ const genUnknownParseError = () =>
           );
           process.stderr.write("\n");
         });
+      } else {
         try {
           await evalRuleSet(
             {

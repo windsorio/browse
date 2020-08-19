@@ -19,8 +19,8 @@ const { help } = require("@browselang/core/lib/utils");
 const fs = require("fs-extra");
 const { keys } = require("./constants");
 
-const dataStorageFn = (jsProcessing, type, optional = false) => (
-  scope
+const dataStorageFn = (jsProcessing, type, optional = false) => (scope) => (
+  _opts
 ) => async (key, selector) => {
   assertPageScope(scope, `Cannot call @${type} outside of page context`);
   const value = await resolveInternal("page", scope).$eval(
@@ -63,7 +63,7 @@ const getPageScope = (parent) => ({
     config: {},
   },
   fns: {
-    help: (scope) => (key) => {
+    help: (scope) => (_opts) => (key) => {
       // Find the lowest scope that actually has the 'help' function
       const helpScope = resolveFnScope("help", scope);
       help({
@@ -107,7 +107,7 @@ const getPageScope = (parent) => ({
     "@number?": dataStorageFn(getNumber, "number", true),
     "@url": dataStorageFn(getUrl, "url"),
     "@url?": dataStorageFn(getUrl, "url", true),
-    click: (scope) => async (selector) => {
+    click: (scope) => (_opts) => async (selector) => {
       assertPageScope(scope, `Cannot call click outside of page context`);
       const page = resolveInternal("page", scope);
       if (!page) {
@@ -116,7 +116,7 @@ const getPageScope = (parent) => ({
       await page.click(selector);
       return true;
     },
-    config: (scope) => async (ruleSet) => {
+    config: (scope) => (_opts) => async (ruleSet) => {
       assertPageScope(scope, `Cannot call config outside of page context`);
       //Since config applies to pages, this should set the config for the nearest page
       const nearestPageScope = resolveInternalScope("page", scope);
@@ -124,7 +124,7 @@ const getPageScope = (parent) => ({
       const configScope = getNewScope(nearestPageScope);
 
       //Override the set behavior
-      configScope.fns.set = (scope) => (name, value) => {
+      configScope.fns.set = (_) => (_) => (name, value) => {
         //Note: a benefit of validate scope, there is no need to check nearestPageScope, we know we're in a page scope
         nearestPageScope.internal.config[name] = value;
         if (name === "output") {
@@ -140,7 +140,7 @@ const getPageScope = (parent) => ({
 
       return nearestPageScope.internal.config;
     },
-    crawl: (scope) => async (selector) => {
+    crawl: (scope) => (_opts) => async (selector) => {
       assertPageScope(scope, `Cannot call crawl outside of page context`);
       const page = resolveInternal("page", scope);
       const urls = await page.$$eval(selector, (elArr) =>
@@ -162,7 +162,7 @@ const getPageScope = (parent) => ({
       );
       return values;
     },
-    press: (scope) => async (key) => {
+    press: (scope) => (_opts) => async (key) => {
       assertPageScope(scope, `Cannot call press outside of page context`);
       const page = resolveInternal("page", scope);
       if (!page) {
@@ -171,7 +171,7 @@ const getPageScope = (parent) => ({
       await page.keyboard.press(key);
       return true;
     },
-    screenshot: (scope) => async (fname) => {
+    screenshot: (scope) => (_opts) => async (fname) => {
       const page = resolveInternal("page", scope);
       if (!page) {
         return false;
@@ -179,7 +179,7 @@ const getPageScope = (parent) => ({
       await page.screenshot({ path: fname });
       return true;
     },
-    type: (scope) => async (...values) => {
+    type: (scope) => (_opts) => async (...values) => {
       assertPageScope(scope, `Cannot call type outside of page context`);
       validateScope((scope) => scope.internal.isPage, scope, true);
       const page = resolveInternal("page", scope);
@@ -193,7 +193,7 @@ const getPageScope = (parent) => ({
       }
       return values.join(" ");
     },
-    wait: (scope) => async (value) => {
+    wait: (scope) => (_opts) => async (value) => {
       assertPageScope(scope, `Cannot call wait outside of page context`);
       const page = resolveInternal("page", scope);
       if (!page) {

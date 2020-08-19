@@ -119,8 +119,7 @@ const evalRule = async (rule, scope) => {
     // async This try...catch will handle that, and also any errors from a
     // rejected promise
     const promise = Promise.resolve(
-      // TODO: pass in the options
-      resolveFn(fn.name, scope)(scope)(...resolvedArgs)
+      resolveFn(fn.name, scope)(scope)(resolvedOpts)(...resolvedArgs)
     );
     return await promise;
   } catch (err) {

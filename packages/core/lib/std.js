@@ -1,8 +1,9 @@
 const { resolveFn, resolveFnScope, resolveVar } = require("./scope");
 const { help, stringify } = require("./utils");
+const { BrowseError } = require("./error");
 
-const get = (scope) => (name) => resolveVar(name, scope);
-const set = (scope) => (name, value) => {
+const get = (scope) => (_opts) => (name) => resolveVar(name, scope);
+const set = (scope) => (_opts) => (name, value) => {
   scope.vars[name] = value;
   return value;
 };
@@ -15,7 +16,7 @@ module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
   vars: {},
   internal: {},
   fns: {
-    help: (scope) => (key) => {
+    help: (scope) => (_opts) => (key) => {
       // Find the lowest scope that actually has the 'help' function
       const helpScope = resolveFnScope("help", scope);
       help({
@@ -41,13 +42,13 @@ module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
     },
     get,
     set,
-    sleep: (scope) => async (ms) =>
+    sleep: (_scope) => (_opts) => async (ms) =>
       new Promise((resolve) => setTimeout(resolve, ms)),
-    print: (_) => (...args) => {
+    print: (_) => (_opts) => (...args) => {
       console.log(...args.map(stringify));
       return null;
     },
-    fun: (scope) => (name, body) => {
+    fun: (scope) => (_opts) => (name, body) => {
       let existingFn;
       try {
         existingFn = resolveFn(name, scope);
@@ -55,23 +56,24 @@ module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
       if (existingFn) {
         throw new Error(`Function '${name}' is already defined`);
       }
-      scope.fns[name] = (fnScope) => (...args) => {
+      // TODO: allow rules to describe the options they accept
+      scope.fns[name] = (fnScope) => (_) => (...args) => {
         // Setup bind and return functions
         const newScope = getNewScope(fnScope);
-        newScope.fns.bind = (bindScope) => (...names) => {
-          names.forEach((name, i) => set(bindScope)(name, args[i] || null));
+        newScope.fns.bind = (bindScope) => (_) => (...names) => {
+          names.forEach((name, i) => set(bindScope)({})(name, args[i] || null));
           return null;
         };
-        newScope.fns.return = (_) => (v) => (v === undefined ? null : v);
+        newScope.fns.return = (_) => (_) => (v) => (v === undefined ? null : v);
         return evalRuleSet(body, newScope);
       };
       return scope.fns[name];
     },
-    scope: (scope) => (_) => {
+    scope: (scope) => (_opts) => (_) => {
       console.log(scope);
       return null;
     },
-    if: (scope) => (cond, then, thenRS, el, elseRS) => {
+    if: (scope) => (_opts) => (cond, then, thenRS, el, elseRS) => {
       if (then !== "then") {
         throw new Error("Second argument to \"if\" should be the word 'then'");
       }
@@ -100,7 +102,7 @@ module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
         return evalRuleSet(elseRS, bodyScope);
       }
     },
-    for: (scope) => async (iterator, body) => {
+    for: (scope) => (_opts) => async (iterator, body) => {
       if (!iterator || iterator.type !== "RuleSet") {
         throw new Error(
           'Second argument to "for" should be a RuleSet containing the iteration criteria'
@@ -113,7 +115,7 @@ module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
       }
 
       const loopScope = getNewScope(scope);
-      loopScope.fns.test = (_) => (expr) => (!!expr ? true : false);
+      loopScope.fns.test = (_) => (_) => (expr) => (!!expr ? true : false);
 
       // Prepare the iterator
       const iteratorRules = [...iterator.rules];
@@ -154,6 +156,7 @@ module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
           throw BrowseError.from(err, iterator);
         }
       }
+      return null;
     },
   },
 });
