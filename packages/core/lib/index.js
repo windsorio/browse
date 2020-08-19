@@ -99,9 +99,13 @@ const evalExpr = async (expr, scope) => {
  * @returns JS return value from the rule. Can be a promise
  */
 const evalRule = async (rule, scope) => {
-  assert(rule.type === "Rule");
   const { fn, args } = rule;
-  assert(fn.type === "Word");
+
+  const resolvedOpts = {};
+  for (const opt of fn.options) {
+    assert(resolvedOpts[opt.key.name] === undefined); // No duplicate option keys
+    resolvedOpts[opt.key.name] = await evalExpr(opt.value, scope);
+  }
 
   const resolvedArgs = [];
   if (args) {
@@ -111,14 +115,16 @@ const evalRule = async (rule, scope) => {
     }
   }
   try {
-    // It's possible for the fn call itself to throw in the case that it's not async
-    // This try...catch will handle that, and also any errors from a rejected promise
+    // It's possible for the fn call itself to throw in the case that it's not
+    // async This try...catch will handle that, and also any errors from a
+    // rejected promise
     const promise = Promise.resolve(
-      resolveFn(fn, scope)(scope)(...resolvedArgs)
+      // TODO: pass in the options
+      resolveFn(fn.name, scope)(scope)(...resolvedArgs)
     );
     return await promise;
   } catch (err) {
-    throw BrowseError.from(err, fn);
+    throw BrowseError.from(err, fn.name);
   }
 };
 

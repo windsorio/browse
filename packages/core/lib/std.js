@@ -137,7 +137,7 @@ module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
           } catch (err) {
             throw BrowseError.from(err, iterator);
           }
-          if (rule.fn.name === "test" && !result) {
+          if (rule.fn.name.name === "test" && !result) {
             finished = true; // ends the loop
           }
         }

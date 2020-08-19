@@ -140,7 +140,11 @@ Browse {
                         | "\\" escapeSequence                             -- escaped
   implicitStringStart = ~"$" ~"@" letter
   implicitStringPart
-                    = ~(whitespace | ";" | "\\" | lineTerminator) sourceCharacter 	  -- nonEscaped
+                    = ~( "\\" | whitespace
+                        | ";" | lineTerminator
+                        | "(" | ")" 
+                        | "{" | "}"
+                      ) sourceCharacter 	                                -- nonEscaped
                     | "\\" escapeSequence                                 -- escaped
   						
   lineContinuation = "\\" lineTerminatorSequence
@@ -258,8 +262,20 @@ Browse {
    ** Statements **
   \****************/ 
   
+  Option
+    = #(word "=") Expr   -- value
+    | #("!" word)        -- false
+    | word               -- true
+
+  Options = (lineTerminator* Option)+ lineTerminator*
+
+  InitRule
+  	= #(word "(") Options ")"   -- withOpts
+    | word                      -- vanilla
+    
+
   Rule
-    = word (Expr)*
+    = InitRule (Expr)*
   
   Rules = (space | lineTerminator)* Rule (sep Rule)* sep?
 

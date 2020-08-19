@@ -16,12 +16,12 @@ page https://www.twitch.tv {
   wait $username
   type 'RandomTwitchUser31415'
   click '#password-input'
-  type 'RandomPassword31415'
+  type 'jfnosenfjksef'
   click '#password-input-confirmation'
-  type 'RandomPassword31415'
+  type 'jfnosenfjksef'
   click $birthMonth
   type 'apr'
-  press $Enter
+  press Enter
   click $birthDay
   type '29'
   click $birthYear

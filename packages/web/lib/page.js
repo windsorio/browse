@@ -149,7 +149,11 @@ const getPageScope = (parent) => ({
 
       const ruleNodes = urls.map((url) => ({
         type: "Rule",
-        fn: { type: "Word", name: "visit" },
+        fn: {
+          type: "InitRule",
+          name: { type: "Word", name: "visit" },
+          options: [],
+        },
         args: [{ type: "Literal", value: url }],
       }));
 
