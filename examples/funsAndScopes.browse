@@ -1,3 +1,7 @@
+##################
+##### PREFACE ####
+##################
+
 # Create a scope
 scope math {
   vars {
@@ -14,7 +18,9 @@ scope math {
   }
 }
 
-##### OPTION 1 #####
+############################################
+############################################
+
 # We can extend the match scope directly and create additional rules that are
 # available whenever we're in a match scope
 extend math {
@@ -42,7 +48,9 @@ using math {
   pow 2 8
 }
 
-#### OPTION 2 #####
+############################################
+############################################
+
 # Instead of extending a scope, which feels quite OOP, rules can do 2 new
 # things: 
 #   1. They can define which scope they are accessible in. This way, they still
@@ -106,7 +114,8 @@ rule(runtimes=[,[browser,page]]) page {
   return nil
 }
 
-# now, if a scopes's rules actually rely on another scope, it can define that using `requred`
+# now, if a scopes's rules actually rely on another scope, it can define that
+# using `requred`
 scope advMath {
   requires math
   rules {
@@ -122,6 +131,75 @@ scope advMath {
   }
 }
 
-# any 
+# any function that actually defines runtimes, can specify multiple 
 
-# and function that actually defines runtimes, can specify multiple 
+
+############################################
+############################################
+
+# Explicitly passing the scope
+rule waitAndVisit {
+  bind scope ms url
+  
+  # using is a special rule. While we normally have lexical scoping, `using` is
+  # the escape hatch that lets us explicity live in another scope
+  using $scope {    
+    # inside here, we cannot statically determine what rules and vars are
+    # accessible
+
+    wait $ms
+    visit $url
+  }
+
+  # but this bit can only access what's lexically available
+}
+
+page https://windsor.io {
+  # scope is a std rule that just returns the current scope
+  waitAndVisit ( scope ) 100 https://app.windsor.io
+}
+
+############################################
+############################################
+
+# Defining the specific requirements for a rule. The specific rules will be
+# provided via dependency injection
+
+rule waitAndVisit {
+  # We're defining just the specifc requirements for any scope that wishes to
+  # evaluate this rule. It doesn't matter WHAT scope provides these (whether
+  # it's a page or otherwise), just that it exists
+  expects {
+    vars { }
+    rules {
+      wait
+      visit
+    }
+  }
+
+  bind ms url
+  
+  # `expects` a language level feature (not just another rule), so we can
+  # statically guarentee at this point that two rules, called `wait` and `visit`
+  # are available
+  wait $ms
+  visit $url
+}
+
+
+# This won't work
+waitAndVisit 12 https://google.com
+
+# however, if we just defined the necessary rules
+rule wait {}
+rule visit {}
+
+# now, since the current scope matches the requirements, ew can use the rule
+waitAndVisit 12 https://google.com
+
+# when waitAndVisit above is evaluated, the internal mechanics will 
+#   1. create a blank scope that inherits from `waitAndVisit`'s lexical scope
+#   2. inject `wait` and `visit` from the current call scope into the blank scope
+#   3. evaluate the rule
+
+
