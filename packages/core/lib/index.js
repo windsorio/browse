@@ -103,7 +103,12 @@ const evalRule = async (rule, scope) => {
 
   const resolvedOpts = {};
   for (const opt of fn.options) {
-    assert(resolvedOpts[opt.key.name] === undefined); // No duplicate option keys
+    if (resolvedOpts[opt.key.name] !== undefined) {
+      throw new BrowseError({
+        message: `Option '${opt.key.name}' has already been provided to this rule`,
+        node: opt.key,
+      });
+    }
     resolvedOpts[opt.key.name] = await evalExpr(opt.value, scope);
   }
 
