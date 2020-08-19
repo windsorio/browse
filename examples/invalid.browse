@@ -1,2 +1,2 @@
 # ( must be escaped in an implicit string
-page https://windsor.io(/*) { }
+page https://windsor.io(/*)

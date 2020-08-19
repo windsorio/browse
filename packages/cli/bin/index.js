@@ -38,6 +38,11 @@ if (argv.web) {
   scope = require("@browselang/web")(scope);
 }
 
+const genUnknownParseError = () =>
+  new Error(
+    "Browse encountered an error while parsing your script but was unable\nto identify the specific issue. Check the syntax carefully"
+  );
+
 (async () => {
   if (!script) {
     const readline = require("readline");
@@ -84,8 +89,14 @@ if (argv.web) {
             }
           }
         } else {
+          let e;
+          try {
+            e = new Error(r.shortMessage);
+          } catch (_) {
+            e = genUnknownParseError();
+          }
           process.stderr.write(
-            stringifyError(new Error(r.shortMessage), {
+            stringifyError(e, {
               color: process.stderr.isTTY,
             })
           );
@@ -114,7 +125,6 @@ if (argv.web) {
           );
           process.stderr.write("\n");
         });
-      } else {
         try {
           await evalRuleSet(
             {
@@ -139,8 +149,14 @@ if (argv.web) {
         }
       }
     } else {
+      let e;
+      try {
+        e = new Error(r.shortMessage);
+      } catch (_) {
+        e = genUnknownParseError();
+      }
       process.stderr.write(
-        stringifyError(new Error(r.shortMessage), {
+        stringifyError(e, {
           color: process.stderr.isTTY,
         })
       );
