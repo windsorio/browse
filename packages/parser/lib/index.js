@@ -5,6 +5,8 @@ const path = require("path");
 
 const ohm = require("ohm-js");
 
+const { literal } = require("./ast");
+
 // Instantiate the grammar.
 const contents = fs.readFileSync(path.join(__dirname, "browse.ohm"));
 const g = ohm.grammars(contents).Browse;
@@ -225,6 +227,52 @@ semantics.addAttribute("asAST", {
     };
   },
 
+  Option_value(w, _, v) {
+    return {
+      type: "Option",
+      key: w.asAST,
+      value: v.asAST,
+      source: this.source,
+    };
+  },
+  Option_false(_, w) {
+    return {
+      type: "Option",
+      key: w.asAST,
+      value: literal(false),
+      source: this.source,
+    };
+  },
+  Option_true(w) {
+    return {
+      type: "Option",
+      key: w.asAST,
+      value: literal(true),
+      source: this.source,
+    };
+  },
+
+  Options(_leadingNL, opts, _endNL) {
+    return opts.asAST;
+  },
+
+  InitRule_withOpts(w, _l, opts, _r) {
+    return {
+      type: "InitRule",
+      name: w.asAST,
+      options: opts.asAST,
+      source: this.source,
+    };
+  },
+  InitRule_vanilla(w) {
+    return {
+      type: "InitRule",
+      name: w.asAST,
+      options: [],
+      source: this.source,
+    };
+  },
+
   Rule: function (w, es) {
     return {
       type: "Rule",
@@ -252,61 +300,28 @@ semantics.addAttribute("asAST", {
   },
 
   nilLiteral: function (_) {
-    return {
-      type: "Literal",
-      value: null,
-      source: this.source,
-    };
+    return literal(null, this.source);
   },
   booleanLiteral: function (_) {
-    return {
-      type: "Literal",
-      value: this.sourceString === "true" ? true : false,
-      source: this.source,
-    };
+    return literal(this.sourceString === "true" ? true : false, this.source);
   },
   numericLiteral: function (_) {
-    return {
-      type: "Literal",
-      value: Number(this.sourceString),
-      source: this.source,
-    };
+    return literal(Number(this.sourceString), this.source);
   },
-
-  stringLiteral_doubleQuote: function (l, c, _r) {
-    return {
-      type: "Literal",
-      value: c.sourceString,
-      source: this.source,
-    };
+  stringLiteral_doubleQuote: function (_l, c, _r) {
+    return literal(c.sourceString, this.source);
   },
-  stringLiteral_singleQuote: function (l, c, _r) {
-    return {
-      type: "Literal",
-      value: c.sourceString,
-      source: this.source,
-    };
+  stringLiteral_singleQuote: function (_l, c, _r) {
+    return literal(c.sourceString, this.source);
   },
-  stringLiteral_cssSelector: function (l, c, _r) {
-    return {
-      type: "Literal",
-      value: c.sourceString,
-      source: this.source,
-    };
+  stringLiteral_cssSelector: function (_l, c, _r) {
+    return literal(c.sourceString, this.source);
   },
-  stringLiteral_javascript: function (l, c, _r) {
-    return {
-      type: "Literal",
-      value: c.sourceString,
-      source: this.source,
-    };
+  stringLiteral_javascript: function (_l, c, _r) {
+    return literal(c.sourceString, this.source);
   },
   stringLiteral_implicit: function (_f, _r) {
-    return {
-      type: "Literal",
-      value: this.sourceString,
-      source: this.source,
-    };
+    return literal(this.sourceString, this.source);
   },
 
   word: function (_) {

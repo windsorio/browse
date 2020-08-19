@@ -1,11 +1,9 @@
 # Sets the max number of tabs that the browser window will use at any time
-@config {
-  @set concurrency 4
+config {
+  set concurrency 4
 }
 
-@page(
-  render
-) https://www.indiehackers.com/products?minRevenue=1&techSkills=code {
+page https://www.indiehackers.com/products {
 
   # We have to manually click a filter to refresh the page and evaluate 
   # the filters
@@ -42,27 +40,26 @@
   crawl `.product-card__link` 
 }
 
-@page(
-  render
+page(
   cache
-  ttl=30d
-) https://www.indiehackers.com/(.+)/history {
+  ttl='30d'
+) https://www.indiehackers.com/:product/history {
   wait `.product-header__title`
 
   @string title `.product-header__title`
   @url website `.product-metrics__stat--website`
   @url twitter `.product-metrics__stat--twitter`
 
-  @set firstUserSelector `.product-sidebar__users  .user-link__link:nth-of-type(1)`
+  set firstUserSelector `.product-sidebar__users .user-link__link:nth-of-type(1)`
   wait $firstUserSelector
   click $firstUserSelector
 }
 
-@page(
+page(
   render
   cache
-  ttl=30d
-) https://www.indiehackers.com/product/(.+) {
+  ttl='30d'
+) https://www.indiehackers.com/profile/:userid {
   wait `.user-header__username`
 
   @string username `.user-header__username`
@@ -77,3 +74,5 @@
     value=string
   ) { @attr title } { @attr href } `.user-header__satellite--contact`
 }
+
+visit https://www.indiehackers.com/products?minRevenue=1&techSkills=code

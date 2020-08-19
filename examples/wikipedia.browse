@@ -1,7 +1,8 @@
-@page(
+page(
   cache
-  ttl=7d
-) https://en.wikipedia.org/wiki/(slug:.+) {
+  ttl="7d"
+) https://en.wikipedia.org/wiki/:slug {
+  wait 1000
   @string title `#firstHeading`
   @string summary `#mw-content-text > div > p:nth-child(4)`
   @arr headings `.mw-headline` {
@@ -10,3 +11,4 @@
   }
   crawl `a`
 }
+visit https://en.wikipedia.org/wiki/Kevin_Bacon

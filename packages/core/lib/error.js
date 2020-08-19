@@ -42,11 +42,13 @@ function stringifyError(err, opts = {}) {
   if (err instanceof BrowseError) {
     if (opts.snippet && err.node) {
       opts.color && (msg += WHITE);
-      msg += err.node.source
-        .getLineAndColumnMessage()
-        .split("\n")
-        .slice(1)
-        .join("\n");
+      if (err.node.source) {
+        msg += err.node.source
+          .getLineAndColumnMessage()
+          .split("\n")
+          .slice(1)
+          .join("\n");
+      }
       msg += "\n";
       opts.color && (msg += RESET);
     }
@@ -89,6 +91,11 @@ function stringifyError(err, opts = {}) {
         msg += "\n";
       });
       opts.color && (msg += RESET);
+    }
+
+    if (process.env.BROWSE_DEBUG) {
+      msg += "\n[DEBUG]\n";
+      msg += err.stack;
     }
     return msg;
   } else if (err instanceof Error) {

@@ -96,7 +96,7 @@ const getBrowserScope = (parent) => ({
     pageDefs: {},
   },
   fns: {
-    help: (scope) => (key) => {
+    help: (scope) => (_opts) => (key) => {
       // Find the lowest scope that actually has the 'help' function
       const helpScope = resolveFnScope("help", scope);
       help({
@@ -112,7 +112,7 @@ const getBrowserScope = (parent) => ({
       });
       return null;
     },
-    page: (scope) => (pattern, ...ruleSets) => {
+    page: (scope) => (_opts) => (pattern, ...ruleSets) => {
       assertBrowserScope(scope, "Cannot call page outside of a Browser scope");
       const urlObj = url.parse(pattern);
 
@@ -147,7 +147,7 @@ const getBrowserScope = (parent) => ({
       };
       return null;
     },
-    visit: (scope) => async (href) => {
+    visit: (scope) => (_opts) => async (href) => {
       assertBrowserScope(scope, "Cannot call visit outside of a Browser scope");
       // Check if any pageDefs exist and execute them if found
       let match = null;
