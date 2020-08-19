@@ -3,9 +3,7 @@ config {
   set concurrency 4
 }
 
-page(
-  render
-) https://www.indiehackers.com/products {
+page https://www.indiehackers.com/products {
 
   # We have to manually click a filter to refresh the page and evaluate 
   # the filters
@@ -43,7 +41,6 @@ page(
 }
 
 page(
-  render
   cache
   ttl='30d'
 ) https://www.indiehackers.com/:product/history {
