@@ -15,7 +15,7 @@ scope math {
 }
 
 #You can define rules that reference any other scope with the 
-#'uses' keyword
+#'uses' keyword, this is implemented as part of the 'rule' Rule
 rule pow {
   bind x y
   if ($y == 0) then { return 1 }
@@ -37,18 +37,21 @@ using math {
 }
 
 pow 2 8
-# ERROR: 'Rule pow is not defined in the current scope. Trying running pow in one of these scopes (Grab scopes where math is deifined)'
+# ERROR: 'Rule pow is not defined in the current scope. Trying running pow in one of these scopes (Grab scopes where pow is deifined)'
 
 
 
 
 #Alternative syntax which is also valid at the top of a browse file
 #
-import math;
-import fs;
-import net;
+with math;
+with fs;
+with net;
 
+
+#We are able to use pow
 pow 2 3
+
 #Opening/clsing/writing to  files is allowed bc we're in an fs scope
 fOpen 'out.txt' 'Hello World'
 fWrite 'out.txt' 'Hello World' 'a+'
@@ -60,26 +63,28 @@ fetch 'https://google.com'
 using math {
   using fs {
     using net {
+      #We are able to use pow
       pow 2 3
-      #Opening/clsing/writing to  files is allowed with in a fs scope
+      
+      #Opening/clsing/writing to  files is allowed bc we're in an fs scope
       fOpen 'out.txt' 'Hello World'
       fWrite 'out.txt' 'Hello World' 'a+'
       fClose 'out.txt'
       fetch 'https://google.com'
+
     }
   }
 }
 
 
 
-# Internally the 'rule' rule checks any arguments after the third
 rule waitAndClick {
   bind ms selector
   wait $ms
   click $selector
 } uses page
 
-#Exponential backoff for click uses both the math and the page scope
+#Exponential backoff for click uses both the math and the page scope.
 rule exponentalBackoffClick {
   bind selector, initWait;
 
@@ -92,16 +97,3 @@ rule exponentalBackoffClick {
     }
   }
 } uses page math
-
-
-##If we are able to implement it, this might also be nice
-#
-#
-
-import page;
-
-rule waitAndClick {
-  bind ms selector
-  wait $ms
-  click $selector
-}
