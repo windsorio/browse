@@ -23,13 +23,16 @@ const stringify = (jsValue) => {
  * @param {{rule: string]: string}} functions An object with a description for each rule
  */
 const help = ({ resolveRule, scope, functions, key }) => {
+  // TODO: probably accept the output stream as an arg so it can switch between
+  // stdout and stderr, or just return the final string that needs to be printed
+  // instead and let the caller decide how to output it
   if (!key) {
     Object.keys(functions).forEach((key) => {
-      console.log(`${key.padEnd(10)} -\t${functions[key]}\n`);
+      console.error(`${key.padEnd(10)} -\t${functions[key]}\n`);
     });
   } else {
     if (functions[key]) {
-      console.log(`${key.padEnd(10)} -\t${functions[key]}\n`);
+      console.error(`${key.padEnd(10)} -\t${functions[key]}\n`);
       return;
     }
   }

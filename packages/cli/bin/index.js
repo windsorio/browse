@@ -118,7 +118,8 @@ const genUnknownParseError = () =>
     const document = path.resolve(process.cwd(), script);
     const code = fs.readFileSync(document, "utf8");
     if (!code) {
-      console.log(`Could not find any browse code at ${script}`);
+      console.error(`Could not find any browse code at ${script}`);
+      process.exit(1);
     }
 
     const r = parser.grammar.match(code);
