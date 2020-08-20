@@ -1475,6 +1475,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         "npm:5.1.0"
       ],
       [
+        "remove-trailing-slash",
+        "npm:0.1.0"
+      ],
+      [
         "repeat-string",
         "npm:1.6.1"
       ],
@@ -1969,6 +1973,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["is-docker", "npm:2.1.1"],
             ["puppeteer", "npm:5.2.1"],
             ["puppeteer-core", "npm:5.2.1"],
+            ["remove-trailing-slash", "npm:0.1.0"],
             ["url-pattern", "npm:1.0.3"]
           ],
           "linkType": "SOFT",
@@ -5995,6 +6000,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [
             ["registry-url", "npm:5.1.0"],
             ["rc", "npm:1.2.8"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["remove-trailing-slash", [
+        ["npm:0.1.0", {
+          "packageLocation": "./.yarn/cache/remove-trailing-slash-npm-0.1.0-c4b4467489-5ba16dbb93.zip/node_modules/remove-trailing-slash/",
+          "packageDependencies": [
+            ["remove-trailing-slash", "npm:0.1.0"]
           ],
           "linkType": "HARD",
         }]

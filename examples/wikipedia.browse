@@ -1,14 +1,13 @@
+set headless false
+
 page(
   cache
   ttl="7d"
 ) https://en.wikipedia.org/wiki/:slug {
   wait 1000
+
   @string title `#firstHeading`
-  @string summary `#mw-content-text > div > p:nth-child(4)`
-  @arr headings `.mw-headline` {
-    @string text `.span`
-    @url? mainArticle `a` href
-  }
-  crawl `a`
+  @arr( string ) paragraphs `div.mw-parser-output`
+  # crawl `a`
 }
 visit https://en.wikipedia.org/wiki/Kevin_Bacon

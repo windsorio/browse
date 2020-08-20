@@ -9,6 +9,7 @@ module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
   parent: null, // This is the root
   vars: {},
   internal: {},
+  close: async () => {},
   rules: {
     help: (scope) => (_) => (key) => {
       // Find the lowest scope that actually has the 'help' rule
@@ -23,6 +24,8 @@ module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
           get:
             "<key> - Get the value of the variable 'key'. When using this rule as an expression - i.e. (get var), you may use the shorthand '$var' instead",
           set: "<key> <value> - Set the variable 'key' to the value 'value'",
+          unset:
+            "<key> - Unset the variable 'key', and return a value if there is one",
           sleep: "<ms> - Sleep for the specifed amount of milliseconds",
           print: "<...vals> - Print values to stdout",
           rule: `<name> <body> - Define a new rule 'name'. The 'body' has access to two additional rules, 'bind' and 'return' to take arguments and return a value
@@ -43,6 +46,11 @@ module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
       scope.vars[name] = value;
       return value;
     },
+    unset: (scope) => (_) => (name) => {
+      const value = scope.vars[name] || null;
+      delete scope.vars[name];
+      return value;
+    },
     rule: (scope) => (_opts) => (name, body) => {
       let existingRule;
       try {
@@ -55,6 +63,7 @@ module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
         // TODO: if body has `expects`, inject those from _ruleEvalScope
         evalRuleSet(body, {
           rules: {
+            // TODO: bind should only be accessible at the top level
             bind: (boundScope) => (bindOpts) => (...names) => {
               Object.keys(bindOpts).forEach((opt) => {
                 if (bindOpts[opt] !== true) {
@@ -148,7 +157,7 @@ module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
           // and remove after, so that it's not available in the body
           scope.rules.test = (_) => (_) => (expr) => (!!expr ? true : false);
           for (const rule of iteratorRules) {
-            const result = await evalRule(rule, iteratorScope);
+            const result = await evalRule(rule, scope);
             if (rule.fn.name.name === "test" && !result) {
               finished = true; // ends the loop
               break; // Skip evaluating the rest

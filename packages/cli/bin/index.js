@@ -38,6 +38,14 @@ if (argv.web) {
   scope = require("@browselang/web")(scope);
 }
 
+async function closeAllScopes() {
+  let c = scope;
+  while (c) {
+    await c.close();
+    c = c.parent;
+  }
+}
+
 const genUnknownParseError = () =>
   new Error(
     "Browse encountered an error while parsing your script but was unable\nto identify the specific issue. Check the syntax carefully"
@@ -162,4 +170,6 @@ const genUnknownParseError = () =>
       process.stderr.write("\n");
     }
   }
+
+  await closeAllScopes();
 })();

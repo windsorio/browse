@@ -1,69 +1,69 @@
 "use strict";
 
-const {
-  resolveInternal,
-  resolveRule,
-  resolveRuleScope,
-  resolveInternalScope,
-  validateScope,
-} = require("@browselang/core/lib/scope");
-
-const assertPageScope = (scope, message) => {
-  if (!validateScope((scope) => scope.internal.isPage, scope)) {
-    throw new Error(message);
-  }
-};
-
+const fs = require("fs-extra");
+const { resolveRule, resolveRuleScope } = require("@browselang/core/lib/scope");
 const { evalRule, evalRuleSet, getNewScope } = require("@browselang/core");
 const { help } = require("@browselang/core/lib/utils");
-const fs = require("fs-extra");
+const scope = require("@browselang/core/lib/scope");
 
-const dataStorageRule = (jsProcessing, type, optional = false) => (scope) => (
-  _opts
-) => async (key, selector) => {
-  assertPageScope(scope, `Cannot call @${type} outside of page context`);
-  const value = await resolveInternal("page", scope).$eval(
-    selector,
-    jsProcessing
-  );
-  if (value === null && !optional) {
-    throw new BrowseError({
-      message: `Element given to @${type} call had no content of the correct type. If this value is optional, try using @${type}?. This will set the value to null if a match isn't found`,
-      node: null,
-    });
-  }
-  const nearestPageScope = resolveInternalScope("page", scope);
-  nearestPageScope.internal.data[key] = value;
-  return value;
-};
-
-// undefined is not understood by browse. Best practice is to always return null
-// rather than undefined to make function conversion to browse easier later
+/**
+ * Data extraction functions
+ * Explicitly return `null` if no data is available
+ */
 const getString = (el) => el.textContent || el.innerText || null;
-
+const getStrings = (els) =>
+  els.map((el) => el.textContent || el.innerText || null).filter(Boolean);
 const getNumber = (el) => {
   const text = el.textContent || el.innerText;
   const num = text ? Number(text) : null;
-  return isNaN(num) ? null : num;
+  return isNaN(num) ? null : num; // TODO: add NaN to browse?
 };
-
 const getUrl = (el) => el.href || null;
 
 /**
- * A scope accessible within a page RuleSet
+ * A scope accessible within a `page` RuleSet
  */
-const getPageScope = (parent) => ({
-  parent,
-  vars: {},
-  internal: {
-    //To tell if you're in a page scope
-    isPage: true,
-    page: null,
-    data: {},
-    config: {},
-  },
-  rules: {
-    help: (scope) => (_opts) => (key) => {
+const getPageScope = (parent) => {
+  const pageScope = {
+    parent,
+    vars: {},
+    internal: {
+      page: null,
+      config: {},
+
+      // If other pages are visited from this page, we track those here
+      links: [],
+    },
+    rules: {},
+  };
+
+  const dataStorageRule = (extractor, type, optional = false) => (_) => ({
+    trim = true,
+  }) => async (key, selector) => {
+    let value = null;
+    try {
+      value = await pageScope.internal.page.$eval(selector, extractor);
+      if (value === null || value === undefined) {
+        value = null; // We don't want undefined in the `finally` clause
+        throw new Error(
+          `Element given to @${type} call had no content of the correct type. If this value is optional, try using @${type}?. This will set the value to null if a match isn't found`
+        );
+      }
+      if (trim && typeof value === "string") {
+        value = value.trim();
+      }
+    } catch (e) {
+      if (!optional) throw e;
+    } finally {
+      // These are always set on the page scope, not the scope in which the data
+      // extraction rule is evaluated
+      pageScope.vars[key] = value;
+    }
+    return value;
+  };
+
+  pageScope.rules = {
+    help: (scope) => (_) => (key) => {
       // Find the lowest scope that actually has the 'help' rule
       const helpScope = resolveRuleScope("help", scope);
       help({
@@ -99,52 +99,68 @@ const getPageScope = (parent) => ({
       });
       return null;
     },
-    "@string": dataStorageRule(getString, "string"),
-    "@string?": dataStorageRule(getString, "string", true),
-    "@number": dataStorageRule(getNumber, "number"),
-    "@number?": dataStorageRule(getNumber, "number", true),
-    "@url": dataStorageRule(getUrl, "url"),
-    "@url?": dataStorageRule(getUrl, "url", true),
-    click: (scope) => (_opts) => async (selector) => {
-      assertPageScope(scope, `Cannot call click outside of page context`);
-      const page = resolveInternal("page", scope);
-      if (!page) {
-        return false;
-      }
-      await page.click(selector);
-      return true;
-    },
-    config: (scope) => (_opts) => async (ruleSet) => {
-      assertPageScope(scope, `Cannot call config outside of page context`);
-      // Since config applies to pages, this should set the config for the nearest page
-      const nearestPageScope = resolveInternalScope("page", scope);
-
-      //Evaluate the ruleSet
+    config: (_) => (_) => async (ruleSet) => {
+      // Evaluate the ruleSet
       await evalRuleSet(ruleSet, {
         rules: {
           set: (_) => (_) => (name, value) => {
-            // Note: a benefit of validate scope, there is no need to check
-            // nearestPageScope, we know we're in a page scope
-            nearestPageScope.internal.config[name] = value;
+            pageScope.internal.config[name] = value;
             if (name === "output") {
               // For output files, we create the file and any directories and then open up a write stream
               fs.ensureFileSync(value);
-              nearestPageScope.internal.config.writeStream = fs.createWriteStream(
+              pageScope.internal.config.writeStream = fs.createWriteStream(
                 value
               );
             }
           },
         },
       });
-
-      return nearestPageScope.internal.config;
+      return pageScope.internal.config;
     },
-    crawl: (scope) => (_opts) => async (selector) => {
-      assertPageScope(scope, `Cannot call crawl outside of page context`);
-      const page = resolveInternal("page", scope);
+    "@string": dataStorageRule(getString, "string"),
+    "@string?": dataStorageRule(getString, "string", true),
+    "@number": dataStorageRule(getNumber, "number"),
+    "@number?": dataStorageRule(getNumber, "number", true),
+    "@url": dataStorageRule(getUrl, "url"),
+    "@url?": dataStorageRule(getUrl, "url", true),
+    "@arr": (_) => ({ string = false, trim = true }) => async (
+      key,
+      selector
+    ) => {
+      let type, extractor;
+      if (string) {
+        type = "string";
+        extractor = getStrings;
+      }
+      // TODO: support more type
+
+      if (!type)
+        throw new Error(
+          "A type option must be set when using @arr. Example: @arr(string) or @arr(number)"
+        );
+
+      let value = await pageScope.internal.page.$$eval(selector, getStrings);
+      if (trim && type === "string") {
+        value = value.map((s) => s.trim());
+      }
+      pageScope.vars[key] = value;
+      return value;
+    },
+    click: (_) => (_) => async (selector) => {
+      const page = pageScope.internal.page;
+      if (!page) {
+        return false;
+      }
+      await page.click(selector);
+      return true;
+    },
+    crawl: (scope) => (_) => async (selector) => {
+      const page = pageScope.internal.page;
       const urls = await page.$$eval(selector, (elArr) =>
         elArr.map((el) => el.href).filter(Boolean)
       );
+
+      pageScope.internal.links.push(...urls);
 
       const ruleNodes = urls.map((url) => ({
         type: "Rule",
@@ -157,44 +173,43 @@ const getPageScope = (parent) => ({
       }));
 
       const values = await Promise.all(
+        // It's as if this crawl was replaced with multiple visit calls, so we
+        // can use this current scope to evaluate them
         ruleNodes.map((ruleNode) => evalRule(ruleNode, scope))
       );
       return values;
     },
-    press: (scope) => (_opts) => async (key) => {
-      assertPageScope(scope, `Cannot call press outside of page context`);
-      const page = resolveInternal("page", scope);
+    press: (_) => (_) => async (key) => {
+      const page = pageScope.internal.page;
       if (!page) {
         return false;
       }
       await page.keyboard.press(key);
       return true;
     },
-    screenshot: (scope) => (_opts) => async (fname) => {
-      const page = resolveInternal("page", scope);
+    screenshot: (_) => (_) => async (fname) => {
+      const page = pageScope.internal.page;
       if (!page) {
         return false;
       }
       await page.screenshot({ path: fname });
       return true;
     },
-    type: (scope) => (_opts) => async (...values) => {
-      assertPageScope(scope, `Cannot call type outside of page context`);
-      validateScope((scope) => scope.internal.isPage, scope, true);
-      const page = resolveInternal("page", scope);
+    type: (_) => (_) => async (...values) => {
+      const page = pageScope.internal.page;
       if (!page) {
         return false;
       }
-      const keys = [...values.join(" ")];
+      const str = values.join(" ");
+      const keys = [...str];
       for (let i = 0; i < keys.length; i++) {
         const key = keys[i];
         await page.keyboard.press(key);
       }
-      return values.join(" ");
+      return str;
     },
-    wait: (scope) => (_opts) => async (value) => {
-      assertPageScope(scope, `Cannot call wait outside of page context`);
-      const page = resolveInternal("page", scope);
+    wait: (_) => (_) => async (value) => {
+      const page = pageScope.internal.page;
       if (!page) {
         return false;
       }
@@ -207,7 +222,15 @@ const getPageScope = (parent) => ({
       }
       return true;
     },
-  },
-});
+  };
+
+  pageScope.close = async () => {
+    if (pageScope.internal.page) {
+      await pageScope.internal.page.close();
+    }
+  };
+
+  return pageScope;
+};
 
 module.exports = getPageScope;

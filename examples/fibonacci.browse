@@ -4,8 +4,6 @@ rule fib {
   # Bind "n" to the incoming value
   bind n
 
-  print $n
-
   # Another comment
 
   if ($n <= 1) then {

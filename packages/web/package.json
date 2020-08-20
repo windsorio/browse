@@ -41,8 +41,9 @@
     "@browselang/core": "workspace:packages/core",
     "fs-extra": "9.0.1",
     "is-docker": "2.1.1",
-    "puppeteer": "^5.2.1",
+    "puppeteer": "5.2.1",
     "puppeteer-core": "5.2.1",
+    "remove-trailing-slash": "0.1.0",
     "url-pattern": "1.0.3"
   }
 }

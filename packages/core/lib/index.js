@@ -10,10 +10,11 @@ const getNewScope = (parent) => {
     parent = getSTD({ evalRule, evalRuleSet, getNewScope });
   }
   return {
+    parent,
     rules: {},
     vars: {},
     internal: {},
-    parent,
+    close: async () => {},
   };
 };
 

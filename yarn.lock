@@ -86,8 +86,9 @@ __metadata:
     ava: 3.11.1
     fs-extra: 9.0.1
     is-docker: 2.1.1
-    puppeteer: ^5.2.1
+    puppeteer: 5.2.1
     puppeteer-core: 5.2.1
+    remove-trailing-slash: 0.1.0
     url-pattern: 1.0.3
   languageName: unknown
   linkType: soft
@@ -3558,7 +3559,7 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"puppeteer@npm:^5.2.1":
+"puppeteer@npm:5.2.1":
   version: 5.2.1
   resolution: "puppeteer@npm:5.2.1"
   dependencies:
@@ -3668,6 +3669,13 @@ fsevents@~2.1.2:
   dependencies:
     rc: ^1.2.8
   checksum: 50802a1d43efb18505ffc1f242b8af43bde95e95ac2461f453ef21d4bce793d4230076147809f1ade7452afaa537c6e0324dd4a7bc9d83f1b6f5cc7e1300c544
+  languageName: node
+  linkType: hard
+
+"remove-trailing-slash@npm:0.1.0":
+  version: 0.1.0
+  resolution: "remove-trailing-slash@npm:0.1.0"
+  checksum: 5ba16dbb931095534e8708a00c959d0937a4990e0db09480bf853529925e6f69b2bf15b2cd83b08ce17bfd15f82c6212f0e17a48942c4b9be09ef81ad8dbdf2c
   languageName: node
   linkType: hard
 
