@@ -127,13 +127,11 @@ const genUnknownParseError = () =>
         });
       } else {
         try {
-          await evalRuleSet(
-            {
-              type: "RuleSet",
-              rules: n.asAST,
-            },
-            scope
-          );
+          await evalRuleSet({
+            type: "RuleSet",
+            rules: n.asAST,
+            scope,
+          });
         } catch (e) {
           process.stderr.write(
             stringifyError(e, {

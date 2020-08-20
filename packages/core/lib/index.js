@@ -27,7 +27,7 @@ const evalExpr = async (expr, scope) => {
     case "Ident":
       return resolveVar(expr, scope);
     case "RuleSet":
-      return expr;
+      return { ...expr, scope }; // tracks lexical scope
     case "RuleExpr":
       return evalRule(expr.expr, scope);
     case "UnaryExpr":
@@ -132,20 +132,26 @@ const evalRule = async (rule, scope) => {
   }
 };
 
-const evalRuleSet = async (ruleSet, parent) => {
-  assert(ruleSet.type === "RuleSet");
+const evalRuleSet = async (ruleSet, inject = {}) => {
+  const rules = [...ruleSet.rules]; // Don't want to modify the original rules
 
-  if (!parent) {
-    parent = getSTD({ evalRule, evalRuleSet, getNewScope });
-  }
-
-  const { rules: oRules } = ruleSet;
-  const rules = [...oRules]; // Don't want to modify the original rules
-
-  const scope = getNewScope(parent);
   if (!rules.length) {
     return null;
   }
+
+  // Setup scope
+  let scope;
+  if (inject.parent !== undefined) {
+    // if inject has a `parent` set, then we just treat inject as the scope
+    // inject should RARELY be used this way
+    scope = inject;
+  } else {
+    scope = getNewScope(ruleSet.scope);
+    Object.assign(scope.fns, inject.fns || {});
+    Object.assign(scope.vars, inject.vars || {});
+    Object.assign(scope.internal, inject.internal || {});
+  }
+
   const lastRule = rules.pop();
   for (const rule of rules) {
     try {

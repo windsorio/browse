@@ -118,25 +118,26 @@ const getPageScope = (parent) => ({
     },
     config: (scope) => (_opts) => async (ruleSet) => {
       assertPageScope(scope, `Cannot call config outside of page context`);
-      //Since config applies to pages, this should set the config for the nearest page
+      // Since config applies to pages, this should set the config for the nearest page
       const nearestPageScope = resolveInternalScope("page", scope);
 
-      const configScope = getNewScope(nearestPageScope);
-
-      //Override the set behavior
-      configScope.fns.set = (_) => (_) => (name, value) => {
-        //Note: a benefit of validate scope, there is no need to check nearestPageScope, we know we're in a page scope
-        nearestPageScope.internal.config[name] = value;
-        if (name === "output") {
-          //For output files, we create the file and any directories and then open up a write stream
-          fs.ensureFileSync(value);
-          nearestPageScope.internal.config.writeStream = fs.createWriteStream(
-            value
-          );
-        }
-      };
       //Evaluate the ruleSet
-      await evalRuleSet(ruleSet, configScope);
+      await evalRuleSet(ruleSet, {
+        fns: {
+          set: (_) => (_) => (name, value) => {
+            // Note: a benefit of validate scope, there is no need to check
+            // nearestPageScope, we know we're in a page scope
+            nearestPageScope.internal.config[name] = value;
+            if (name === "output") {
+              // For output files, we create the file and any directories and then open up a write stream
+              fs.ensureFileSync(value);
+              nearestPageScope.internal.config.writeStream = fs.createWriteStream(
+                value
+              );
+            }
+          },
+        },
+      });
 
       return nearestPageScope.internal.config;
     },

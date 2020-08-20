@@ -1,18 +1,12 @@
-fun print_page_details {
-  print $url
-  print $query
-  print $hash
-}
-
 page https://www.thegazette.co.uk/all-notices/notice {
-  print_page_details
+  print $url
 
   crawl `article div header h3.title a`
   crawl `li.next a`
 }
 
 page https://www.thegazette.co.uk/:ignore/issue/:ignore/page/:page {
-  print_page_details
+  print $url
 
   config {
     set output "./notices/" + $page + ".json"

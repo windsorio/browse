@@ -21,7 +21,7 @@ const isDocker = require("is-docker");
 const getPageScope = require("./page");
 
 const newBrowser = async (headless) => {
-  return await puppeteer.launch({
+  return puppeteer.launch({
     ...(isDocker()
       ? {
           headless: false,
@@ -29,8 +29,8 @@ const newBrowser = async (headless) => {
             // Required for Docker version of Puppeteer
             "--no-sandbox",
             "--disable-setuid-sandbox",
-            // This will write shared memory files into /tmp instead of /dev/shm,
-            // because Docker’s default for /dev/shm is 64MB
+            // This will write shared memory files into /tmp instead of
+            // /dev/shm, because Docker’s default for /dev/shm is 64MB
             "--disable-dev-shm-usage",
           ],
         }
@@ -54,20 +54,15 @@ const assertBrowserScope = (scope, message) => {
 };
 
 //Centralize control of goto function
-const go = async (page, href) => {
-  return page.goto(href, {
+const go = async (page, url) => {
+  return page.goto(url, {
     timeout: 25000,
   });
 };
 
-const preparePage = (parent) => async (browser, href) => {
-  const newPageScope = getPageScope(parent);
-
-  //Give the new page scope a fresh tab
+const preparePage = async (browser, href) => {
   const page = await browser.newPage();
-  newPageScope.internal.page = page;
 
-  //Navigate to the fresh page
   try {
     await go(page, href);
   } catch (e) {
@@ -76,7 +71,8 @@ const preparePage = (parent) => async (browser, href) => {
       node: null,
     });
   }
-  return newPageScope;
+
+  return page;
 };
 
 /**
@@ -143,7 +139,6 @@ const getBrowserScope = (parent) => ({
       resolveInternal("pageDefs", scope)[finalPattern] = {
         matcher: new UrlPattern(finalPattern),
         ruleSets,
-        parent: scope,
       };
       return null;
     },
@@ -157,12 +152,11 @@ const getBrowserScope = (parent) => ({
 
           // TODO: Make this determinisitic
           for (const key in defs) {
-            const { matcher, ruleSets, parent } = defs[key];
+            const { matcher, ruleSets } = defs[key];
             const matchObj = matcher.match(href.split("?")[0]);
             if (matchObj) {
               const urlObj = url.parse(href);
               match = {
-                parent,
                 ruleSets,
                 path: matchObj,
                 query: urlObj.query || null,
@@ -174,8 +168,10 @@ const getBrowserScope = (parent) => ({
         });
       } catch (e) {}
 
-      //Get the nearest browser scope
+      // Get the nearest browser scope
       const nearestBrowserScope = resolveInternalScope("browser", scope);
+      // Get the nearest page scope
+      const nearestPageScope = resolveInternalScope("page", scope);
 
       const isHeadless = resolveVar("headless", scope);
 
@@ -190,8 +186,10 @@ const getBrowserScope = (parent) => ({
       if (match) {
         await Promise.all(
           match.ruleSets.map(async (ruleSet) => {
-            //Create a new page scope in the same scope that the page rule was created in and navigate to href
-            const newPageScope = await preparePage(match.parent)(browser, href);
+            const newPageScope = getPageScope(ruleSet.scope);
+
+            const page = await preparePage(browser, href);
+            newPageScope.internal.page = page;
 
             // inject args and "url" as variables into the new page scope
             Object.assign(newPageScope.vars, match.path, {
@@ -202,16 +200,14 @@ const getBrowserScope = (parent) => ({
 
             await evalRuleSet(ruleSet, newPageScope);
 
-            // TODO: check if the url has changed? If so, recurse and execute the necessary `page` rule
             const data = newPageScope.internal.data;
             if (Object.keys(data).length) {
               if (data.url) {
                 console.warn(
-                  "WARNING:: The key 'url' will always be overridden by the default url value (See docs <https://....>)"
+                  "Warning: The key 'url' will always be overridden by the default url value (See docs <https://....>)"
                 );
               }
               data.url = href;
-              //Grabs the nearest config where output is defined, else return false
               const { value: config, success } = throws(resolveInternal)(
                 "config",
                 newPageScope,
@@ -219,6 +215,7 @@ const getBrowserScope = (parent) => ({
               );
 
               if (success) {
+                // TODO: A better file output setup
                 if (config.writeStream) {
                   config.writeStream.write(JSON.stringify(data) + "\n", {
                     flags: "a",
@@ -232,13 +229,16 @@ const getBrowserScope = (parent) => ({
                 console.log(JSON.stringify(data));
               }
             }
+
+            // TODO: check if the url has changed? If so, recurse and execute
+            // the necessary `page` rule
+
             // Finally, close the page
             newPageScope.internal.page.close();
           })
         );
       } else {
-        //Create a new page in the nearest browser scope and navigate to href
-        await preparePage(nearestBrowserScope)(browser, href);
+        nearestPageScope.page = await preparePage(browser, href);
       }
       return href;
     },
