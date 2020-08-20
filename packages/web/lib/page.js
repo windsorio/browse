@@ -2,8 +2,8 @@
 
 const {
   resolveInternal,
-  resolveFn,
-  resolveFnScope,
+  resolveRule,
+  resolveRuleScope,
   resolveInternalScope,
   validateScope,
 } = require("@browselang/core/lib/scope");
@@ -17,9 +17,8 @@ const assertPageScope = (scope, message) => {
 const { evalRule, evalRuleSet, getNewScope } = require("@browselang/core");
 const { help } = require("@browselang/core/lib/utils");
 const fs = require("fs-extra");
-const { keys } = require("./constants");
 
-const dataStorageFn = (jsProcessing, type, optional = false) => (scope) => (
+const dataStorageRule = (jsProcessing, type, optional = false) => (scope) => (
   _opts
 ) => async (key, selector) => {
   assertPageScope(scope, `Cannot call @${type} outside of page context`);
@@ -38,7 +37,8 @@ const dataStorageFn = (jsProcessing, type, optional = false) => (scope) => (
   return value;
 };
 
-//Undefined is not understood by browse. Best practice is to always return null rather than undefined to make function conversion to browse easier later
+// undefined is not understood by browse. Best practice is to always return null
+// rather than undefined to make function conversion to browse easier later
 const getString = (el) => el.textContent || el.innerText || null;
 
 const getNumber = (el) => {
@@ -62,17 +62,17 @@ const getPageScope = (parent) => ({
     data: {},
     config: {},
   },
-  fns: {
+  rules: {
     help: (scope) => (_opts) => (key) => {
-      // Find the lowest scope that actually has the 'help' function
-      const helpScope = resolveFnScope("help", scope);
+      // Find the lowest scope that actually has the 'help' rule
+      const helpScope = resolveRuleScope("help", scope);
       help({
-        resolveFn,
+        resolveRule,
         scope: helpScope,
         key,
         functions: {
           config:
-            "Takes in a ruleSet and overrides the set function so that any sets within the ruleSet set config variables",
+            "Takes in a ruleSet and overrides the set rule so that any sets within the ruleSet set config variables",
           click:
             "Takes in a selector and clicks the argument indicated by the selector",
           "@string":
@@ -87,8 +87,6 @@ const getPageScope = (parent) => ({
             "<key> <selector>: Sets a key on the data object in nearest page scope to the href value at the selector",
           "@url?":
             "<key> <selector>: Sets a key on the data object in nearest page scope to the href value at the selector or to null if there is no href value",
-          info:
-            "Prints out info about all of the functions if given no arguemnts. If given an argument, prints out info about the function whose name was passed",
           page:
             "Defines a page definition which matches on the regex passed in as the first argument, and which executes the rule set passed in as the second argument on every matching page",
           press: "Presses the given key",
@@ -101,12 +99,12 @@ const getPageScope = (parent) => ({
       });
       return null;
     },
-    "@string": dataStorageFn(getString, "string"),
-    "@string?": dataStorageFn(getString, "string", true),
-    "@number": dataStorageFn(getNumber, "number"),
-    "@number?": dataStorageFn(getNumber, "number", true),
-    "@url": dataStorageFn(getUrl, "url"),
-    "@url?": dataStorageFn(getUrl, "url", true),
+    "@string": dataStorageRule(getString, "string"),
+    "@string?": dataStorageRule(getString, "string", true),
+    "@number": dataStorageRule(getNumber, "number"),
+    "@number?": dataStorageRule(getNumber, "number", true),
+    "@url": dataStorageRule(getUrl, "url"),
+    "@url?": dataStorageRule(getUrl, "url", true),
     click: (scope) => (_opts) => async (selector) => {
       assertPageScope(scope, `Cannot call click outside of page context`);
       const page = resolveInternal("page", scope);
@@ -123,7 +121,7 @@ const getPageScope = (parent) => ({
 
       //Evaluate the ruleSet
       await evalRuleSet(ruleSet, {
-        fns: {
+        rules: {
           set: (_) => (_) => (name, value) => {
             // Note: a benefit of validate scope, there is no need to check
             // nearestPageScope, we know we're in a page scope

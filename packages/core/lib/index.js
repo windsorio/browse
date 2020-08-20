@@ -1,9 +1,8 @@
 "use strict";
 
 const getSTD = require("./std");
-const assert = require("assert");
 const { stringify } = require("./utils");
-const { resolveFn, resolveVar } = require("./scope");
+const { resolveRule, resolveVar } = require("./scope");
 const { BrowseError, stringifyError } = require("./error");
 
 const getNewScope = (parent) => {
@@ -11,7 +10,7 @@ const getNewScope = (parent) => {
     parent = getSTD({ evalRule, evalRuleSet, getNewScope });
   }
   return {
-    fns: {},
+    rules: {},
     vars: {},
     internal: {},
     parent,
@@ -124,7 +123,7 @@ const evalRule = async (rule, scope) => {
     // async This try...catch will handle that, and also any errors from a
     // rejected promise
     const promise = Promise.resolve(
-      resolveFn(fn.name, scope)(scope)(resolvedOpts)(...resolvedArgs)
+      resolveRule(fn.name, scope)(scope)(resolvedOpts)(...resolvedArgs)
     );
     return await promise;
   } catch (err) {
@@ -147,7 +146,7 @@ const evalRuleSet = async (ruleSet, inject = {}) => {
     scope = inject;
   } else {
     scope = getNewScope(ruleSet.scope);
-    Object.assign(scope.fns, inject.fns || {});
+    Object.assign(scope.rules, inject.rules || {});
     Object.assign(scope.vars, inject.vars || {});
     Object.assign(scope.internal, inject.internal || {});
   }

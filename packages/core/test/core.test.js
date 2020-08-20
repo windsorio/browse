@@ -62,19 +62,19 @@ test("undefined variable", async (t) => {
   );
 });
 
-test("redefining a function", async (t) => {
-  const fn = {
+test("redefining a rule", async (t) => {
+  const rule = {
     type: "Rule",
-    fn: { type: "Word", name: "fun" },
+    fn: { type: "Word", name: "rule" },
     args: [
       { type: "Literal", value: "f" },
       { type: "RuleSet", rules: [] },
     ],
   };
   const scope = getNewScope();
-  await evalRule(fn, scope);
+  await evalRule(rule, scope);
   await t.throwsAsync(
-    () => evalRule(fn, scope),
-    getBrowseErrorAssertion("Function 'f' is already defined")
+    () => evalRule(rule, scope),
+    getBrowseErrorAssertion("Rule 'f' is already defined")
   );
 });

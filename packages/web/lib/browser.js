@@ -6,8 +6,8 @@ const url = require("url");
 const puppeteer = require("puppeteer");
 const { evalRuleSet } = require("@browselang/core");
 const {
-  resolveFn,
-  resolveFnScope,
+  resolveRule,
+  resolveRuleScope,
   resolveVar,
   resolveInternal,
   resolveInternalScope,
@@ -76,7 +76,7 @@ const preparePage = async (browser, href) => {
 };
 
 /**
- * A scope containing all the web-scraping functions and variables
+ * A scope containing all the web-scraping rules and variables
  */
 const getBrowserScope = (parent) => ({
   parent,
@@ -91,12 +91,12 @@ const getBrowserScope = (parent) => ({
     // Page definitions
     pageDefs: {},
   },
-  fns: {
+  rules: {
     help: (scope) => (_opts) => (key) => {
-      // Find the lowest scope that actually has the 'help' function
-      const helpScope = resolveFnScope("help", scope);
+      // Find the lowest scope that actually has the 'help' rule
+      const helpScope = resolveRuleScope("help", scope);
       help({
-        resolveFn,
+        resolveRule,
         scope: helpScope,
         key,
         functions: {

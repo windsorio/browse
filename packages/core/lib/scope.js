@@ -1,23 +1,23 @@
 const { BrowseError } = require("./error");
 
 /**
- * Recursively find a function matching the name by walking up the scope/environment inheritance chain
- * @param {string | Word} name The function/rule name or Word AST node
+ * Recursively find a rule matching the name by walking up the scope/environment inheritance chain
+ * @param {string | Word} name The rule name or Word AST node
  * @param {Scope} scope The scope to use
  */
-const resolveFn = (name, scope) => {
+const resolveRule = (name, scope) => {
   const varName = typeof name === "string" ? name : name.name;
   if (!scope) {
     throw new BrowseError({
-      message: `Function '${varName}' is not defined`,
+      message: `Rule '${varName}' is not defined`,
       node: typeof name === "string" ? null : name,
     });
   }
-  if (scope.fns[varName]) {
-    return scope.fns[varName];
+  if (scope.rules[varName]) {
+    return scope.rules[varName];
   }
 
-  return resolveFn(name, scope.parent);
+  return resolveRule(name, scope.parent);
 };
 
 /**
@@ -42,23 +42,23 @@ const resolveVar = (name, scope) => {
 };
 
 /**
- * Recursively find a function matching the name by walking up the scope/environment inheritance
- * chain and return the containing scope, not the function
- * @param {string | Word} name The function name
+ * Recursively find a rule matching the name by walking up the scope/environment inheritance
+ * chain and return the containing scope, not the rule
+ * @param {string | Word} name The rule name
  * @param {Scope} scope The scope to use
  */
-const resolveFnScope = (name, scope) => {
+const resolveRuleScope = (name, scope) => {
   const varName = typeof name === "string" ? name : name.name;
   if (!scope) {
     throw new BrowseError({
-      message: `Function '${varName}' is not defined`,
+      message: `Rule '${varName}' is not defined`,
       node: typeof name === "string" ? null : name,
     });
   }
-  if (scope.fns[varName]) {
+  if (scope.rules[varName]) {
     return scope;
   } else {
-    return resolveFnScope(name, scope.parent);
+    return resolveRuleScope(name, scope.parent);
   }
 };
 
@@ -129,9 +129,9 @@ const validateScope = (f, scope) => {
 };
 
 module.exports = {
-  resolveFn,
+  resolveRule,
   resolveVar,
-  resolveFnScope,
+  resolveRuleScope,
   resolveVarScope,
   resolveInternal,
   resolveInternalScope,

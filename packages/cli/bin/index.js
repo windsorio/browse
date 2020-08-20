@@ -12,7 +12,7 @@ const { argv } = yargs
   .command("$0 [script]", "Run browse", (yargs) => {
     yargs.option("web", {
       type: "boolean",
-      description: "Add web-scraping function to the global context",
+      description: "Add web-scraping rules to the global context",
     });
   })
   .help("h")

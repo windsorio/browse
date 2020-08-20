@@ -1,35 +1,35 @@
-const { resolveFn, resolveFnScope, resolveVar } = require("./scope");
+const { resolveRule, resolveRuleScope, resolveVar } = require("./scope");
 const { help, stringify } = require("./utils");
 const { BrowseError } = require("./error");
 
 /**
- * The root scope that contains all the basic/standard functions and variables
+ * The root scope that contains all the basic/standard rules and variables
  */
 module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
   parent: null, // This is the root
   vars: {},
   internal: {},
-  fns: {
+  rules: {
     help: (scope) => (_) => (key) => {
-      // Find the lowest scope that actually has the 'help' function
-      const helpScope = resolveFnScope("help", scope);
+      // Find the lowest scope that actually has the 'help' rule
+      const helpScope = resolveRuleScope("help", scope);
       help({
-        resolveFn,
+        resolveRule,
         scope: helpScope,
         key,
         functions: {
           help:
-            "Prints out help information about all the available functions. Pass an argument to get information on a specific function",
+            "Prints out help information about all the available rules. Pass an argument to get information on a specific rule",
           get:
             "<key> - Get the value of the variable 'key'. When using this rule as an expression - i.e. (get var), you may use the shorthand '$var' instead",
           set: "<key> <value> - Set the variable 'key' to the value 'value'",
           sleep: "<ms> - Sleep for the specifed amount of milliseconds",
           print: "<...vals> - Print values to stdout",
-          fun: `<name> <body> - Define a new function 'name'. The 'body' has access to two additional functions, 'bind' and 'return' to take arguments and return a value
-                    bind <...keys> - for each value passed into the function, store it as a variable using the names passed by 'keys'
+          rule: `<name> <body> - Define a new rule 'name'. The 'body' has access to two additional rules, 'bind' and 'return' to take arguments and return a value
+                    bind <...keys> - for each value passed into the rule, store it as a variable using the names passed by 'keys'
                     return <value> - return the value`,
           if: `<condition> then <then> else <else> - If 'condition' is truthy, evaluate the 'then' RuleSet, else evaluate the 'else' rule set`,
-          scope: "Internal: debug functions to print the current JS scope",
+          scope: "Internal: debug rule to print the current JS scope",
         },
       });
       return null;
@@ -44,27 +44,28 @@ module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
       return value;
     },
     rule: (scope) => (_opts) => (name, body) => {
-      let existingFn;
+      let existingRule;
       try {
-        existingFn = resolveFn(name, scope);
+        existingRule = resolveRule(name, scope);
       } catch (e) {}
-      if (existingFn) {
-        throw new Error(`Function '${name}' is already defined`);
+      if (existingRule) {
+        throw new Error(`Rule '${name}' is already defined`);
       }
-      scope.fns[name] = (fnScope) => (fnOpts) => (...args) =>
+      scope.rules[name] = (_ruleEvalScope) => (ruleOpts) => (...args) =>
+        // TODO: if body has `expects`, inject those from _ruleEvalScope
         evalRuleSet(body, {
-          fns: {
-            bind: (_) => (bindOpts) => (...names) => {
+          rules: {
+            bind: (boundScope) => (bindOpts) => (...names) => {
               Object.keys(bindOpts).forEach((opt) => {
                 if (bindOpts[opt] !== true) {
                   throw new BrowseError({
                     message: `Options passed to bind can only have the value "true". Option '${opt}' has a different value`,
                   });
                 }
-                fnScope.vars[opt] = fnOpts[opt] || null;
+                boundScope.vars[opt] = ruleOpts[opt] || null;
               });
               names.forEach(
-                (name, i) => (fnScope.vars[name] = args[i] || null)
+                (name, i) => (boundScope.vars[name] = args[i] || null)
               );
               return null;
             },
@@ -72,7 +73,7 @@ module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
           },
         });
 
-      return scope.fns[name];
+      return scope.rules[name];
     },
     sleep: (_) => (_) => async (ms) =>
       new Promise((resolve) => setTimeout(resolve, ms)),
@@ -143,9 +144,9 @@ module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
         // run the iterator tests
         scope.parent = itLexScope;
         try {
-          // This function is added to the scope before each iterator evaluation
+          // This rule is added to the scope before each iterator evaluation
           // and remove after, so that it's not available in the body
-          scope.fns.test = (_) => (_) => (expr) => (!!expr ? true : false);
+          scope.rules.test = (_) => (_) => (expr) => (!!expr ? true : false);
           for (const rule of iteratorRules) {
             const result = await evalRule(rule, iteratorScope);
             if (rule.fn.name.name === "test" && !result) {
@@ -153,7 +154,7 @@ module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
               break; // Skip evaluating the rest
             }
           }
-          delete scope.fns.test;
+          delete scope.rules.test;
         } catch (err) {
           throw BrowseError.from(err, iterator);
         }
