@@ -46,6 +46,7 @@ __metadata:
   resolution: "@browselang/cli@workspace:packages/cli"
   dependencies:
     "@browselang/core": "workspace:packages/core"
+    "@browselang/format": "workspace:packages/format"
     "@browselang/parser": "workspace:packages/parser"
     "@browselang/web": "workspace:packages/web"
     "@types/yargs": 15.0.5

@@ -33,6 +33,7 @@
   },
   "dependencies": {
     "@browselang/core": "workspace:packages/core",
+    "@browselang/format": "workspace:packages/format",
     "@browselang/parser": "workspace:packages/parser",
     "@browselang/web": "workspace:packages/web",
     "ohm-js": "0.14.0",
