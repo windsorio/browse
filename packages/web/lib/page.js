@@ -14,8 +14,8 @@ const getString = (el) => el.textContent || el.innerText || null;
 const getStrings = (els) =>
   els.map((el) => el.textContent || el.innerText || null).filter(Boolean);
 const getNumber = (el) => {
-  const text = el.textContent || el.innerText;
-  const num = text ? Number(text) : null;
+  let num = el.textContent ? Number(el.textContent) : NaN;
+  if (isNan(num)) num = el.innerText ? Number(el.innerText) : NaN;
   return isNaN(num) ? null : num; // TODO: add NaN to browse?
 };
 const getUrl = (el) => el.href || null;
@@ -227,6 +227,9 @@ const getPageScope = (parent) => {
   pageScope.close = async () => {
     if (pageScope.internal.page) {
       await pageScope.internal.page.close();
+    }
+    if (pageScope.internal.config.writeStream) {
+      pageScope.internal.config.writeStream.end();
     }
   };
 
