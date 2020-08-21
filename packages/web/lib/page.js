@@ -1,9 +1,13 @@
 "use strict";
 
 const fs = require("fs-extra");
-const { resolveRule, resolveRuleScope } = require("@browselang/core/lib/scope");
+const {
+  resolveRule,
+  resolveRuleScope,
+  resolveVar,
+} = require("@browselang/core/lib/scope");
 const { evalRule, evalRuleSet, getNewScope } = require("@browselang/core");
-const { help } = require("@browselang/core/lib/utils");
+const { help, throws } = require("@browselang/core/lib/utils");
 const scope = require("@browselang/core/lib/scope");
 
 /**
@@ -30,16 +34,16 @@ const getPageScope = (parent) => {
     internal: {
       page: null,
       config: {},
-
+      data: {},
       // If other pages are visited from this page, we track those here
       links: [],
     },
     rules: {},
   };
 
-  const dataStorageRule = (extractor, type, optional = false) => (_) => ({
-    trim = true,
-  }) => async (key, selector) => {
+  const dataExtractionRule = (extractor, type, optional = false) => (
+    scope
+  ) => ({ trim = true }) => async (key, selector) => {
     let value = null;
     try {
       value = await pageScope.internal.page.$eval(selector, extractor);
@@ -55,8 +59,6 @@ const getPageScope = (parent) => {
     } catch (e) {
       if (!optional) throw e;
     } finally {
-      // These are always set on the page scope, not the scope in which the data
-      // extraction rule is evaluated
       pageScope.vars[key] = value;
     }
     return value;
@@ -117,12 +119,12 @@ const getPageScope = (parent) => {
       });
       return pageScope.internal.config;
     },
-    "@string": dataStorageRule(getString, "string"),
-    "@string?": dataStorageRule(getString, "string", true),
-    "@number": dataStorageRule(getNumber, "number"),
-    "@number?": dataStorageRule(getNumber, "number", true),
-    "@url": dataStorageRule(getUrl, "url"),
-    "@url?": dataStorageRule(getUrl, "url", true),
+    "@string": dataExtractionRule(getString, "string"),
+    "@string?": dataExtractionRule(getString, "string", true),
+    "@number": dataExtractionRule(getNumber, "number"),
+    "@number?": dataExtractionRule(getNumber, "number", true),
+    "@url": dataExtractionRule(getUrl, "url"),
+    "@url?": dataExtractionRule(getUrl, "url", true),
     "@arr": (_) => ({ string = false, trim = true }) => async (
       key,
       selector
@@ -145,6 +147,14 @@ const getPageScope = (parent) => {
       }
       pageScope.vars[key] = value;
       return value;
+    },
+    out: (scope) => (_) => (...vars) => {
+      const safeResolveVar = throws(resolveVar);
+      vars.forEach((name) => {
+        pageScope.internal.data[name] =
+          safeResolveVar(name, scope).value || null;
+      });
+      return null;
     },
     click: (_) => (_) => async (selector) => {
       const page = pageScope.internal.page;

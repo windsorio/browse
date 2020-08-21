@@ -1,6 +1,6 @@
 set headless false
 
-page( !scrape ) https://www.twitch.tv {
+page https://www.twitch.tv {
 
   set logIn '#root > div > div.tw-flex.tw-flex-column.tw-flex-nowrap.tw-full-height > nav > div > div.tw-align-items-center.tw-flex.tw-flex-grow-1.tw-flex-shrink-1.tw-full-width.tw-justify-content-end > div.tw-flex.tw-full-height.tw-mg-r-1.tw-pd-y-1 > div > div.anon-user.tw-flex.tw-flex-nowrap > div:nth-child(2) > button'
   set username 'body > div.ReactModalPortal > div > div > div > div > div > div.tw-border-radius-medium.tw-flex.tw-overflow-hidden > div > div > div.tw-mg-b-1 > form > div > div:nth-child(1) > div > div.tw-relative'

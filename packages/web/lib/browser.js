@@ -15,7 +15,7 @@ const {
   resolveInternalScope,
   validateScope,
 } = require("@browselang/core/lib/scope");
-const { help, stringify } = require("@browselang/core/lib/utils");
+const { help, stringify, throws } = require("@browselang/core/lib/utils");
 const { BrowseError } = require("@browselang/core/lib/error");
 
 const getPageScope = require("./page");
@@ -38,13 +38,6 @@ const newBrowser = async (headless) => {
           headless,
         }),
   });
-};
-const throws = (fn) => (...args) => {
-  try {
-    return { success: true, value: fn(...args) };
-  } catch (e) {
-    return { success: false, err: e };
-  }
 };
 
 const assertBrowserScope = (scope, message) => {
@@ -204,17 +197,17 @@ const getBrowserScope = (parent) => {
             await evalRuleSet(ruleSet, newPageScope);
 
             if (match.scrape) {
-              const data = newPageScope.vars;
+              const data = newPageScope.internal.data;
               if (Object.keys(data).length) {
-                if (data.url !== href) {
+                if (data.url !== undefined) {
                   console.error(
-                    "Warning: The variable 'url' cannot be changed and will always be overridden (See docs <https://....>)"
+                    "Warning: 'url' cannot be passed to the 'out' rule. This key is reserved and it will be overridden by browse (See docs <https://....>)"
                   );
                 }
                 data.url = href;
                 if (data._links !== undefined) {
                   console.error(
-                    "Warning: The variable '_links' will not be included in the scraped out. This key is reserved (See docs <https://....>)"
+                    "Warning: '_links' cannot be passed to the 'out' rule. This key is reserved and it will be overridden by browse (See docs <https://....>)"
                   );
                 }
                 data._links = newPageScope.internal.links;

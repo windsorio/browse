@@ -115,10 +115,17 @@ const genUnknownParseError = () =>
     };
     rep();
   } else {
-    const document = path.resolve(process.cwd(), script);
-    const code = fs.readFileSync(document, "utf8");
-    if (!code) {
-      console.error(`Could not find any browse code at ${script}`);
+    let document, code;
+    try {
+      document = path.resolve(process.cwd(), script);
+      code = fs.readFileSync(document, "utf8");
+    } catch (err) {
+      process.stderr.write(
+        stringifyError(new Error(err.message), {
+          color: process.stderr.isTTY,
+        })
+      );
+      process.stderr.write("\n");
       process.exit(1);
     }
 
@@ -145,8 +152,8 @@ const genUnknownParseError = () =>
           process.stderr.write(
             stringifyError(e, {
               /*
-              TODO: Support multi-file stack traces (across imports)
-              BODY: document should be extracted from the AST so we can support multi-file stack traces
+                TODO: Support multi-file stack traces (across imports)
+                BODY: document should be extracted from the AST so we can support multi-file stack traces
               */
               document,
               snippet: true,

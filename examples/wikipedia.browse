@@ -1,13 +1,7 @@
-set headless false
-
-page(
-  cache
-  ttl="7d"
-) https://en.wikipedia.org/wiki/:slug {
-  wait 1000
-
+page https://en.wikipedia.org/wiki/:slug {
   @string title `#firstHeading`
-  @arr( string ) paragraphs `div.mw-parser-output`
+  @arr(string) paragraphs `div.mw-parser-output`
   # crawl `a`
+  out title paragraphs
 }
 visit https://en.wikipedia.org/wiki/Kevin_Bacon

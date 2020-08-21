@@ -2,7 +2,7 @@
 # directory with information extracted from notices on the London Gazette. Hit
 # Ctrl+C to stop it after some time. This script probably won't end for a while
 
-page( !scrape ) https://www.thegazette.co.uk/all-notices/notice {
+page https://www.thegazette.co.uk/all-notices/notice {
   print $url
 
   crawl `div.feed-item h3.title a`
@@ -19,6 +19,8 @@ page https://www.thegazette.co.uk/notice/:issue {
   @string title `h1.title`
   @string? date `dd time`
   @string notice `div[about="this:notifiableThing"]`
+
+  out title date notice
 }
 
 visit https://www.thegazette.co.uk/all-notices/notice?text=&categorycode-all=all&noticetypes=&location-postcode-1=&location-distance-1=1&location-local-authority-1=&numberOfLocationSearches=1&start-publish-date=01%2F01%2F2000&end-publish-date=12%2F08%2F2020&edition=&london-issue=&edinburgh-issue=&belfast-issue=&sort-by=&results-page-size=10

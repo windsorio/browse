@@ -43,4 +43,16 @@ const help = ({ resolveRule, scope, functions, key }) => {
   }
 };
 
-module.exports = { stringify, help };
+/**
+ * Convert any error throwing function into a function that returns a Maybe
+ * monad
+ */
+const throws = (fn) => (...args) => {
+  try {
+    return { success: true, value: fn(...args) };
+  } catch (e) {
+    return { success: false, err: e };
+  }
+};
+
+module.exports = { stringify, help, throws };

@@ -11,8 +11,7 @@ page(
   print Scraping user $userid
 
   wait `.user-header__username`
-  @string username `.user-header__username`
-  @string? fullNameEl `.user-header__full-name`
+  @string? fullName `.user-header__full-name`
   
   # @map will iterate through each element that matches the mapper, and then
   # evaluate the `key` and `value` RuleSets to create a dictionary. @mergemap
@@ -24,6 +23,8 @@ page(
   #   key=string
   #   value=string
   # ) { @attr title } { @attr href } `.user-header__satellite--contact`
+  
+  out userid fullName
 }
 
 # Products
@@ -41,10 +42,12 @@ page(
   set firstUserSelector `.product-sidebar__users .user-link__link`
   wait $firstUserSelector
   crawl $firstUserSelector
+
+  out product title website twitter
 }
 
 # The Product Listing page
-page( !scrape ) https://www.indiehackers.com/products {
+page https://www.indiehackers.com/products {
   # We have to manually click a filter to refresh the page and evaluate 
   # the filters
   wait `.collapsible-filters--active`
