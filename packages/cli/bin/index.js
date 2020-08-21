@@ -46,11 +46,6 @@ async function closeAllScopes() {
   }
 }
 
-const genUnknownParseError = () =>
-  new Error(
-    "Browse encountered an error while parsing your script but was unable\nto identify the specific issue. Check the syntax carefully"
-  );
-
 (async () => {
   if (!script) {
     const readline = require("readline");
@@ -74,37 +69,15 @@ const genUnknownParseError = () =>
           rl.close();
           return;
         }
-        const r = parser.grammar.match(stmt, "Rule");
-        if (r.succeeded()) {
-          const n = parser.semantics(r);
-          if (n.errors.length > 0) {
-            process.stderr.write(
-              stringifyError(new Error(n.errors[0].message), {
-                color: process.stderr.isTTY,
-              })
-            );
-          } else {
-            try {
-              const out = stringify(await evalRule(n.asAST, scope));
-              process.stdout.write("\u001b[32m" + out + "\u001b[0m");
-            } catch (e) {
-              process.stderr.write(
-                stringifyError(e, {
-                  document: "repl",
-                  color: process.stderr.isTTY,
-                })
-              );
-            }
-          }
-        } else {
-          let e;
-          try {
-            e = new Error(r.shortMessage);
-          } catch (_) {
-            e = genUnknownParseError();
-          }
+        try {
+          const rules = parser.parse(stmt);
+          const rule = rules[0];
+          const out = stringify(await evalRule(rule, scope));
+          process.stdout.write("\u001b[32m" + out + "\u001b[0m");
+        } catch (e) {
           process.stderr.write(
             stringifyError(e, {
+              document: "repl",
               color: process.stderr.isTTY,
             })
           );
@@ -115,63 +88,28 @@ const genUnknownParseError = () =>
     };
     rep();
   } else {
-    let document, code;
+    const document = path.resolve(process.cwd(), script);
     try {
-      document = path.resolve(process.cwd(), script);
-      code = fs.readFileSync(document, "utf8");
+      const code = fs.readFileSync(document, "utf8").trim();
+      if (!code) {
+        process.exit(0); // empty program so skip
+      }
+      const rules = parser.parse(code);
+
+      await evalRuleSet({
+        type: "RuleSet",
+        rules: rules,
+        scope,
+      });
     } catch (err) {
       process.stderr.write(
-        stringifyError(new Error(err.message), {
-          color: process.stderr.isTTY,
-        })
-      );
-      process.stderr.write("\n");
-      process.exit(1);
-    }
-
-    const r = parser.grammar.match(code);
-    if (r.succeeded()) {
-      const n = parser.semantics(r);
-      if (n.errors.length > 0) {
-        n.errors.forEach((err) => {
-          process.stderr.write(
-            stringifyError(new Error(err.message), {
-              color: process.stderr.isTTY,
-            })
-          );
-          process.stderr.write("\n");
-        });
-      } else {
-        try {
-          await evalRuleSet({
-            type: "RuleSet",
-            rules: n.asAST,
-            scope,
-          });
-        } catch (e) {
-          process.stderr.write(
-            stringifyError(e, {
-              /*
-                TODO: Support multi-file stack traces (across imports)
-                BODY: document should be extracted from the AST so we can support multi-file stack traces
-              */
-              document,
-              snippet: true,
-              color: process.stderr.isTTY,
-            })
-          );
-          process.stderr.write("\n");
-        }
-      }
-    } else {
-      let e;
-      try {
-        e = new Error(r.shortMessage);
-      } catch (_) {
-        e = genUnknownParseError();
-      }
-      process.stderr.write(
-        stringifyError(e, {
+        stringifyError(err, {
+          /*
+            TODO: Support multi-file stack traces (across imports)
+            BODY: document should be extracted from the AST so we can support multi-file stack traces
+          */
+          document,
+          snippet: true,
           color: process.stderr.isTTY,
         })
       );
