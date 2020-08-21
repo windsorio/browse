@@ -4,6 +4,7 @@ const fs = require("fs");
 const path = require("path");
 
 const ohm = require("ohm-js");
+const { getLineAndColumn } = require("ohm-js/src/util");
 
 const { literal } = require("./ast");
 
@@ -314,19 +315,19 @@ semantics.addAttribute("asAST", {
     return literal(Number(this.sourceString), this.source);
   },
   stringLiteral_doubleQuote: function (_l, c, _r) {
-    return literal(c.sourceString, this.source);
+    return literal(c.sourceString, this.source, '"');
   },
   stringLiteral_singleQuote: function (_l, c, _r) {
-    return literal(c.sourceString, this.source);
+    return literal(c.sourceString, this.source, "'");
   },
   stringLiteral_cssSelector: function (_l, c, _r) {
-    return literal(c.sourceString, this.source);
+    return literal(c.sourceString, this.source, "`");
   },
   stringLiteral_javascript: function (_l, c, _r) {
-    return literal(c.sourceString, this.source);
+    return literal(c.sourceString, this.source, "|");
   },
   stringLiteral_implicit: function (_f, _r) {
-    return literal(this.sourceString, this.source);
+    return literal(this.sourceString, this.source, "");
   },
 
   word: function (_) {
@@ -431,14 +432,18 @@ const parse = (text) => {
     } catch (_) {
       e = genUnknownParseError();
     }
+    const offset = r.getRightmostFailurePosition();
+    e.pos = getLineAndColumn(text, offset);
     throw e;
-    process.stderr.write("\n");
   }
 
   const n = semantics(r);
 
   if (n.errors.length > 0) {
-    throw new Error(n.errors.map((err) => err.message).join("\n"));
+    const last = n.errors.slice(-1)[0];
+    const e = new Error(last.message);
+    e.pos = getLineAndColumn(text, last.source.startIdx);
+    throw e;
   }
 
   return n.asAST;

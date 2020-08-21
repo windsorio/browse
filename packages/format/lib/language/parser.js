@@ -2,6 +2,8 @@
 
 const parser = require("@browselang/parser");
 
+const createError = require("../common/parser-create-error");
+
 function parseComments(ast) {
   const comments = [];
   // TODO: parse comments
@@ -19,16 +21,23 @@ function removeTokens(node) {
 }
 
 function parse(text /*, parsers, opts*/) {
-  const rules = parser.parse(text) || [];
-  // TODO: that parser should return a Program node
-  const ast = {
-    type: "Program",
-    rules,
-    source: null,
-  };
-  ast.comments = parseComments(ast);
-  // removeTokens(ast);
-  return ast;
+  try {
+    const rules = parser.parse(text) || [];
+    // TODO: that parser should return a Program node
+    const ast = {
+      type: "Program",
+      rules,
+      source: null,
+    };
+    ast.comments = parseComments(ast);
+    // removeTokens(ast);
+    return ast;
+  } catch (e) {
+    // TODO: get the real position from the parse error
+    throw createError(e, {
+      start: { line: e.pos.lineNum, column: e.pos.colNum },
+    });
+  }
 }
 
 module.exports = {

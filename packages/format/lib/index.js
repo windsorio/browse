@@ -8,6 +8,7 @@ const core = require("./main/core");
 // const sharedUtil = require("./common/util-shared");
 const plugins = require("./common/load-plugins");
 // const config = require("./config/resolve-config");
+const languages = require("./languages");
 const doc = require("./document");
 
 function _withPlugins(
@@ -18,7 +19,10 @@ function _withPlugins(
     const opts = args[optsArgIdx] || {};
     args[optsArgIdx] = {
       ...opts,
-      plugins: plugins.loadPlugins(opts.plugins, opts.pluginSearchDirs),
+      plugins: [
+        ...plugins.loadPlugins(opts.plugins, opts.pluginSearchDirs),
+        ...languages,
+      ],
     };
     return fn(...args);
   };

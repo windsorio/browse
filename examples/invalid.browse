@@ -1,2 +1,11 @@
 # ( must be escaped in an implicit string
 page https://windsor.io(/*)
+
+print 1 === 2
+
+print 2 === 3
+
+
+print 3 !== 5
+
+print 1 == 5

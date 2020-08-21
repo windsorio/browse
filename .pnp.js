@@ -2024,6 +2024,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [
             ["@browselang/cli", "workspace:packages/cli"],
             ["@browselang/core", "workspace:packages/core"],
+            ["@browselang/format", "workspace:packages/format"],
             ["@browselang/parser", "workspace:packages/parser"],
             ["@browselang/web", "workspace:packages/web"],
             ["@types/yargs", "npm:15.0.5"],

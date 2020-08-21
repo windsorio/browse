@@ -45,9 +45,6 @@ function stringifyError(err, opts = {}) {
   const docment = opts.document || "unknown";
 
   let msg = "";
-  opts.color && (msg += B_RED);
-  msg += "Error\n";
-  opts.color && (msg += RESET);
 
   if (err instanceof BrowseError) {
     if (opts.snippet && err.node) {
