@@ -3,7 +3,7 @@ const lang = require("./lib/language");
 
 const input = `
 print
-  print
+  print(a b=true !c d=false e sfd  sefnhn sjenf sejnf sefes=true sdjnfbk    shefbsef  bsebf sefh sehf bes bnf bs efbj eb fs bj )
 
     print
 `;

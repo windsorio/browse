@@ -54,10 +54,44 @@ function genericPrint(path, options, print) {
       return concat([concat(parts), hardline]);
     }
     case "InitRule": {
-      return concat([path.call(print, "name")]);
+      return concat([
+        path.call(print, "name"),
+        n.options.length
+          ? group(
+              concat([
+                "(",
+                indent(
+                  concat([
+                    softline,
+                    join(
+                      concat([ifBreak("", " "), softline]),
+                      path.map(print, "options")
+                    ),
+                  ])
+                ),
+                softline,
+                ")",
+              ])
+            )
+          : "",
+      ]);
     }
     case "Word": {
       return n.name;
+    }
+    case "Option": {
+      const isBool =
+        n.value.type === "Literal" && typeof n.value.value === "boolean";
+      if (isBool) {
+        return concat([!n.value.value ? "!" : "", path.call(print, "key")]);
+      } else {
+        return concat([
+          path.call(print, "key"),
+          "=",
+          path.call(print, "value"),
+        ]);
+      }
+      return "opt";
     }
     case "OperationDefinition": {
       const hasOperation = options.originalText[options.locStart(n)] !== "{";
