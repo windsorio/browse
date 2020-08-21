@@ -7,6 +7,11 @@ const ohm = require("ohm-js");
 
 const { literal } = require("./ast");
 
+const genUnknownParseError = () =>
+  new Error(
+    "Browse encountered an error while parsing your script but was unable\nto identify the specific issue. Check the syntax carefully"
+  );
+
 // Instantiate the grammar.
 const contents = fs.readFileSync(path.join(__dirname, "browse.ohm"));
 const g = ohm.grammars(contents).Browse;
@@ -417,7 +422,30 @@ semantics.addOperation("something()", {
   },
 });
 
+const parse = (text) => {
+  const r = g.match(text);
+  if (!r.succeeded()) {
+    let e;
+    try {
+      e = new Error(r.shortMessage);
+    } catch (_) {
+      e = genUnknownParseError();
+    }
+    throw e;
+    process.stderr.write("\n");
+  }
+
+  const n = semantics(r);
+
+  if (n.errors.length > 0) {
+    throw new Error(n.errors.map((err) => err.message).join("\n"));
+  }
+
+  return n.asAST;
+};
+
 module.exports = {
   grammar: g,
   semantics,
+  parse,
 };
