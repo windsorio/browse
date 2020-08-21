@@ -19,25 +19,40 @@ const stringify = (jsValue) => {
 };
 
 /**
- * Display a help message using the given function descriptions, and then recursively trigger parent help functions
- * @param {{[fn: string]: string}} functions An object with a description for each function
+ * Display a help message using the given function descriptions, and then recursively trigger parent help rules
+ * @param {{rule: string]: string}} functions An object with a description for each rule
  */
-const help = ({ resolveFn, scope, functions, key }) => {
+const help = ({ resolveRule, scope, functions, key }) => {
+  // TODO: probably accept the output stream as an arg so it can switch between
+  // stdout and stderr, or just return the final string that needs to be printed
+  // instead and let the caller decide how to output it
   if (!key) {
     Object.keys(functions).forEach((key) => {
-      console.log(`${key.padEnd(10)} -\t${functions[key]}\n`);
+      console.error(`${key.padEnd(10)} -\t${functions[key]}\n`);
     });
   } else {
     if (functions[key]) {
-      console.log(`${key.padEnd(10)} -\t${functions[key]}\n`);
+      console.error(`${key.padEnd(10)} -\t${functions[key]}\n`);
       return;
     }
   }
   if (scope.parent) {
     try {
-      resolveFn("help", scope.parent)(scope.parent)(key);
+      resolveRule("help", scope.parent)(scope.parent)(key);
     } catch (e) {}
   }
 };
 
-module.exports = { stringify, help };
+/**
+ * Convert any error throwing function into a function that returns a Maybe
+ * monad
+ */
+const throws = (fn) => (...args) => {
+  try {
+    return { success: true, value: fn(...args) };
+  } catch (e) {
+    return { success: false, err: e };
+  }
+};
+
+module.exports = { stringify, help, throws };

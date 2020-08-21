@@ -12,7 +12,7 @@ const { argv } = yargs
   .command("$0 [script]", "Run browse", (yargs) => {
     yargs.option("web", {
       type: "boolean",
-      description: "Add web-scraping function to the global context",
+      description: "Add web-scraping rules to the global context",
     });
   })
   .help("h")
@@ -36,6 +36,14 @@ const {
 let scope = getNewScope();
 if (argv.web) {
   scope = require("@browselang/web")(scope);
+}
+
+async function closeAllScopes() {
+  let c = scope;
+  while (c) {
+    await c.close();
+    c = c.parent;
+  }
 }
 
 const genUnknownParseError = () =>
@@ -107,10 +115,18 @@ const genUnknownParseError = () =>
     };
     rep();
   } else {
-    const document = path.resolve(process.cwd(), script);
-    const code = fs.readFileSync(document, "utf8");
-    if (!code) {
-      console.log(`Could not find any browse code at ${script}`);
+    let document, code;
+    try {
+      document = path.resolve(process.cwd(), script);
+      code = fs.readFileSync(document, "utf8");
+    } catch (err) {
+      process.stderr.write(
+        stringifyError(new Error(err.message), {
+          color: process.stderr.isTTY,
+        })
+      );
+      process.stderr.write("\n");
+      process.exit(1);
     }
 
     const r = parser.grammar.match(code);
@@ -127,19 +143,17 @@ const genUnknownParseError = () =>
         });
       } else {
         try {
-          await evalRuleSet(
-            {
-              type: "RuleSet",
-              rules: n.asAST,
-            },
-            scope
-          );
+          await evalRuleSet({
+            type: "RuleSet",
+            rules: n.asAST,
+            scope,
+          });
         } catch (e) {
           process.stderr.write(
             stringifyError(e, {
               /*
-              TODO: Support multi-file stack traces (across imports)
-              BODY: document should be extracted from the AST so we can support multi-file stack traces
+                TODO: Support multi-file stack traces (across imports)
+                BODY: document should be extracted from the AST so we can support multi-file stack traces
               */
               document,
               snippet: true,
@@ -164,4 +178,6 @@ const genUnknownParseError = () =>
       process.stderr.write("\n");
     }
   }
+
+  await closeAllScopes();
 })();

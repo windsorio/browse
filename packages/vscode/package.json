@@ -36,6 +36,11 @@
         "extensions": [
           ".browse"
         ],
+        "aliases": [
+          "Browse",
+          "browse",
+          "browselang"
+        ],
         "configuration": "./language-configuration.json"
       }
     ],

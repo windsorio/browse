@@ -1,9 +1,8 @@
 "use strict";
 
 const getSTD = require("./std");
-const assert = require("assert");
 const { stringify } = require("./utils");
-const { resolveFn, resolveVar } = require("./scope");
+const { resolveRule, resolveVar } = require("./scope");
 const { BrowseError, stringifyError } = require("./error");
 
 const getNewScope = (parent) => {
@@ -11,10 +10,11 @@ const getNewScope = (parent) => {
     parent = getSTD({ evalRule, evalRuleSet, getNewScope });
   }
   return {
-    fns: {},
+    parent,
+    rules: {},
     vars: {},
     internal: {},
-    parent,
+    close: async () => {},
   };
 };
 
@@ -27,7 +27,7 @@ const evalExpr = async (expr, scope) => {
     case "Ident":
       return resolveVar(expr, scope);
     case "RuleSet":
-      return expr;
+      return { ...expr, scope }; // tracks lexical scope
     case "RuleExpr":
       return evalRule(expr.expr, scope);
     case "UnaryExpr":
@@ -124,7 +124,7 @@ const evalRule = async (rule, scope) => {
     // async This try...catch will handle that, and also any errors from a
     // rejected promise
     const promise = Promise.resolve(
-      resolveFn(fn.name, scope)(scope)(resolvedOpts)(...resolvedArgs)
+      resolveRule(fn.name, scope)(scope)(resolvedOpts)(...resolvedArgs)
     );
     return await promise;
   } catch (err) {
@@ -132,20 +132,26 @@ const evalRule = async (rule, scope) => {
   }
 };
 
-const evalRuleSet = async (ruleSet, parent) => {
-  assert(ruleSet.type === "RuleSet");
+const evalRuleSet = async (ruleSet, inject = {}) => {
+  const rules = [...ruleSet.rules]; // Don't want to modify the original rules
 
-  if (!parent) {
-    parent = getSTD({ evalRule, evalRuleSet, getNewScope });
-  }
-
-  const { rules: oRules } = ruleSet;
-  const rules = [...oRules]; // Don't want to modify the original rules
-
-  const scope = getNewScope(parent);
   if (!rules.length) {
     return null;
   }
+
+  // Setup scope
+  let scope;
+  if (inject.parent !== undefined) {
+    // if inject has a `parent` set, then we just treat inject as the scope
+    // inject should RARELY be used this way
+    scope = inject;
+  } else {
+    scope = getNewScope(ruleSet.scope);
+    Object.assign(scope.rules, inject.rules || {});
+    Object.assign(scope.vars, inject.vars || {});
+    Object.assign(scope.internal, inject.internal || {});
+  }
+
   const lastRule = rules.pop();
   for (const rule of rules) {
     try {

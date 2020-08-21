@@ -1475,6 +1475,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         "npm:5.1.0"
       ],
       [
+        "remove-trailing-slash",
+        "npm:0.1.0"
+      ],
+      [
         "repeat-string",
         "npm:1.6.1"
       ],
@@ -1704,7 +1708,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       ],
       [
         "tslib",
-        "npm:1.13.0"
+        "npm:2.0.1"
       ],
       [
         "tunnel",
@@ -1732,7 +1736,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       ],
       [
         "typescript",
-        "patch:typescript@npm%3A3.9.7#builtin<compat/typescript>::version=3.9.7&hash=5b02a2"
+        "patch:typescript@npm%3A4.0.2#builtin<compat/typescript>::version=4.0.2&hash=5b02a2"
       ],
       [
         "unbzip2-stream",
@@ -1870,8 +1874,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["husky", "npm:4.2.5"],
             ["prettier", "npm:2.0.5"],
             ["pretty-quick", "virtual:ba367005dcc9e642f796e835097ee3914c50b5006fc81536b5959222ce2d330fa4f015850afa3048322d4f62f170d2e2a22164b26fa2fb88c9d85009081bd469#npm:2.0.1"],
-            ["tslib", "npm:1.13.0"],
-            ["typescript", "patch:typescript@npm%3A3.9.7#builtin<compat/typescript>::version=3.9.7&hash=5b02a2"]
+            ["tslib", "npm:2.0.1"],
+            ["typescript", "patch:typescript@npm%3A4.0.2#builtin<compat/typescript>::version=4.0.2&hash=5b02a2"]
           ],
           "linkType": "SOFT",
         }]
@@ -1969,6 +1973,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["is-docker", "npm:2.1.1"],
             ["puppeteer", "npm:5.2.1"],
             ["puppeteer-core", "npm:5.2.1"],
+            ["remove-trailing-slash", "npm:0.1.0"],
             ["url-pattern", "npm:1.0.3"]
           ],
           "linkType": "SOFT",
@@ -2338,7 +2343,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["eslint", null],
             ["lodash", "npm:4.17.19"],
             ["tslib", "npm:1.13.0"],
-            ["typescript", "patch:typescript@npm%3A3.9.7#builtin<compat/typescript>::version=3.9.7&hash=5b02a2"]
+            ["typescript", "patch:typescript@npm%3A4.0.2#builtin<compat/typescript>::version=4.0.2&hash=5b02a2"]
           ],
           "packagePeers": [
             "eslint",
@@ -2826,8 +2831,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["husky", "npm:4.2.5"],
             ["prettier", "npm:2.0.5"],
             ["pretty-quick", "virtual:ba367005dcc9e642f796e835097ee3914c50b5006fc81536b5959222ce2d330fa4f015850afa3048322d4f62f170d2e2a22164b26fa2fb88c9d85009081bd469#npm:2.0.1"],
-            ["tslib", "npm:1.13.0"],
-            ["typescript", "patch:typescript@npm%3A3.9.7#builtin<compat/typescript>::version=3.9.7&hash=5b02a2"]
+            ["tslib", "npm:2.0.1"],
+            ["typescript", "patch:typescript@npm%3A4.0.2#builtin<compat/typescript>::version=4.0.2&hash=5b02a2"]
           ],
           "linkType": "SOFT",
         }]
@@ -5999,6 +6004,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD",
         }]
       ]],
+      ["remove-trailing-slash", [
+        ["npm:0.1.0", {
+          "packageLocation": "./.yarn/cache/remove-trailing-slash-npm-0.1.0-c4b4467489-5ba16dbb93.zip/node_modules/remove-trailing-slash/",
+          "packageDependencies": [
+            ["remove-trailing-slash", "npm:0.1.0"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
       ["repeat-string", [
         ["npm:1.6.1", {
           "packageLocation": "./.yarn/cache/repeat-string-npm-1.6.1-bc8e388655-99c431ba7b.zip/node_modules/repeat-string/",
@@ -6709,6 +6723,13 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["tslib", "npm:1.13.0"]
           ],
           "linkType": "HARD",
+        }],
+        ["npm:2.0.1", {
+          "packageLocation": "./.yarn/cache/tslib-npm-2.0.1-26f70961f9-7b42337a07.zip/node_modules/tslib/",
+          "packageDependencies": [
+            ["tslib", "npm:2.0.1"]
+          ],
+          "linkType": "HARD",
         }]
       ]],
       ["tunnel", [
@@ -6789,10 +6810,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]
       ]],
       ["typescript", [
-        ["patch:typescript@npm%3A3.9.7#builtin<compat/typescript>::version=3.9.7&hash=5b02a2", {
-          "packageLocation": "./.yarn/cache/typescript-patch-ba0dbfd217-f0d3d9c987.zip/node_modules/typescript/",
+        ["patch:typescript@npm%3A4.0.2#builtin<compat/typescript>::version=4.0.2&hash=5b02a2", {
+          "packageLocation": "./.yarn/cache/typescript-patch-edef266e49-b8b689ef99.zip/node_modules/typescript/",
           "packageDependencies": [
-            ["typescript", "patch:typescript@npm%3A3.9.7#builtin<compat/typescript>::version=3.9.7&hash=5b02a2"]
+            ["typescript", "patch:typescript@npm%3A4.0.2#builtin<compat/typescript>::version=4.0.2&hash=5b02a2"]
           ],
           "linkType": "HARD",
         }]

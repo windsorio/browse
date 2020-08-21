@@ -1,3 +1,13 @@
+/**
+ * A BrowseError which tracks the browse callstack. This is primarily for Rule
+ * and RuleSet evaluations to use since we don't have lines we need to add to
+ * the stacktrace anywhere else
+ *
+ * throwing a BrowseError that has no `node` set is the same as throwing a
+ * regular Error, since the nearest evalRule or evalRuleSet will catch it and
+ * use BrowseError.from to wrap it in a BrowseError
+ */
+
 const { getLineAndColumn } = require("ohm-js/src/util");
 
 const B_RED = "\u001b[31;1m";

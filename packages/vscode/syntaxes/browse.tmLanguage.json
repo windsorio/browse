@@ -75,7 +75,7 @@
       "patterns": [
         {
           "name": "keyword.control.browse",
-          "match": "\\b(if|for|fun|return|bind)\\b"
+          "match": "\\b(if|for|rule|return|bind)\\b"
         },
         {
           "name": "storage.type.browse",

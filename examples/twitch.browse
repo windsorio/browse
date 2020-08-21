@@ -1,16 +1,14 @@
+set headless false
+
 page https://www.twitch.tv {
 
   set logIn '#root > div > div.tw-flex.tw-flex-column.tw-flex-nowrap.tw-full-height > nav > div > div.tw-align-items-center.tw-flex.tw-flex-grow-1.tw-flex-shrink-1.tw-full-width.tw-justify-content-end > div.tw-flex.tw-full-height.tw-mg-r-1.tw-pd-y-1 > div > div.anon-user.tw-flex.tw-flex-nowrap > div:nth-child(2) > button'
-
   set username 'body > div.ReactModalPortal > div > div > div > div > div > div.tw-border-radius-medium.tw-flex.tw-overflow-hidden > div > div > div.tw-mg-b-1 > form > div > div:nth-child(1) > div > div.tw-relative'
-  type 'RandomTwitchUser31415'
-
   set birthMonth 'body > div.ReactModalPortal > div > div > div > div > div > div.tw-border-radius-medium.tw-flex.tw-overflow-hidden > div > div > div.tw-mg-b-1 > form > div > div:nth-child(3) > div > div.tw-flex.tw-flex-row.tw-overflow-auto > div.tw-full-width > select'
-
   set birthDay 'body > div.ReactModalPortal > div > div > div > div > div > div.tw-border-radius-medium.tw-flex.tw-overflow-hidden > div > div > div.tw-mg-b-1 > form > div > div:nth-child(3) > div > div.tw-flex.tw-flex-row.tw-overflow-auto > div:nth-child(2) > div > input'
-
   set birthYear 'body > div.ReactModalPortal > div > div > div > div > div > div.tw-border-radius-medium.tw-flex.tw-overflow-hidden > div > div > div.tw-mg-b-1 > form > div > div:nth-child(3) > div > div.tw-flex.tw-flex-row.tw-overflow-auto > div:nth-child(3) > div > input'
 
+  type 'RandomTwitchUser31415'
   wait $logIn
   click $logIn 
   wait $username
@@ -28,7 +26,8 @@ page https://www.twitch.tv {
   type '1997'
   click '#email-input'
   type 'faust@windsor.io'
-  sleep 1000 * 60 * 10
+  sleep 1000 * 10 # 10s
+
 }
 
 visit https://www.twitch.tv/

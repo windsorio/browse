@@ -15,7 +15,11 @@ test("print", async (t) => {
   await evalRule(
     {
       type: "Rule",
-      fn: { type: "Word", name: "print" },
+      fn: {
+        type: "InitRule",
+        name: { type: "Word", name: "print" },
+        options: [],
+      },
       args: [
         { type: "Literal", value: "hello" },
         { type: "Literal", value: "world" },
@@ -32,7 +36,11 @@ test("Unknown Operator", async (t) => {
       evalRule(
         {
           type: "Rule",
-          fn: { type: "Word", name: "print" },
+          fn: {
+            type: "InitRule",
+            name: { type: "Word", name: "print" },
+            options: [],
+          },
           args: [
             {
               type: "UnaryExpr",
@@ -53,7 +61,11 @@ test("undefined variable", async (t) => {
       evalRule(
         {
           type: "Rule",
-          fn: { type: "Word", name: "print" },
+          fn: {
+            type: "InitRule",
+            name: { type: "Word", name: "print" },
+            options: [],
+          },
           args: [{ type: "Ident", name: "x" }],
         },
         getNewScope()
@@ -62,19 +74,19 @@ test("undefined variable", async (t) => {
   );
 });
 
-test("redefining a function", async (t) => {
-  const fn = {
+test("redefining a rule", async (t) => {
+  const rule = {
     type: "Rule",
-    fn: { type: "Word", name: "fun" },
+    fn: { type: "InitRule", name: { type: "Word", name: "rule" }, options: [] },
     args: [
       { type: "Literal", value: "f" },
       { type: "RuleSet", rules: [] },
     ],
   };
   const scope = getNewScope();
-  await evalRule(fn, scope);
+  await evalRule(rule, scope);
   await t.throwsAsync(
-    () => evalRule(fn, scope),
-    getBrowseErrorAssertion("Function 'f' is already defined")
+    () => evalRule(rule, scope),
+    getBrowseErrorAssertion("Rule 'f' is already defined")
   );
 });

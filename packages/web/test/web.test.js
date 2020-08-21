@@ -7,25 +7,25 @@ const getWebScope = require("..");
 
 const press = (key) => ({
   type: "Rule",
-  fn: { type: "Word", name: "press" },
+  fn: { type: "InitRule", name: { type: "Word", name: "press" }, options: [] },
   args: [{ type: "Literal", value: key }],
 });
 const wait = (value) => ({
   type: "Rule",
-  fn: { type: "Word", name: "wait" },
+  fn: { type: "InitRule", name: { type: "Word", name: "wait" }, options: [] },
   args: [{ type: "Literal", value }],
 });
 
 test("page", async (t) => {
   const waitTime = {
     type: "Rule",
-    fn: { type: "Word", name: "wait" },
+    fn: { type: "InitRule", name: { type: "Word", name: "wait" }, options: [] },
     args: [{ type: "Literal", value: 5000 }],
   };
 
   const waitLogin = {
     type: "Rule",
-    fn: { type: "Word", name: "wait" },
+    fn: { type: "InitRule", name: { type: "Word", name: "wait" }, options: [] },
     args: [
       {
         type: "Literal",
@@ -37,7 +37,11 @@ test("page", async (t) => {
 
   const clickLogin = {
     type: "Rule",
-    fn: { type: "Word", name: "click" },
+    fn: {
+      type: "InitRule",
+      name: { type: "Word", name: "click" },
+      options: [],
+    },
     args: [
       {
         type: "Literal",
@@ -49,7 +53,7 @@ test("page", async (t) => {
 
   const waitPhone = {
     type: "Rule",
-    fn: { type: "Word", name: "wait" },
+    fn: { type: "InitRule", name: { type: "Word", name: "wait" }, options: [] },
     args: [
       {
         type: "Literal",
@@ -61,7 +65,11 @@ test("page", async (t) => {
 
   const clickPhone = {
     type: "Rule",
-    fn: { type: "Word", name: "click" },
+    fn: {
+      type: "InitRule",
+      name: { type: "Word", name: "click" },
+      options: [],
+    },
     args: [
       {
         type: "Literal",
@@ -73,7 +81,7 @@ test("page", async (t) => {
 
   const page = {
     type: "Rule",
-    fn: { type: "Word", name: "page" },
+    fn: { type: "InitRule", name: { type: "Word", name: "page" }, options: [] },
     args: [
       { type: "Literal", value: "https://tinder.com" },
       {
@@ -94,7 +102,11 @@ test("page", async (t) => {
 
   const visit = {
     type: "Rule",
-    fn: { type: "Word", name: "visit" },
+    fn: {
+      type: "InitRule",
+      name: { type: "Word", name: "visit" },
+      options: [],
+    },
     args: [{ type: "Literal", value: "https://tinder.com" }],
   };
 

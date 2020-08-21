@@ -1,6 +1,6 @@
-# A Fibonacci functions
+# A Fibonacci rule
 
-fun fib {
+rule fib {
   # Bind "n" to the incoming value
   bind n
 
@@ -12,7 +12,7 @@ fun fib {
   } else {
     
     # Recursion
-    return (fib $n-1) + (fib $n - 2)
+    return (fib $n-1) + (fib $n-2)
   }
 }
 

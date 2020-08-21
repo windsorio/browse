@@ -5,10 +5,17 @@ This extension adds support for the Browse language to VSCode
 ## Features
 
 - Syntax Highlighting
-- Toggle comments
-- Auto-Close braces and strings
+- Toggle Comments
+- Code Folding
+- Match, auto-close and auto-surround brackets
+- Auto-close and auto-surround strings
+- Auto Indentation
 
 ### Coming Soon
 
+- Auto-Complete
 - Formatter / Linter
-- Code Navigation (go to definition, etc.)
+- Code Navigation (jump to definition, etc.)
+- Hover information
+- Error checking
+- Refactoring
