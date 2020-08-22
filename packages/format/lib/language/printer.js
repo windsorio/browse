@@ -148,38 +148,13 @@ function genericPrint(path, options, print) {
   }
 }
 
-function printDirectives(path, print, n) {
-  if (n.directives.length === 0) {
-    return "";
-  }
-
-  return group(concat([line, join(line, path.map(print, "directives"))]));
-}
-
-function printSequence(sequencePath, options, print) {
-  const count = sequencePath.getValue().length;
-
-  return sequencePath.map((path, i) => {
-    const printed = print(path);
-
-    if (
-      isNextLineEmpty(options.originalText, path.getValue(), options.locEnd) &&
-      i < count - 1
-    ) {
-      return concat([printed, hardline]);
-    }
-
-    return printed;
-  });
-}
-
 function canAttachComment(node) {
-  return node.kind && node.kind !== "Comment";
+  return node.type && node.type !== "Comment";
 }
 
 function printComment(commentPath) {
   const comment = commentPath.getValue();
-  if (comment.kind === "Comment") {
+  if (comment.type === "Comment") {
     return "#" + comment.value.trimEnd();
   }
 
