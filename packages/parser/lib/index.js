@@ -7,6 +7,7 @@ const ohm = require("ohm-js");
 const { getLineAndColumn } = require("ohm-js/src/util");
 
 const { literal } = require("./ast");
+const parseComments = require("./comments");
 
 const genUnknownParseError = () =>
   new Error(
@@ -44,6 +45,33 @@ semantics.addAttribute("errors", {
   _nonterminal(children) {
     const errors = children.map((c) => c.errors);
     return [].concat(...errors);
+  },
+  _terminal() {
+    return [];
+  },
+});
+
+// get a list of all the nodes that include a `#` in their body so that the
+// comment parser can ignore them
+function getRange(_l, c, _r) {
+  const { sourceString, _contents, ...range } = this.source;
+  return /#/.test(this.sourceString) ? range : [];
+}
+semantics.addAttribute("forbiddenComments", {
+  stringLiteral_doubleQuote: getRange,
+  stringLiteral_singleQuote: getRange,
+  stringLiteral_cssSelector: getRange,
+  stringLiteral_javascript: getRange,
+  stringLiteral_implicit(_c, _r) {
+    return getRange.call(this);
+  },
+  _iter(children) {
+    const forbiddenComments = children.map((c) => c.forbiddenComments);
+    return [].concat(...forbiddenComments);
+  },
+  _nonterminal(children) {
+    const forbiddenComments = children.map((c) => c.forbiddenComments);
+    return [].concat(...forbiddenComments);
   },
   _terminal() {
     return [];
@@ -101,6 +129,13 @@ semantics.addAttribute('asLisp', {
 });
 
 semantics.addAttribute("asAST", {
+  Program(c) {
+    return {
+      type: "Program",
+      rules: c.asAST,
+      source: this.source,
+    };
+  },
   PriExpr_ruleExpr: function (_l, e, _r) {
     return {
       type: "RuleExpr",
@@ -414,15 +449,6 @@ semantics.addOperation('interpret()', {
   // _terminal: function () { return this.sourceString },
 });
 
-semantics.addOperation("something()", {
-  //   _nonterminal: function(children) {
-  //     return something(this, children);
-  //   },
-  _terminal: function () {
-    return this.sourceString;
-  },
-});
-
 const parse = (text) => {
   const r = g.match(text);
   if (!r.succeeded()) {
@@ -446,7 +472,10 @@ const parse = (text) => {
     throw e;
   }
 
-  return n.asAST;
+  const ast = n.asAST;
+  ast.comments = parseComments(text, n.forbiddenComments);
+
+  return ast;
 };
 
 module.exports = {

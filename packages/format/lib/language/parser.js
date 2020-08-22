@@ -7,36 +7,35 @@ const createError = require("../common/parser-create-error");
 function parseComments(ast) {
   const comments = [];
   // TODO: parse comments
+  const { startExpr } = ast;
+  // console.log(startExpr);
   return comments;
 }
 
 function removeTokens(node) {
   if (node && typeof node === "object") {
-    // delete any unneeded tokens from the tree
     for (const key in node) {
       removeTokens(node[key]);
     }
+    delete node.sourceString;
   }
   return node;
 }
 
 function parse(text /*, parsers, opts*/) {
   try {
-    const rules = parser.parse(text) || [];
-    // TODO: that parser should return a Program node
-    const ast = {
-      type: "Program",
-      rules,
-      source: null,
-    };
-    ast.comments = parseComments(ast);
-    // removeTokens(ast);
+    const ast = parser.parse(text);
+    removeTokens(ast);
     return ast;
   } catch (e) {
     // TODO: get the real position from the parse error
-    throw createError(e, {
-      start: { line: e.pos.lineNum, column: e.pos.colNum },
-    });
+    if (e.pos) {
+      throw createError(e, {
+        start: { line: e.pos.lineNum, column: e.pos.colNum },
+      });
+    } else {
+      throw e;
+    }
   }
 }
 

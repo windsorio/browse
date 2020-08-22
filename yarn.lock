@@ -113,6 +113,7 @@ __metadata:
   resolution: "@browselang/parser@workspace:packages/parser"
   dependencies:
     ava: 3.11.1
+    binary-search: 1.3.6
     ohm-js: 0.14.0
   languageName: unknown
   linkType: soft
@@ -961,6 +962,13 @@ __metadata:
   version: 2.1.0
   resolution: "binary-extensions@npm:2.1.0"
   checksum: 12bee2817930b211b88f6de5da2edb64f924ffde79e01516fcb17005a39e75374fae1ce1a9c58b52557a4d81eb6eb7a804cbe7170ea3a553919a7ce0053e2e4f
+  languageName: node
+  linkType: hard
+
+"binary-search@npm:1.3.6":
+  version: 1.3.6
+  resolution: "binary-search@npm:1.3.6"
+  checksum: cfca2b6ef721657fb3130fa4d05dddf9152541a592b6302d1d50be2b52b0b175d1c82b79d5cb1c1f2643c53d0dfe3ebeea7acba82d763409dd66b6513ffccd98
   languageName: node
   linkType: hard
 
