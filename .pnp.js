@@ -1328,7 +1328,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       ],
       [
         "ohm-js",
-        "npm:0.14.0"
+        "npm:15.0.1"
       ],
       [
         "once",
@@ -2023,7 +2023,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@browselang/parser", "workspace:packages/parser"],
             ["@browselang/web", "workspace:packages/web"],
             ["@types/yargs", "npm:15.0.5"],
-            ["ohm-js", "npm:0.14.0"],
+            ["ohm-js", "npm:15.0.1"],
             ["yargs", "npm:15.4.1"]
           ],
           "linkType": "SOFT",
@@ -2035,7 +2035,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [
             ["@browselang/core", "workspace:packages/core"],
             ["ava", "npm:3.11.1"],
-            ["ohm-js", "npm:0.14.0"]
+            ["ohm-js", "npm:15.0.1"]
           ],
           "linkType": "SOFT",
         }]
@@ -2091,7 +2091,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@browselang/parser", "workspace:packages/parser"],
             ["ava", "npm:3.11.1"],
             ["binary-search", "npm:1.3.6"],
-            ["ohm-js", "npm:0.14.0"]
+            ["ohm-js", "npm:15.0.1"]
           ],
           "linkType": "SOFT",
         }]
@@ -5681,10 +5681,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]
       ]],
       ["ohm-js", [
-        ["npm:0.14.0", {
-          "packageLocation": "./.yarn/unplugged/ohm-js-npm-0.14.0-ccdcf01170/node_modules/ohm-js/",
+        ["npm:15.0.1", {
+          "packageLocation": "./.yarn/unplugged/ohm-js-npm-15.0.1-4beeecf2b1/node_modules/ohm-js/",
           "packageDependencies": [
-            ["ohm-js", "npm:0.14.0"],
+            ["ohm-js", "npm:15.0.1"],
             ["es6-symbol", "npm:3.1.3"],
             ["inherits", "npm:2.0.4"],
             ["is-buffer", "npm:1.1.6"],
