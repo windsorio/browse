@@ -81,7 +81,7 @@ class BrowseDocumentFormatter {
       this.outputChannel.appendLine("Formatted document.");
       return formattedText;
     } catch (error) {
-      outputChannel.logError("Error formatting document.", error);
+      this.outputChannel.logError("Error formatting document.", error);
       // this.statusBarService.updateStatusBar(FormattingResult.Error);
 
       return text;

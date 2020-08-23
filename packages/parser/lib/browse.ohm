@@ -59,7 +59,10 @@ Browse {
             | "\u200C" | "\u200D"
   letter += unicodeCategoryNl
   
-  reservedWord = keyword | futureReservedWord | booleanLiteral
+  reservedWord = 
+              // | keyword
+              // | futureReservedWord
+              | booleanLiteral
   
   // Note: keywords that are the complete prefix of another keyword should
   // be prioritized (e.g. 'in' should come before 'instanceof')
