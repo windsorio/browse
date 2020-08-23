@@ -64,12 +64,9 @@ function genericPrint(path, options, print) {
           }
         }
       }, "rules");
-      return concat([
-        "{",
-        indent(concat([hardline, group(concat(parts))])),
-        hardline,
-        "}",
-      ]);
+      return group(
+        concat(["{", indent(concat([line, group(concat(parts))])), line, "}"])
+      );
     }
     case "Rule": {
       return concat([
