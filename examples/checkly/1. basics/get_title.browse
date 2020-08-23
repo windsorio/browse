@@ -1,0 +1,2 @@
+page https://www.google.com/ { title title; print $title }
+visit https://www.google.com/

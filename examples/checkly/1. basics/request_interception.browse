@@ -1,0 +1,15 @@
+# TODO: For this to work corerectly, we have to extract the `on` handler and
+# evaluate that BEFORE the page.goto()
+page(requestInterception width=1280 height=800) https://www.nytimes.com/ {
+  on request |
+    async (request) => {
+      if (request.resourceType() == 'image') {
+        await request.abort()
+      } else {
+        await request.continue()
+      }
+    }
+  |
+
+  screenshot(fullPage) nytimes.png
+}

@@ -1,0 +1,12 @@
+page https://www.google.com {
+  on dialog |
+    () => {
+      console.log(dialog.message())
+      return dialog.dismiss()
+    }
+  |
+
+  eval | () => alert('This message is inside an alert box') |
+}
+
+visit https://www.google.com

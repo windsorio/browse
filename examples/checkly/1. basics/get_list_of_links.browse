@@ -1,0 +1,7 @@
+page https://news.ycombinator.com/news {
+  @arr(string) stories 'a.storylink'
+  # TODO: split first 10 characters for each link
+  print $stories
+}
+
+visit https://news.ycombinator.com/news

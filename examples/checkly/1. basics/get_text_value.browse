@@ -1,0 +1,5 @@
+page https://news.ycombinator.com/news {
+  @string name '.hnname > a'; print $name
+}
+
+visit https://news.ycombinator.com/news

@@ -1,0 +1,4 @@
+page https://trix-editor.org/ {
+  focus 'trix-editor'; type Just adding a title; screenshot keyboard.png
+}
+visit https://trix-editor.org/
