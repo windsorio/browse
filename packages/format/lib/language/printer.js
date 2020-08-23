@@ -162,32 +162,6 @@ function printComment(commentPath) {
   throw new Error("Not a comment: " + JSON.stringify(comment));
 }
 
-function printInterfaces(path, options, print) {
-  const node = path.getNode();
-  const parts = [];
-  const { interfaces } = node;
-  const printed = path.map((node) => print(node), "interfaces");
-
-  for (let index = 0; index < interfaces.length; index++) {
-    const interfaceNode = interfaces[index];
-    parts.push(printed[index]);
-    const nextInterfaceNode = interfaces[index + 1];
-    if (nextInterfaceNode) {
-      const textBetween = options.originalText.slice(
-        interfaceNode.loc.end,
-        nextInterfaceNode.loc.start
-      );
-      const hasComment = textBetween.includes("#");
-      const separator = textBetween.replace(/#.*/g, "").trim();
-
-      parts.push(separator === "," ? "," : " &");
-      parts.push(hasComment ? line : " ");
-    }
-  }
-
-  return parts;
-}
-
 function clean(node, newNode /*, parent*/) {
   // delete newNode.loc;
   delete newNode.comments;
