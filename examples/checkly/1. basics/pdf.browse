@@ -1,0 +1,6 @@
+page https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md {
+  pdf(format=A4) api.pdf
+}
+visit https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#pdf
+
+# TODO: create a PDF from raw HTML

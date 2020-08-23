@@ -6,40 +6,21 @@
       "include": "#comment"
     },
     {
-      "include": "#rule-continuation"
+      "include": "#rule"
     },
     {
-      "include": "#rule"
+      "include": "#expr"
     }
   ],
   "repository": {
-    "rule-continuation": {
-      "match": "[})\\|]([^;{\\n]*)",
-      "captures": {
-        "1": {
-          "patterns": [
-            {
-              "include": "#expr"
-            }
-          ]
-        }
-      }
-    },
     "rule": {
-      "match": "([a-zA-Z_@][a-zA-Z_@\\?\\d]*)([^;{\\n]*)",
+      "match": "^\\s*([a-zA-Z_@][a-zA-Z_@\\?\\d]*)\\s*",
       "captures": {
         "1": {
           "name": "entity.name.function.browse",
           "patterns": [
             {
               "include": "#builtins"
-            }
-          ]
-        },
-        "2": {
-          "patterns": [
-            {
-              "include": "#expr"
             }
           ]
         }
@@ -158,9 +139,13 @@
       "begin": "\\|",
       "end": "\\|",
       "name": "string.quoted.other.browse",
+      "contentName": "meta.embedded.block.javascript",
       "patterns": [
         {
           "include": "#escape"
+        },
+        {
+          "include": "source.js"
         }
       ]
     },

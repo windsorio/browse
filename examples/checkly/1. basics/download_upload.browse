@@ -1,0 +1,9 @@
+import fs
+
+page https://checklyhq.com/ {
+  @string(attr=src) imageHref '.hero-image'
+
+  visit https://checklyhq.com/ + (replace '/' '' $imageHref)
+}
+
+page https://checklyhq.com/* { buffer buffer; fs write checkly.png $buffer }

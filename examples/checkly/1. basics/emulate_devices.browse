@@ -1,0 +1,9 @@
+import web.devices
+
+# Should this be on the visit, or as a browse config instead? on puppeteer, this
+# is a call on page - page.emulate()
+page(emulate=(id 'iPhone 6' web.devices)) https://google.com {
+  screenshot(fullPage) full.png; title title; print $title
+}
+
+visit https://google.com

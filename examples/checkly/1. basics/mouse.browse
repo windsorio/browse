@@ -1,0 +1,5 @@
+page(width=800 h=600) http://unixpapa.com/js/testmouse.html {
+  click 132 103; screenshot mouse_click.png
+}
+
+visit http://unixpapa.com/js/testmouse.html
