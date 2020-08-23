@@ -1,3 +1,6 @@
+# Pass `--web` to browse when running this example
+# $ browse --web ./examples/windsor.browse
+
 page https://windsor.io {
   click input
   wait 2000

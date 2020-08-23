@@ -1,3 +1,6 @@
+# Pass `--web` to browse when running this example
+# $ browse --web ./examples/thegazette.browse
+
 # This is a long running script that keeps populating files in a ./notices
 # directory with information extracted from notices on the London Gazette. Hit
 # Ctrl+C to stop it after some time. This script probably won't end for a while

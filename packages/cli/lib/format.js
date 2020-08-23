@@ -41,20 +41,27 @@ exports.handler = async (argv) => {
   try {
     const code = fs.readFileSync(document, "utf8");
 
-    const data = formatter.formatWithCursor(code, {
-      parser: "browse",
-      plugins: [],
-    });
-
     if (check) {
-      if (data.formatted !== code) {
+      if (
+        !formatter.check(code, {
+          parser: "browse",
+          plugins: [],
+        })
+      ) {
         console.error("The code is not formatted correctly");
         process.exit(1);
       }
-    } else if (write) {
-      fs.writeFileSync(document, data.formatted);
     } else {
-      console.log(data.formatted);
+      const formatted = formatter.format(code, {
+        parser: "browse",
+        plugins: [],
+      });
+
+      if (write) {
+        fs.writeFileSync(document, formatted);
+      } else {
+        console.log(formatted);
+      }
     }
   } catch (err) {
     process.stderr.write(

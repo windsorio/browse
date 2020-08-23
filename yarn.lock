@@ -1025,12 +1025,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"browse-vscode@workspace:packages/vscode":
-  version: 0.0.0-use.local
-  resolution: "browse-vscode@workspace:packages/vscode"
-  languageName: unknown
-  linkType: soft
-
 "browse@workspace:.":
   version: 0.0.0-use.local
   resolution: "browse@workspace:."
