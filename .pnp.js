@@ -39,24 +39,19 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         "reference": "workspace:packages/parser"
       },
       {
-        "name": "browse-vscode",
-        "reference": "workspace:packages/vscode"
-      },
-      {
         "name": "@browselang/web",
         "reference": "workspace:packages/web"
       }
     ],
     "enableTopLevelFallback": true,
-    "ignorePatternData": "(^(?:\\.yarn\\/sdks(?:\\/(?!\\.)(?:(?:(?!(?:^|\\/)\\.).)*?)|$))$)",
+    "ignorePatternData": "(^(?:\\.yarn\\/sdks(?:\\/(?!\\.)(?:(?:(?!(?:^|\\/)\\.).)*?)|$))$)|(^(?:^(?:vscode)$)$)|(^(?:vscode(?:\\/(?!\\.)(?:(?:(?!(?:^|\\/)\\.).)*?)|$))$)",
     "fallbackExclusionList": [
       ["@browselang/cli", ["workspace:packages/cli"]],
       ["@browselang/core", ["workspace:packages/core"]],
       ["@browselang/format", ["workspace:packages/format"]],
       ["@browselang/parser", ["workspace:packages/parser"]],
       ["@browselang/web", ["workspace:packages/web"]],
-      ["browse", ["workspace:."]],
-      ["browse-vscode", ["workspace:packages/vscode"]]
+      ["browse", ["workspace:."]]
     ],
     "fallbackPool": [
       [
@@ -438,10 +433,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       [
         "braces",
         "npm:3.0.2"
-      ],
-      [
-        "browse-vscode",
-        "workspace:packages/vscode"
       ],
       [
         "buffer",
@@ -3141,15 +3132,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["pretty-quick", "virtual:ba367005dcc9e642f796e835097ee3914c50b5006fc81536b5959222ce2d330fa4f015850afa3048322d4f62f170d2e2a22164b26fa2fb88c9d85009081bd469#npm:2.0.1"],
             ["tslib", "npm:2.0.1"],
             ["typescript", "patch:typescript@npm%3A4.0.2#builtin<compat/typescript>::version=4.0.2&hash=5b02a2"]
-          ],
-          "linkType": "SOFT",
-        }]
-      ]],
-      ["browse-vscode", [
-        ["workspace:packages/vscode", {
-          "packageLocation": "./packages/vscode/",
-          "packageDependencies": [
-            ["browse-vscode", "workspace:packages/vscode"]
           ],
           "linkType": "SOFT",
         }]

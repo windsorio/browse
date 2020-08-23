@@ -1,3 +1,6 @@
+# Pass `--web` to browse when running this example
+# $ browse --web ./examples/twitch.browse
+
 set headless false
 
 page https://www.twitch.tv {

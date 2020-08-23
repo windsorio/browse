@@ -1,3 +1,6 @@
+# Pass `--web` to browse when running this example
+# $ browse --web ./examples/indiehackers.browse
+
 # Sets the max number of tabs that the browser window will use at any time
 config { set concurrency 4 }
 
