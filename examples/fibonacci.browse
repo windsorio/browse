@@ -10,9 +10,8 @@ rule fib {
     # Base case
     return 1
   } else {
-    
     # Recursion
-    return (fib $n-1) + (fib $n-2)
+    return (fib $n - 1) + (fib $n - 2)
   }
 }
 

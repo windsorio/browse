@@ -1,3 +1,1 @@
-for { set i 2 ; test $i < 5 ; set i $i+1 } {
-  print loop $i
-}
+for { set i 2; test $i < 5; set i $i + 1 } { print loop $i }
