@@ -4,14 +4,6 @@ const parser = require("@browselang/parser");
 
 const createError = require("../common/parser-create-error");
 
-function parseComments(ast) {
-  const comments = [];
-  // TODO: parse comments
-  const { startExpr } = ast;
-  // console.log(startExpr);
-  return comments;
-}
-
 function removeTokens(node) {
   if (node && typeof node === "object") {
     for (const key in node) {

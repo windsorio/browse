@@ -11,7 +11,6 @@ const linguistBrowse = {
   extensions: [".browse"],
   tmScope: "source.browse",
   aceMode: "text",
-  // languageId: 139,
 };
 
 const languages = [
