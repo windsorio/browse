@@ -36,7 +36,7 @@
     "@browselang/format": "workspace:packages/format",
     "@browselang/parser": "workspace:packages/parser",
     "@browselang/web": "workspace:packages/web",
-    "ohm-js": "0.14.0",
+    "ohm-js": "15.0.1",
     "yargs": "15.4.1"
   },
   "devDependencies": {
