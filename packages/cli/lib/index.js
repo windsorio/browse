@@ -67,8 +67,8 @@ exports.handler = async (argv) => {
           return;
         }
         try {
-          const rules = parser.parse(stmt);
-          const rule = rules[0];
+          const program = parser.parse(stmt);
+          const rule = program.rules[0];
           const out = stringify(await evalRule(rule, scope));
           process.stdout.write("\u001b[32m" + out + "\u001b[0m");
         } catch (e) {
@@ -91,11 +91,11 @@ exports.handler = async (argv) => {
       if (!code) {
         process.exit(0); // empty program so skip
       }
-      const rules = parser.parse(code);
+      const program = parser.parse(code);
 
       await evalRuleSet({
         type: "RuleSet",
-        rules: rules,
+        rules: program.rules,
         scope,
       });
     } catch (err) {
