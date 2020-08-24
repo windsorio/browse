@@ -1,0 +1,12 @@
+# Pass `--web` to browse when running this example
+# $ browse --web ./examples/wikipedia.browse
+
+page https://en.wikipedia.org/wiki/:slug {
+  @string title `#firstHeading`
+  @arr(string) paragraphs `div.mw-parser-output`
+  out title paragraphs
+
+  # uncomment this to infinitely crawl through wikipedia
+  # crawl `a`
+}
+visit https://en.wikipedia.org/wiki/Kevin_Bacon

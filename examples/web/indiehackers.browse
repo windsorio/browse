@@ -1,0 +1,75 @@
+# Pass `--web` to browse when running this example
+# $ browse --web ./examples/indiehackers.browse
+
+# Sets the max number of tabs that the browser window will use at any time
+config { set concurrency 4 }
+
+# Profiles
+page(cache ttl='30d') https://www.indiehackers.com/:userid {
+  print Scraping user $userid
+
+  wait `.user-header__username`
+  @string? fullName `.user-header__full-name`
+
+  # @map will iterate through each element that matches the mapper, and then
+  # evaluate the `key` and `value` RuleSets to create a dictionary. @mergemap
+  # works just the same, but the dictionary is merged into the parent object
+  # instead of a nested object
+
+  # @mergemap(
+  #   !nested
+  #   key=string
+  #   value=string
+  # ) { @attr title } { @attr href } `.user-header__satellite--contact`
+
+  out userid fullName
+}
+
+# Products
+page(cache ttl='30d') https://www.indiehackers.com/product/:product {
+  print Scraping product $product
+
+  wait `.product-header__title`
+  @string title `.product-header__title`
+  @url? website `.product-metrics__stat--website`
+  @url? twitter `.product-metrics__stat--twitter`
+
+  set firstUserSelector `.product-sidebar__users .user-link__link`
+  wait $firstUserSelector
+  crawl $firstUserSelector
+
+  out product title website twitter
+}
+
+# The Product Listing page
+page https://www.indiehackers.com/products {
+  # We have to manually click a filter to refresh the page and evaluate
+  # the filters
+  wait `.collapsible-filters--active`
+  click `.collapsible-filters--active`
+  click `.collapsible-filters__option--selected`
+
+  wait 1000 # TODO: remove?
+  wait `.product-card__link`
+
+  # Scroll multiple
+  # eval(async) |
+  #   await new Promise((resolve, reject) => {
+  #     const timer = setInterval(() => {
+  #       const height = document.body.scrollHeight - 600;
+
+  #       if (height >= 5000) {
+  #         clearInterval(timer);
+  #         resolve();
+  #       }
+
+  #       window.scrollBy(0, height);
+  #     }, 200);
+  #   });
+  # |
+
+  crawl `.product-card__link`
+}
+
+# Start!
+visit https://www.indiehackers.com/products?minRevenue=1&techSkills=code
