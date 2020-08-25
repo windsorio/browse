@@ -39,11 +39,11 @@ rule logTimestamps {
 
     rule print {
       bind arg
-      # TODO: use the actual timestamp
       stdPrint '[' +
-      12345 +
-      '] ' +
-      $arg
+        # TODO: use a real timestamp
+        12345 +
+        '] ' +
+        $arg
     }
   }
 }
