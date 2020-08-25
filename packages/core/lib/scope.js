@@ -76,7 +76,7 @@ const resolveVarScope = (name, scope) => {
       node: typeof name === "string" ? null : name,
     });
   }
-  if (scope.vars[varName]) {
+  if (scope.vars[varName] !== undefined) {
     return scope;
   } else {
     return resolveVarScope(name, scope.parent);

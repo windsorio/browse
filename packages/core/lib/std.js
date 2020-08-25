@@ -1,11 +1,50 @@
-const { resolveRule, resolveRuleScope, resolveVar } = require("./scope");
+const {
+  resolveRule,
+  resolveRuleScope,
+  resolveVar,
+  resolveVarScope,
+} = require("./scope");
 const { help, stringify } = require("./utils");
 const { BrowseError } = require("./error");
+
+// Rules that are not allowed to be overriden:
+const IMMUTABLE_RULES = ["rule", "id", "return", "eval"]; // if and for?
+
+const defRule = (evalRuleSet) => (scope) => (_opts) => (name, body) => {
+  scope.rules[name] = (_ruleEvalScope) => (ruleOpts) => (...args) =>
+    // TODO: if body has `expects`, inject those from _ruleEvalScope
+    evalRuleSet(body, {
+      rules: {
+        // TODO: bind should only be accessible at the top level
+        bind: (boundScope) => (bindOpts) => (...names) => {
+          Object.keys(bindOpts).forEach((opt) => {
+            if (bindOpts[opt] !== true) {
+              throw new BrowseError({
+                message: `Options passed to bind can only have the value "true". Option '${opt}' has a different value`,
+              });
+            }
+            boundScope.vars[opt] = ruleOpts[opt] || null;
+          });
+          names.forEach((name, i) => (boundScope.vars[name] = args[i] || null));
+          return null;
+        },
+        // Same thing as id, but makes for better readability in rules
+        return: (_) => (_) => (v) => (v === undefined ? null : v),
+      },
+    });
+
+  return scope.rules[name];
+};
 
 /**
  * The root scope that contains all the basic/standard rules and variables
  */
-module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
+module.exports = ({
+  evalRule,
+  evalRuleSet,
+  getNewScope,
+  // evalArray,
+}) => ({
   parent: null, // This is the root
   vars: {},
   internal: {},
@@ -46,12 +85,23 @@ module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
       scope.vars[name] = value;
       return value;
     },
+    update: (scope) => (_) => (name, value) => {
+      if (scope.vars[name] !== undefined) {
+        throw new Error(
+          `Variable 'name' is already defined in this scope. Use 'set' to update it. 'update' is only used to update variables that are outside of the current scope, like globals`
+        );
+      }
+      const varScope = resolveVarScope(name, scope);
+      varScope.vars[name] = value;
+      return value;
+    },
     unset: (scope) => (_) => (name) => {
       const value = scope.vars[name] || null;
       delete scope.vars[name];
       return value;
     },
-    rule: (scope) => (_opts) => (name, body) => {
+    id: (_) => (_) => (v) => (v === undefined ? null : v),
+    rule: (scope) => (opts) => (name, body) => {
       let existingRule;
       try {
         existingRule = resolveRule(name, scope);
@@ -59,33 +109,12 @@ module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
       if (existingRule) {
         throw new Error(`Rule '${name}' is already defined`);
       }
-      scope.rules[name] = (_ruleEvalScope) => (ruleOpts) => (...args) =>
-        // TODO: if body has `expects`, inject those from _ruleEvalScope
-        evalRuleSet(body, {
-          rules: {
-            // TODO: bind should only be accessible at the top level
-            bind: (boundScope) => (bindOpts) => (...names) => {
-              Object.keys(bindOpts).forEach((opt) => {
-                if (bindOpts[opt] !== true) {
-                  throw new BrowseError({
-                    message: `Options passed to bind can only have the value "true". Option '${opt}' has a different value`,
-                  });
-                }
-                boundScope.vars[opt] = ruleOpts[opt] || null;
-              });
-              names.forEach(
-                (name, i) => (boundScope.vars[name] = args[i] || null)
-              );
-              return null;
-            },
-            return: (_) => (_) => (v) => (v === undefined ? null : v),
-          },
-        });
-
-      return scope.rules[name];
+      return defRule(evalRuleSet)(scope)(opts)(name, body);
     },
-    sleep: (_) => (_) => async (ms) =>
-      new Promise((resolve) => setTimeout(resolve, ms)),
+    sleep: (_) => (_) => async (ms) => {
+      if (typeof ms !== "number") throw new Error("timeout is a not a number");
+      return new Promise((resolve) => setTimeout(resolve, ms));
+    },
     print: (_) => (_) => (...args) => {
       console.log(...args.map(stringify));
       return null;
@@ -184,5 +213,32 @@ module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
       }
       return null;
     },
+    eval: (_) => (_) => async (ruleset, inject) => {
+      if (inject) {
+        const injectScope = getNewScope(inject.scope);
+        injectScope.rules.rule = (scope) => (opts) => (name, body) => {
+          // This version of rule allows redfining existing rules
+          if (IMMUTABLE_RULES.includes(name))
+            throw new Error(`Cannot override the ${name} rule`);
+          return defRule(evalRuleSet)(scope)(opts)(name, body);
+        };
+        await evalRuleSet(inject, injectScope);
+        // We don't care about the return value, we just wanted to populate the
+        // scope
+
+        const { rule, ...newRules } = injectScope.rules;
+
+        // And use it as the scope in which to eval ruleset
+        return evalRuleSet(ruleset, {
+          rules: newRules,
+          vars: injectScope.vars,
+          internal: injectScope.internal,
+        });
+      } else {
+        return evalRuleSet(ruleset);
+      }
+    },
+    // evalArray: (_) => (_) => evalArray,
+    // claimDict: (_) => (_) => claimDict,
   },
 });

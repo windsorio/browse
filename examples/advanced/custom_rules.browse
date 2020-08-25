@@ -1,0 +1,51 @@
+# See basic/fibonacci.browse for an example of a simple rule
+# This file consists of more advanced rules that take RuleSets as arguments
+
+# doAfter executes a RuleSet after some time
+rule doAfter {
+  bind ms ruleset
+  sleep $ms
+
+  return (eval $ruleset)
+}
+
+print start
+doAfter 2000 { print two seconds have passed }
+
+# while implements a familiar control flow syntax - i.e. the while loop.
+# Both arguments to while are rulesets
+rule while {
+  bind cond body
+  if (eval $cond) then {
+    eval $body
+
+    # return is unncescessary since the result from the last rule in a RuleSet
+    # is implicitly returned
+    while $cond $body
+  } else { return null }
+}
+
+set i 0
+while { id $i < 5 } { print loop $i; update i $i + 1 }
+
+## injection ##
+# we can inject custom rules and variables that are accessible within the nested
+# scope, or overload other exising rules too
+rule logTimestamps {
+  bind ruleset
+  rule stdPrint { bind arg; print $arg }
+  eval $ruleset {
+    set WITH_TS true
+
+    rule print {
+      bind arg
+      # TODO: use the actual timestamp
+      stdPrint '[' + 12345 + '] ' + $arg
+    }
+  }
+}
+
+logTimestamps {
+  print "hello world" # => [12345] hello world
+  if ($WITH_TS) then { print "I has timestamps" } else { print "I sad :(" } # => [12345] I has timestamps
+}
