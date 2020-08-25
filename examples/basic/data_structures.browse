@@ -1,10 +1,22 @@
-# A basic data structure - an array
+# basic data structures
 #
 # Maps are a composition of primitives, much like the RuleSet is a composition
-# of Rules. Since Rules can easily wrap a primitive (using the 'id' rule), we
-# can use RuleSets to compose primitives too into maps
+# of Rules. Since Rules can easily wrap a primitive (using the 'el' rule), we
+# can use RuleSets to compose primitives too into arrays and maps
 
-set arr { id 1; id 2; id 3; id 4 }
+# arrays
+
+set a1 (arr {
+  el 1
+  el 2
+
+  # 'e' and '_' are aliases for 'el'
+  e 3
+  _ 4
+})
+
+# nested/mutli-dimensionaly arrays
+set a2 (arr { _ 1; _ (arr { _ 2; _ 3; _ (arr { _ 4 }) }) })
 
 # There's a shorthand syntax for arrays
 #
@@ -13,14 +25,47 @@ set arr { id 1; id 2; id 3; id 4 }
 # They are still treated as RuleSets behind the scenes though and this is just
 # syntactic sugar
 
-# Dictionary
-#
+# Dictionaries
 
-set dict {
-  record key1 value2
+set o1 (dict {
+  record key1 value1
   record key2 value2
 
   # r and _ are aliases for the record rule. Chose whichever you prefer
   r key3 value3
   _ key4 value4
-}
+})
+
+# Nested Dictionaries
+set o2 (dict {
+  r key1 (dict { _ key2 (dict { _ (dict { _ key3 b }) (dict { _ c d }) }) })
+})
+
+## Access and Mutate ##
+
+# Access values
+print (get 1 $a1) # => 2
+print (get 1 (get 1 $a2)) # => 3
+print (get key1 $o1) # => value1
+print (get key2 (get key1 $o2)) # => dict { ... }
+#
+
+# Set values This is the same set rule you're used to, but, when a third
+# argument is passed in, set will use the array/dictionary instead of creating a
+# new variable
+set 1 42 $a1
+set 1 42 (get 1 $a2)
+set key1 val1 $o1
+set key1 val1 (get key1 $o2)
+
+# Delete entries in a dictionary using unset
+unset key1 $o1
+# print (get key1 $o1) # => throws an error
+#
+
+# You can't delete random items in an array, but you can set them to `nil`
+# However, using the `pop` method, you can remove the last element in an array
+push foo $a1
+print $a1
+print (pop $a1)
+print $a1
