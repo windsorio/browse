@@ -1,11 +1,8 @@
-set targetUrl https://developers.google.com/maps/documentation/javascript/examples/map-geolocation
+# set targetUrl https://developers.google.com/maps/documentation/javascript/examples/map-geolocation
 
-context(default) {
-  overridePermissions $targetUrl [geolocation]
-}
+context(default) { overridePermissions $targetUrl { id geolocation } }
 
-page $targetUrl { 
-  # TODO: finish this example
-}
+# TODO: finish this example
+page $targetUrl {  }
 
 visit $targetUrl

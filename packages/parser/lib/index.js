@@ -108,7 +108,7 @@ semantics.addAttribute('asLisp', {
                                         ];
                                       },
   RuleSet_withRules(_l, r, _r)        { return r.asLisp },
-  RuleSet_empty(_l, _r)               { return [] },
+  RuleSet_empty(_l, _, _r)               { return [] },
 
   word:          function(_)          { return this.sourceString; },
   identifier:    function(_, _name)   { return this.sourceString; },
@@ -332,7 +332,7 @@ semantics.addAttribute("asAST", {
       source: this.source,
     };
   },
-  RuleSet_empty(_l, _r) {
+  RuleSet_empty(_l, _, _r) {
     return {
       type: "RuleSet",
       rules: [],
@@ -422,7 +422,7 @@ semantics.addOperation('interpret()', {
                                         ];
                                       },
   RuleSet_withRules(_l, r, _r)        { return r.interpret() },
-  RuleSet_empty(_l, _r)               { return [] },
+  RuleSet_empty(_l, _, _r)               { return [] },
   
   nilLiteral: function(_)              { return null },
   booleanLiteral: function(_)           { return this.sourceString === "true" ? true : false; },
