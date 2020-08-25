@@ -23,13 +23,13 @@
     chalk "^2.0.0"
     js-tokens "^4.0.0"
 
-"@browselang/format@^0.0.3":
-  version "0.0.3"
-  resolved "https://registry.yarnpkg.com/@browselang/format/-/format-0.0.3.tgz#2d97e4c6279ed270ca0255371a62abd8d71813bd"
-  integrity sha512-V0qmx2yn1ANcDLdQ/Wi91hO680iFcUEpVZuZ6NPZM08ODpKbDG6/aHA7Srfk4md6DQdJEDJErHzmpqW/Q3fANw==
+"@browselang/format@^0.0.6":
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/@browselang/format/-/format-0.0.6.tgz#dfd35926bc734ab0538e18a645dea77380d64be7"
+  integrity sha512-ZJ1A0pyO+rNnLOyl+uO14xAmj+9qKDYIbnnwbW9s06h7JXXk0xgtyBT5Nq3huR63Ru+rK5jBKRarURVcmPgrHg==
   dependencies:
     "@babel/code-frame" "7.10.4"
-    "@browselang/parser" "0.0.3"
+    "@browselang/parser" "0.0.4"
     "@iarna/toml" "2.2.5"
     chalk "4.1.0"
     ci-info "2.0.0"
@@ -48,13 +48,13 @@
     string-width "4.2.0"
     vnopts "1.0.2"
 
-"@browselang/parser@0.0.3":
-  version "0.0.3"
-  resolved "https://registry.yarnpkg.com/@browselang/parser/-/parser-0.0.3.tgz#5a490876f7394795cab0611df94ccdc054c04e3b"
-  integrity sha512-L9uQhZp9PWEU9RBZEt8qZxzdVr53i+zy2fJ1zCtH5DQkfSkhBuQWWJEfskFeWyeoM7JF3gxdfxgal1lqWTCniQ==
+"@browselang/parser@0.0.4":
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/@browselang/parser/-/parser-0.0.4.tgz#70590988d35407ad2bf3514f6d6ff61e060725e8"
+  integrity sha512-AeSN11AZlvYa0dtZ95/61DdJl360UcLEBxmZtfAFD+GOxfl6gbfSwL/hfk/Ok3QVP1So0X7Gl3TRX1iIGNRqdQ==
   dependencies:
     binary-search "1.3.6"
-    ohm-js "0.14.0"
+    ohm-js "15.0.1"
 
 "@iarna/toml@2.2.5":
   version "2.2.5"
@@ -415,10 +415,10 @@ next-tick@~1.0.0:
   resolved "https://registry.yarnpkg.com/next-tick/-/next-tick-1.0.0.tgz#ca86d1fe8828169b0120208e3dc8424b9db8342c"
   integrity sha1-yobR/ogoFpsBICCOPchCS524NCw=
 
-ohm-js@0.14.0:
-  version "0.14.0"
-  resolved "https://registry.yarnpkg.com/ohm-js/-/ohm-js-0.14.0.tgz#ef5dbe33d493407916f8c4c12115161872c2bc0d"
-  integrity sha512-Iuiapfkaf0ZdvuJo9thtE57BT93uNOSIb3/DtwuBNBJiiT28ALzTg++w3HoAXWbQBYPem9Bd8BaNJcDYoABWUA==
+ohm-js@15.0.1:
+  version "15.0.1"
+  resolved "https://registry.yarnpkg.com/ohm-js/-/ohm-js-15.0.1.tgz#d125e9845b8f8f028fd202586b12fd60b792f6c2"
+  integrity sha512-Dbo3gJX82aZ39PX++DbUTlQYF6VKG+bkscG/SKl9RdnubJhLDTBaAzHMHYmTwiDcm6WZFaFltE5LKL35YszFvw==
   dependencies:
     es6-symbol "^3.1.0"
     inherits "^2.0.3"

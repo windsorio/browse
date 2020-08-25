@@ -191,17 +191,13 @@ function printBinExpr(path, print, options, isNested, isInsideParenthesis) {
           "left"
         )
       );
+      !isNested && (parts = parts.map((p) => indent(p)));
     } else {
       parts.push(group(path.call(print, "left")));
     }
 
-    const right = concat([
-      node.op,
-      ifBreak(" (", ""),
-      line,
-      path.call(print, "right"),
-      ifBreak(")", ""),
-    ]);
+    let right = concat([node.op, line, path.call(print, "right")]);
+    !isNested && (right = indent(right));
 
     // If there's only a single binary expression, we want to create a group in
     // order to avoid having a small right part like -1 be on its own line.
