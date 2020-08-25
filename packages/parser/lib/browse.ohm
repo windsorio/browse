@@ -2,7 +2,7 @@ Browse {
 
   Program
     = Rules
-    | (space | lineTerminator)*
+    | noop
   
   /**************\
    ** Preamble ** 
@@ -213,8 +213,10 @@ Browse {
   static = "static" ~wordPart
   yield = "yield" ~wordPart
 
-  sep = ";" (space | lineTerminator)*             -- semi
-      | lineTerminator (space | lineTerminator)*  -- noSemi
+  noop = (space | lineTerminator)*
+
+  sep = ";" noop             -- semi
+      | lineTerminator noop  -- noSemi
     
   /*****************\
    ** Expressions **
@@ -222,8 +224,8 @@ Browse {
 
   PriExpr
     =  
-    | "(" Rule ")"	-- ruleExpr
-    | "(" Expr ")"	-- paren
+    | "(" noop Rule noop")"	  -- ruleExpr
+    | "(" noop Expr noop ")"	-- paren
     | literal
     | RuleSet
     | identifier
@@ -234,28 +236,28 @@ Browse {
     | PriExpr
   
   MultExpr
-    = MultExpr "*" UnaryExpr  -- mul
-    | MultExpr "/" UnaryExpr  -- div
-    | MultExpr "%" UnaryExpr  -- mod
+    = MultExpr "*" noop UnaryExpr  -- mul
+    | MultExpr "/" noop UnaryExpr  -- div
+    | MultExpr "%" noop UnaryExpr  -- mod
     | UnaryExpr
 
   AddExpr 
-    = AddExpr "+" MultExpr -- add
-    | AddExpr "-" MultExpr -- sub
+    = AddExpr "+" noop MultExpr -- add
+    | AddExpr "-" noop MultExpr -- sub
     | MultExpr
 
   CompExpr
-    = CompExpr ">=" AddExpr -- ge
-    | CompExpr "<=" AddExpr -- le
-    | CompExpr ">" AddExpr  -- gt
-    | CompExpr "<" AddExpr  -- lt
+    = CompExpr ">=" noop  AddExpr -- ge
+    | CompExpr "<=" noop AddExpr -- le
+    | CompExpr ">" noop AddExpr  -- gt
+    | CompExpr "<" noop AddExpr  -- lt
     | AddExpr
 
   EqExpr
-    = EqExpr "!=" CompExpr  -- ne
-    | EqExpr "==" CompExpr  -- eq
-    | EqExpr "!==" CompExpr -- neError
-    | EqExpr "===" CompExpr -- eqError
+    = EqExpr "!=" noop CompExpr  -- ne
+    | EqExpr "==" noop CompExpr  -- eq
+    | EqExpr "!==" noop CompExpr -- neError
+    | EqExpr "===" noop CompExpr -- eqError
     | CompExpr
 
   Expr (an expression)
@@ -280,7 +282,7 @@ Browse {
   Rule
     = InitRule (Expr)*
   
-  Rules = (space | lineTerminator)* Rule (sep Rule)* sep?
+  Rules = noop Rule (sep Rule)* sep?
 
   RuleSet 
   	= "{" Rules "}"		-- withRules
