@@ -143,12 +143,6 @@ function genericPrint(path, options, print) {
       );
 
       return concat(parts);
-
-      return concat([
-        path.call(print, "left"),
-        n.op,
-        path.call(print, "right"),
-      ]);
     }
     default:
       /* istanbul ignore next */
@@ -201,7 +195,13 @@ function printBinExpr(path, print, options, isNested, isInsideParenthesis) {
       parts.push(group(path.call(print, "left")));
     }
 
-    const right = concat([node.op, line, path.call(print, "right")]);
+    const right = concat([
+      node.op,
+      ifBreak(" (", ""),
+      line,
+      path.call(print, "right"),
+      ifBreak(")", ""),
+    ]);
 
     // If there's only a single binary expression, we want to create a group in
     // order to avoid having a small right part like -1 be on its own line.

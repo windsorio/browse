@@ -20,7 +20,7 @@ const g = ohm.grammars(contents).Browse;
 const semantics = g.createSemantics();
 
 semantics.addAttribute("errors", {
-  EqExpr_neError(_l, o, _r) {
+  EqExpr_neError(_l, o, _, _r) {
     return [
       {
         message: "!== is not supported, use != instead",
@@ -28,7 +28,7 @@ semantics.addAttribute("errors", {
       },
     ];
   },
-  EqExpr_eqError(_l, o, _r) {
+  EqExpr_eqError(_l, o, _, _r) {
     return [
       {
         message: "=== is not supported, use == instead",
@@ -80,23 +80,23 @@ semantics.addAttribute("forbiddenComments", {
 
 // prettier-ignore
 semantics.addAttribute('asLisp', {
-  PriExpr_ruleExpr:  function(_l, e, _r) { return ["eval", e.asLisp]; }, 
-  PriExpr_paren:  function(_l, e, _r) { return ["group", e.asLisp]; }, 
+  PriExpr_ruleExpr:  function(_l, _nl, e, _nr, _r) { return ["eval", e.asLisp]; }, 
+  PriExpr_paren:  function(_l, _nl, e, _nr, _r) { return ["group", e.asLisp]; }, 
 
   UnaryExpr_not:  function(_, e)      { return ["!", e.asLisp]; },
   UnaryExpr_neg:  function(_, e)      { return ["-", e.asLisp]; },
   
-  MultExpr_mul:   function(l, _, r)   { return ["*", l.asLisp, r.asLisp]; },
-  MultExpr_div:   function(l, _, r)   { return ["/", l.asLisp, r.asLisp]; },
-  MultExpr_mod:   function(l, _, r)   { return ["%", l.asLisp, r.asLisp]; },
-  AddExpr_add:    function(l, _, r)   { return ["+", l.asLisp, r.asLisp]; },
-  AddExpr_sub:    function(l, _, r)   { return ["-", l.asLisp, r.asLisp]; },
-  CompExpr_ge:    function(l, _, r)   { return [">=", l.asLisp, r.asLisp]; },
-  CompExpr_le:    function(l, _, r)   { return ["<=", l.asLisp, r.asLisp]; },
-  CompExpr_gt:    function(l, _, r)   { return [">", l.asLisp, r.asLisp]; },
-  CompExpr_lt:    function(l, _, r)   { return ["<", l.asLisp, r.asLisp]; },
-  EqExpr_ne:      function(l, _, r)   { return ["!=", l.asLisp, r.asLisp]; },
-  EqExpr_eq:      function(l, _, r)   { return ["==", l.asLisp, r.asLisp]; },
+  MultExpr_mul:   function(l, _op, _, r)   { return ["*", l.asLisp, r.asLisp]; },
+  MultExpr_div:   function(l, _op, _, r)   { return ["/", l.asLisp, r.asLisp]; },
+  MultExpr_mod:   function(l, _op, _, r)   { return ["%", l.asLisp, r.asLisp]; },
+  AddExpr_add:    function(l, _op, _, r)   { return ["+", l.asLisp, r.asLisp]; },
+  AddExpr_sub:    function(l, _op, _, r)   { return ["-", l.asLisp, r.asLisp]; },
+  CompExpr_ge:    function(l, _op, _, r)   { return [">=", l.asLisp, r.asLisp]; },
+  CompExpr_le:    function(l, _op, _, r)   { return ["<=", l.asLisp, r.asLisp]; },
+  CompExpr_gt:    function(l, _op, _, r)   { return [">", l.asLisp, r.asLisp]; },
+  CompExpr_lt:    function(l, _op, _, r)   { return ["<", l.asLisp, r.asLisp]; },
+  EqExpr_ne:      function(l, _op, _, r)   { return ["!=", l.asLisp, r.asLisp]; },
+  EqExpr_eq:      function(l, _op, _, r)   { return ["==", l.asLisp, r.asLisp]; },
 
   Rule:           function(w, es)     { return [w.asLisp, es.asLisp] },
   Rules:          function (_nl, first, _rs, rest, _s) 
@@ -136,14 +136,14 @@ semantics.addAttribute("asAST", {
       source: this.source,
     };
   },
-  PriExpr_ruleExpr: function (_l, e, _r) {
+  PriExpr_ruleExpr: function (_l, _nl, e, _nr, _r) {
     return {
       type: "RuleExpr",
       expr: e.asAST,
       source: this.source,
     };
   },
-  PriExpr_paren: function (_l, e, _r) {
+  PriExpr_paren: function (_l, _nl, e, _nr, _r) {
     return {
       type: "Paren",
       expr: e.asAST,
@@ -168,7 +168,7 @@ semantics.addAttribute("asAST", {
     };
   },
 
-  MultExpr_mul: function (l, _, r) {
+  MultExpr_mul: function (l, _op, _, r) {
     return {
       type: "BinExpr",
       op: "*",
@@ -177,7 +177,7 @@ semantics.addAttribute("asAST", {
       source: this.source,
     };
   },
-  MultExpr_div: function (l, _, r) {
+  MultExpr_div: function (l, _op, _, r) {
     return {
       type: "BinExpr",
       op: "/",
@@ -186,7 +186,7 @@ semantics.addAttribute("asAST", {
       source: this.source,
     };
   },
-  MultExpr_mod: function (l, _, r) {
+  MultExpr_mod: function (l, _op, _, r) {
     return {
       type: "BinExpr",
       op: "%",
@@ -195,7 +195,7 @@ semantics.addAttribute("asAST", {
       source: this.source,
     };
   },
-  AddExpr_add: function (l, _, r) {
+  AddExpr_add: function (l, _op, _, r) {
     return {
       type: "BinExpr",
       op: "+",
@@ -204,7 +204,7 @@ semantics.addAttribute("asAST", {
       source: this.source,
     };
   },
-  AddExpr_sub: function (l, _, r) {
+  AddExpr_sub: function (l, _op, _, r) {
     return {
       type: "BinExpr",
       op: "-",
@@ -213,7 +213,7 @@ semantics.addAttribute("asAST", {
       source: this.source,
     };
   },
-  CompExpr_ge: function (l, _, r) {
+  CompExpr_ge: function (l, _op, _, r) {
     return {
       type: "BinExpr",
       op: ">=",
@@ -222,7 +222,7 @@ semantics.addAttribute("asAST", {
       source: this.source,
     };
   },
-  CompExpr_le: function (l, _, r) {
+  CompExpr_le: function (l, _op, _, r) {
     return {
       type: "BinExpr",
       op: "<=",
@@ -231,7 +231,7 @@ semantics.addAttribute("asAST", {
       source: this.source,
     };
   },
-  CompExpr_gt: function (l, _, r) {
+  CompExpr_gt: function (l, _op, _, r) {
     return {
       type: "BinExpr",
       op: ">",
@@ -240,7 +240,7 @@ semantics.addAttribute("asAST", {
       source: this.source,
     };
   },
-  CompExpr_lt: function (l, _, r) {
+  CompExpr_lt: function (l, _op, _, r) {
     return {
       type: "BinExpr",
       op: "<",
@@ -249,7 +249,7 @@ semantics.addAttribute("asAST", {
       source: this.source,
     };
   },
-  EqExpr_ne: function (l, _, r) {
+  EqExpr_ne: function (l, _op, _, r) {
     return {
       type: "BinExpr",
       op: "!=",
@@ -258,7 +258,7 @@ semantics.addAttribute("asAST", {
       source: this.source,
     };
   },
-  EqExpr_eq: function (l, _, r) {
+  EqExpr_eq: function (l, _op, _, r) {
     return {
       type: "BinExpr",
       op: "==",
@@ -395,23 +395,23 @@ semantics.addAttribute("asAST", {
 
 // prettier-ignore
 semantics.addOperation('interpret()', {
-  PriExpr_ruleExpr:    function(_l, e, _r) { return e.interpret(); }, 
-  PriExpr_paren:    function(_l, e, _r) { return e.interpret(); }, 
+  PriExpr_ruleExpr:    function(_l, _sl, e, _sr, _r) { return e.interpret(); }, 
+  PriExpr_paren:    function(_l, _sl, e, _sr, _r) { return e.interpret(); }, 
 
-  UnaryExpr_not:    function(_, e)      { return !e.interpret(); },
-  UnaryExpr_neg:    function(_, e)      { return - e.interpret(); },
+  UnaryExpr_not:    function(_, e)           { return !e.interpret(); },
+  UnaryExpr_neg:    function(_, e)           { return - e.interpret(); },
   
-  MultExpr_mul:     function(l, _, r)   { return l.interpret() * r.interpret(); },
-  MultExpr_div:     function(l, _, r)   { return l.interpret()  /  r.interpret(); },
-  MultExpr_mod:     function(l, _, r)   { return l.interpret()  %  r.interpret(); },
-  AddExpr_add:     function(l, _, r)    { return l.interpret()  +  r.interpret(); },
-  AddExpr_sub:     function(l, _, r)    { return l.interpret()  -  r.interpret(); },
-  CompExpr_ge:     function(l, _, r)    { return  l.interpret() >=  r.interpret(); },
-  CompExpr_le:     function(l, _, r)    { return  l.interpret() <=  r.interpret(); },
-  CompExpr_gt:     function(l, _, r)    { return l.interpret()  >  r.interpret(); },
-  CompExpr_lt:     function(l, _, r)    { return l.interpret()  <  r.interpret(); },
-  EqExpr_ne:     function(l, _, r)      { return  l.interpret() !==  r.interpret(); },
-  EqExpr_eq:     function(l, _, r)      { return  l.interpret() ===  r.interpret(); },
+  MultExpr_mul:     function(l, _op, _, r)   { return l.interpret() * r.interpret(); },
+  MultExpr_div:     function(l, _op, _, r)   { return l.interpret()  /  r.interpret(); },
+  MultExpr_mod:     function(l, _op, _, r)   { return l.interpret()  %  r.interpret(); },
+  AddExpr_add:     function(l, _op, _, r)    { return l.interpret()  +  r.interpret(); },
+  AddExpr_sub:     function(l, _op, _, r)    { return l.interpret()  -  r.interpret(); },
+  CompExpr_ge:     function(l, _op, _, r)    { return  l.interpret() >=  r.interpret(); },
+  CompExpr_le:     function(l, _op, _, r)    { return  l.interpret() <=  r.interpret(); },
+  CompExpr_gt:     function(l, _op, _, r)    { return l.interpret()  >  r.interpret(); },
+  CompExpr_lt:     function(l, _op, _, r)    { return l.interpret()  <  r.interpret(); },
+  EqExpr_ne:     function(l, _op, _, r)      { return  l.interpret() !==  r.interpret(); },
+  EqExpr_eq:     function(l, _op, _, r)      { return  l.interpret() ===  r.interpret(); },
 
   Rule:           function(w, es)     { return [w.interpret(), es.interpret()] },
   Rules:          function (_nl, first, _rs, rest, _s) 
