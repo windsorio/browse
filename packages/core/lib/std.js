@@ -80,27 +80,88 @@ module.exports = ({
       console.log(scope);
       return null;
     },
-    get: (scope) => (_) => (name) => resolveVar(name, scope),
-    set: (scope) => (_) => (name, value) => {
-      scope.vars[name] = value;
+    id: (_) => (_) => (v) => (v === undefined ? null : v),
+    get: (scope) => (_) => (name, source) => {
+      if (!source) {
+        return resolveVar(name, scope);
+      } else {
+        const err = new Error(
+          `Cannot get '${stringify(name)}' from ${stringify(source)}`
+        );
+        if (source instanceof Map) {
+          const v = source.get(name);
+          if (v === undefined) {
+            throw err;
+          }
+          return v;
+        } else if (Array.isArray(source) && typeof name === "number") {
+          const v = source[name];
+          if (v === undefined) {
+            throw err;
+          }
+          return v;
+        } else {
+          throw err;
+        }
+      }
+    },
+    set: (scope) => (_) => (name, value, dest) => {
+      if (!dest) {
+        scope.vars[name] = value;
+      } else if (dest instanceof Map) {
+        dest.set(name, value);
+      } else if (Array.isArray(dest) && typeof name === "number") {
+        if (name < 0 || name >= dest.length) {
+          throw new Error(
+            `Cannot set index ${name} in array of size ${dest.length}`
+          );
+        }
+        dest[name] = value;
+      } else {
+        throw new Error(
+          `Cannot set '${stringify(name)}' in ${stringify(dest)}`
+        );
+      }
       return value;
     },
     update: (scope) => (_) => (name, value) => {
       if (scope.vars[name] !== undefined) {
         throw new Error(
-          `Variable 'name' is already defined in this scope. Use 'set' to update it. 'update' is only used to update variables that are outside of the current scope, like globals`
+          `Variable '${stringify(
+            name
+          )}' is already defined in this scope. Use 'set' to update it. 'update' is only used to update variables that are outside of the current scope, like globals`
         );
       }
       const varScope = resolveVarScope(name, scope);
       varScope.vars[name] = value;
       return value;
     },
-    unset: (scope) => (_) => (name) => {
-      const value = scope.vars[name] || null;
-      delete scope.vars[name];
+    unset: (scope) => (_) => (name, from) => {
+      let value;
+      if (!from) {
+        value = scope.vars[name];
+        delete scope.vars[name];
+      } else if (from instanceof Map) {
+        value = from.get(name);
+        from.delete(name);
+      } else if (Array.isArray(from) && typeof name === "number") {
+        if (name < 0 || name >= dest.length) {
+          throw new Error(
+            `Cannot unset index ${name} from array of size ${from.length}`
+          );
+        }
+        value = from[name];
+        delete from[name];
+      } else {
+        throw new Error(
+          `Cannot unset '${stringify(name)}' from ${stringify(from)}`
+        );
+      }
+      if (value === undefined) value = null;
       return value;
     },
-    id: (_) => (_) => (v) => (v === undefined ? null : v),
+    push: (_) => (_) => (value, dest) => dest.push(value),
+    pop: (_) => (_) => (dest) => dest.pop(),
     rule: (scope) => (opts) => (name, body) => {
       let existingRule;
       try {
@@ -217,7 +278,7 @@ module.exports = ({
       if (inject) {
         const injectScope = getNewScope(inject.scope);
         injectScope.rules.rule = (scope) => (opts) => (name, body) => {
-          // This version of rule allows redfining existing rules
+          // This version of rule allows redifining existing rules
           if (IMMUTABLE_RULES.includes(name))
             throw new Error(`Cannot override the ${name} rule`);
           return defRule(evalRuleSet)(scope)(opts)(name, body);
@@ -238,7 +299,40 @@ module.exports = ({
         return evalRuleSet(ruleset);
       }
     },
-    // evalArray: (_) => (_) => evalArray,
-    // claimDict: (_) => (_) => claimDict,
+    arr: (_) => (_) => async (ruleset) => {
+      const arr = [];
+      const el = (_) => (_) => (value, extra) => {
+        if (extra !== undefined && extra !== null) {
+          throw new Error("'el' only takes 1 argument");
+        }
+        arr.push(value);
+        return value;
+      };
+      await evalRuleSet(ruleset, {
+        rules: { el, e: el, _: el },
+      });
+
+      return arr;
+    },
+    dict: (_) => (_) => async (ruleset) => {
+      const dict = new Map();
+      const record = (_) => (_) => (key, value, extra) => {
+        if (extra !== undefined && extra !== null) {
+          throw new Error("'record' only takes 2 arguments");
+        }
+        if (dict.has(key)) {
+          throw new Error(
+            `Cannot define the same key twice - ${stringify(key)}`
+          );
+        }
+        dict.set(key, value);
+        return value;
+      };
+      await evalRuleSet(ruleset, {
+        rules: { record, r: record, _: record },
+      });
+
+      return dict;
+    },
   },
 });

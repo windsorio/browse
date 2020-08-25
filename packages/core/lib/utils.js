@@ -3,7 +3,7 @@
  * @param {any} jsValue Any JS Value
  * @returns browse string value
  */
-const stringify = (jsValue) => {
+const stringify = (jsValue, depth = 0) => {
   if (jsValue === undefined) {
     throw new Error(
       "The value was somehow 'undefined'. This should not be possible as browse doesn't have 'undefined'. There's an error with this browse implementation"
@@ -13,7 +13,46 @@ const stringify = (jsValue) => {
     return "nil";
   }
   if (typeof jsValue === "function") {
-    return "Function";
+    return "rule ...";
+  }
+
+  const indent = new Array(depth + 1).join("  "); // indent
+  // Arrays
+  if (Array.isArray(jsValue)) {
+    if (jsValue.size === 0) {
+      return "arr { }";
+    }
+    if (depth > 2) {
+      return "arr { ... }";
+    }
+    let out = "arr {\n";
+    for (const v of jsValue) {
+      out += indent + "  ";
+      out += "_ " + stringify(v, depth + 1);
+      out += "\n";
+    }
+    out += indent + "}";
+    return out;
+  }
+
+  // Dictionaries
+  if (jsValue instanceof Map) {
+    const indent = new Array(depth + 1).join("  "); // indent
+
+    if (jsValue.size === 0) {
+      return "dict { }";
+    }
+    if (depth > 2) {
+      return "dict { ... }";
+    }
+    let out = "dict {\n";
+    for (const [k, v] of jsValue.entries()) {
+      out += indent + "  ";
+      out += "_ " + stringify(k, depth + 1) + " " + stringify(v, depth + 1);
+      out += "\n";
+    }
+    out += indent + "}";
+    return out;
   }
   return String(jsValue);
 };
