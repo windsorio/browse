@@ -1,5 +1,4 @@
 page https://soundcloud.com/ {
-  hover '.playableTile__artwork'
-  screenshot hover.png
+  hover '.playableTile__artwork'; screenshot hover.png
 }
 visit https://soundcloud.com/

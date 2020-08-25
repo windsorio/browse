@@ -286,5 +286,5 @@ Browse {
 
   RuleSet 
   	= "{" Rules "}"		-- withRules
-    | "{" "}"	            -- empty
+    | "{" noop "}"	  -- empty
 }
