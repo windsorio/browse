@@ -78,7 +78,8 @@ const preparePage = async (browser, href) => {
 };
 
 /**
- * A scope containing all the web-scraping rules and variables
+ * @scope { A scope containing all the web-scraping functions and variables }
+ * @name { Browser }
  */
 const getBrowserScope = (parent) => {
   const browserScope = {
@@ -150,8 +151,30 @@ const getBrowserScope = (parent) => {
       };
       return null;
     },
+    /**
+     * @desc { Open a new tab with the given url and checks for matches
+     *   on that URL. If there are matches the corresponding ruleSets will
+     *   be run. If there is no match The new tab/page is opened in the
+     *   browser scope and no actions will be taken
+     * }
+     *
+     * @params {
+     *   [href: string] The url to be visited
+     * }
+     *
+     * @return {
+     *   [string] The href visited
+     * }
+     *
+     * @help {  Open a new tab with the given url and checks for matches
+     *   on that URL. If there are matches the corresponding ruleSets will
+     *   be run. If there is no match The new tab/page is opened in the
+     *   browser scope and no actions will be taken
+     *  }
+     */
     visit: (scope) => (_opts) => async (href) => {
-      // Check if any pageDefs exist
+      assertBrowserScope(scope, "Cannot call visit outside of a Browser scope");
+      // Check if any pageDefs exist and execute them if found
       let match = null;
       try {
         resolveInternal("pageDefs", browserScope, (defs) => {
