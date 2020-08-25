@@ -126,7 +126,7 @@ const evalRule = async (rule, scope) => {
     const promise = Promise.resolve(
       resolveRule(fn.name, scope)(scope)(resolvedOpts)(...resolvedArgs)
     );
-    return await promise;
+    return await promise.then((v) => (v === undefined ? null : v));
   } catch (err) {
     throw BrowseError.from(err, fn.name);
   }
@@ -163,6 +163,53 @@ const evalRuleSet = async (ruleSet, inject = {}) => {
   return evalRule(lastRule, scope).catch((err) => {
     throw BrowseError.from(err, ruleSet);
   });
+};
+
+// const evalArray = async (ruleSet) => {
+//   for (const rule of ruleSet.rules) {
+//     if (rule.fn.name.name !== "id") {
+//       throw new Error(`The RuleSet is not a valid array`);
+//     }
+//   }
+//   const out = {
+//     ...ruleSet,
+//     rules: [],
+//   };
+//   await evalRuleSet(ruleSet, {
+//     rules: {
+//       id: (_) => (_) => (v) => {
+//         out.rules.push(v);
+//         return v;
+//       },
+//     },
+//   });
+//   return out.rules.length;
+// };
+
+const claimDict = (ruleSet) => {
+  const keys = new Set();
+  for (const rule of ruleSet.rules) {
+    const { fn, args } = rule;
+    if (!["record", "r", "_"].includes(fn.name.name)) {
+      throw new Error(`The RuleSet is not a valid dictionary`);
+    }
+  }
+
+  return ruleSet.rules.length;
+};
+
+const toJSDict = async (ruleSet) => {
+  claimDict(ruleSet);
+  const obj = [];
+  await evalRuleSet(ruleSet, {
+    rules: {
+      id: (_) => (_) => (v) => {
+        arr.push(v);
+        return v;
+      },
+    },
+  });
+  return obj;
 };
 
 module.exports = {

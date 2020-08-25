@@ -1,0 +1,26 @@
+# A basic data structure - an array
+#
+# Maps are a composition of primitives, much like the RuleSet is a composition
+# of Rules. Since Rules can easily wrap a primitive (using the 'id' rule), we
+# can use RuleSets to compose primitives too into maps
+
+set arr { id 1; id 2; id 3; id 4 }
+
+# There's a shorthand syntax for arrays
+#
+# TODO: actually implement this
+# # set arr [1 2 3 4]
+# They are still treated as RuleSets behind the scenes though and this is just
+# syntactic sugar
+
+# Dictionary
+#
+
+set dict {
+  record key1 value2
+  record key2 value2
+
+  # r and _ are aliases for the record rule. Chose whichever you prefer
+  r key3 value3
+  _ key4 value4
+}
