@@ -49,3 +49,12 @@ logTimestamps {
   print "hello world" # => [12345] hello world
   if ($WITH_TS) then { print "I has timestamps" } else { print "I sad :(" } # => [12345] I has timestamps
 }
+
+# note: because of lexical scoping, a rule defined outside logTimestamps will
+# still use the `print` rule available globally, and not the overloaded one,
+# even if the rule is called from inside logTimestamps
+
+rule ping { print pong }
+logTimestamps {
+  ping # => pong
+}
