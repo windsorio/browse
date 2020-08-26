@@ -1,6 +1,12 @@
+# This example doesnt' include all the stdlib modules and functions. It's just
+# an example on how to use the stlib modules available to you
+
 import "math"
 import "datetime" as dt
 
+print toExponential: (math:toExponential 123456 2)
+print toFixed: (math:toFixed 123.456 2)
+print toPrecision: (math:toPrecision 123.456 4)
 print abs: (math:abs -1)
 print acos: (math:acos 8 / 10)
 print cbrt: (math:cbrt 8)
