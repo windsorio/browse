@@ -1,0 +1,40 @@
+import "math"
+import "datetime" as dt
+
+print abs: (math:abs -1)
+print acos: (math:acos 8 / 10)
+print cbrt: (math:cbrt 8)
+print ceil: (math:ceil 1.2)
+print cos: (math:cos 1)
+print exp: (math:exp 1)
+print floor: (math:floor 1.7)
+print log: (math:log 5)
+print max: (math:max 1 2)
+print min: (math:min 1 2)
+print pow: (math:pow 2 8)
+print random: (math:random )
+print round: (math:round 1.5)
+print sin: (math:sin 1)
+print tan: (math:tan 1)
+print trunc: (math:trunc 1.123)
+
+set d (dt:Date "2020-08-01T07:00:00.000Z")
+
+print $d
+
+print getDate: (dt:getDate $d)
+print getDay: (dt:getDay $d)
+print getFullYear: (dt:getFullYear $d)
+print getHours: (dt:getHours $d)
+
+print toDateString: (dt:toDateString $d)
+print toISOString: (dt:toISOString $d)
+
+print toLocaleString: (dt:toLocaleString $d ar-EG)
+
+print toString: (dt:toString $d)
+
+print toUTCString: (dt:toUTCString $d)
+print valueOf: (dt:valueOf $d)
+
+print dayOfYear: (dt:dayOfYear $d)
