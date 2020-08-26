@@ -1,5 +1,10 @@
 import "." as math
 
+print toExponential: (math:toExponential 123456 2)
+print toFixed: (math:toFixed 123.456 2)
+print toLocaleString: (math:toLocaleString 123456.789 'ar-EG')
+print toPrecision: (math:toPrecision 123.456 4)
+
 print abs: (math:abs -1)
 print acos: (math:acos 8 / 10)
 print acosh: (math:acosh 2)
