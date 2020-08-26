@@ -4,7 +4,7 @@
 
 ### Rules
 
-- ### Page
+- ### Page:
 
   #### Description
 
@@ -14,14 +14,14 @@
 
 ### Rules
 
-- ### help
+- ### help:
 
   #### Description
 
   A function which prints help information
 
-- ### scope
-- ### get
+- ### scope:
+- ### get:
 
   #### Description
 
@@ -35,7 +35,7 @@
 
   ( _any_ ) The value stored in the variable if there is one.
 
-- ### set
+- ### set:
 
   #### Description
 
@@ -50,7 +50,7 @@
 
   ( _any_ ) value
 
-- ### unset
+- ### unset:
 
   #### Description
 
@@ -64,7 +64,7 @@
 
   ( _any_ ) The value stored in the variable key
 
-- ### rule
+- ### rule:
 
   #### Description
 
@@ -79,7 +79,7 @@
 
   ( _RuleSet_ ) The specified rule (TODO: Returns the entire function including a bunch of stuff that can only be used by the back end)
 
-- ### sleep
+- ### sleep:
 
   #### Description
 
@@ -93,7 +93,7 @@
 
   ( _number_ ) TODO: Should return the number of ms slept for
 
-- ### print
+- ### print:
 
   #### Description
 
@@ -117,7 +117,7 @@ TODO: Implement example
 
 > TODO: Implement additional notes
 
-- ### if
+- ### if:
 
   #### Description
 
@@ -145,7 +145,7 @@ TODO: Implement example
 
 > TODO: Implement additional notes
 
-- ### for
+- ### for:
 
   #### Description
 
