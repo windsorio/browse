@@ -61,6 +61,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@browselang/core@workspace:packages/core"
   dependencies:
+    "@browselang/parser": "workspace:packages/parser"
     ava: 3.11.1
     ohm-js: 15.0.1
   languageName: unknown

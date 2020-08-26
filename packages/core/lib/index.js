@@ -1,9 +1,17 @@
 "use strict";
 
+const fs = require("fs");
+const path = require("path");
+
+const parser = require("@browselang/parser");
+
 const getSTD = require("./std");
 const { stringify } = require("./utils");
 const { resolveRule, resolveVar } = require("./scope");
 const { BrowseError, stringifyError } = require("./error");
+
+// TODO: having a global moduleCache doesn't feel good
+const moduleCache = new Map();
 
 const getNewScope = (parent) => {
   if (!parent) {
@@ -14,6 +22,7 @@ const getNewScope = (parent) => {
     rules: {},
     vars: {},
     internal: {},
+    modules: {},
     close: async () => {},
   };
 };
@@ -120,13 +129,31 @@ const evalRule = async (rule, scope) => {
     }
   }
   try {
-    // It's possible for the fn call itself to throw in the case that it's not
-    // async This try...catch will handle that, and also any errors from a
-    // rejected promise
-    const promise = Promise.resolve(
-      resolveRule(fn.name, scope)(scope)(resolvedOpts)(...resolvedArgs)
-    );
-    return await promise.then((v) => (v === undefined ? null : v));
+    if (fn.name.name === "import") {
+      const fname = path.basename(resolvedArgs[0]);
+      let to = fname.split(".")[0];
+      if (resolvedArgs.length === 3) {
+        to = resolvedArgs[2];
+      }
+      if (scope.modules[to])
+        throw new Error(`Module ${to} was already imported`);
+      const document = path.resolve(
+        fn.source.basedir,
+        resolvedArgs[0] + (fname.includes(".") ? "" : ".browse")
+      );
+      scope.modules[to] = await loadModule(document, {
+        basedir: path.dirname(document),
+      });
+      return null;
+    } else {
+      // It's possible for the fn call itself to throw in the case that it's not
+      // async This try...catch will handle that, and also any errors from a
+      // rejected promise
+      const promise = Promise.resolve(
+        resolveRule(fn, scope)(scope)(resolvedOpts)(...resolvedArgs)
+      );
+      return await promise.then((v) => (v === undefined ? null : v));
+    }
   } catch (err) {
     throw BrowseError.from(err, fn.name);
   }
@@ -165,57 +192,56 @@ const evalRuleSet = async (ruleSet, inject = {}) => {
   });
 };
 
-// const evalArray = async (ruleSet) => {
-//   for (const rule of ruleSet.rules) {
-//     if (rule.fn.name.name !== "id") {
-//       throw new Error(`The RuleSet is not a valid array`);
-//     }
-//   }
-//   const out = {
-//     ...ruleSet,
-//     rules: [],
-//   };
-//   await evalRuleSet(ruleSet, {
-//     rules: {
-//       id: (_) => (_) => (v) => {
-//         out.rules.push(v);
-//         return v;
-//       },
-//     },
-//   });
-//   return out.rules.length;
-// };
-
-const claimDict = (ruleSet) => {
-  const keys = new Set();
-  for (const rule of ruleSet.rules) {
-    const { fn, args } = rule;
-    if (!["record", "r", "_"].includes(fn.name.name)) {
-      throw new Error(`The RuleSet is not a valid dictionary`);
+const injectProgramMeta = (node, meta) => {
+  if (node && typeof node === "object") {
+    for (const key in node) {
+      if (key !== "source") {
+        injectProgramMeta(node[key], meta);
+      }
+    }
+    if (node.source && typeof node.source === "object") {
+      node.source.document = meta.document;
+      node.source.basedir = meta.basedir;
     }
   }
-
-  return ruleSet.rules.length;
+};
+const evalProgram = async (program, { scope, document, basedir }) => {
+  if (document !== "repl") {
+    moduleCache.set(document, scope);
+  }
+  injectProgramMeta(program, { document, basedir });
+  return evalRuleSet(
+    {
+      type: "RuleSet",
+      rules: program.rules,
+    },
+    scope
+  );
 };
 
-const toJSDict = async (ruleSet) => {
-  claimDict(ruleSet);
-  const obj = [];
-  await evalRuleSet(ruleSet, {
-    rules: {
-      id: (_) => (_) => (v) => {
-        arr.push(v);
-        return v;
-      },
-    },
+const loadModule = async (document, { basedir }) => {
+  if (moduleCache.has(document)) {
+    return moduleCache.get(document);
+  }
+
+  const scope = getNewScope();
+
+  // TODO: support github files, or other remotely hosted files?
+  const code = fs.readFileSync(document, "utf8");
+  const program = parser.parse(code);
+  await evalProgram(program, {
+    scope,
+    document,
+    basedir,
   });
-  return obj;
+  return scope;
 };
 
 module.exports = {
   getNewScope,
   evalRule,
   evalRuleSet,
+  evalProgram,
   stringify,
   stringifyError,
 };

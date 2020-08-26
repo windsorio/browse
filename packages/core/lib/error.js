@@ -85,12 +85,13 @@ function stringifyError(err, opts = {}) {
         if (source) {
           const pos = getLineAndColumn(source.sourceString, source.startIdx);
 
-          msg += `\tat ${nodeName} (${docment}:${pos.lineNum}:${pos.colNum})`;
+          msg += `\tat ${nodeName} (${source.document}:${pos.lineNum}:${pos.colNum})`;
         } else {
           if (i < err.astStack.length - 1) {
-            // This only needs to appear in between the stack trace
-            // it's useless if it's the last line
-            msg += `\tat ${nodeName} (${docment})`;
+            // This should never happen, but, if it does, it only needs to
+            // appear in between the stack trace it's useless if it's the last
+            // line. TODO: remove?
+            msg += `\tat ${nodeName} (unknown)`;
           } else {
             return;
           }

@@ -5,13 +5,46 @@ const { BrowseError } = require("./error");
  * @param {string | Word} name The rule name or Word AST node
  * @param {Scope} scope The scope to use
  */
+const resolveModule = (name, scope) => {
+  const moduleName = name.name;
+  if (!scope) {
+    throw new BrowseError({
+      message: `Unknown module '${moduleName}'`,
+      node: name,
+    });
+  }
+  if (scope.modules[moduleName]) {
+    return scope.modules[moduleName];
+  }
+
+  return resolveModule(name, scope.parent);
+};
+
+/**
+ * Recursively find a rule matching the name by walking up the scope/environment inheritance chain
+ * @param {string | Word} name The rule name or Word AST node
+ * @param {Scope} scope The scope to use
+ */
 const resolveRule = (name, scope) => {
-  const varName = typeof name === "string" ? name : name.name;
+  const varName = typeof name === "string" ? name : name.name.name;
   if (!scope) {
     throw new BrowseError({
       message: `Rule '${varName}' is not defined`,
-      node: typeof name === "string" ? null : name,
+      node: typeof name === "string" ? null : name.name,
     });
+  }
+  if (typeof name !== "string" && name.module) {
+    const moduleScope = resolveModule(name.module, scope);
+    // moduleScope is always a top level scope, so resolveRule will only recurse twice,
+    // hitting the base case the second time, if it fails
+    try {
+      return resolveRule(varName, moduleScope);
+    } catch (e) {
+      throw new BrowseError({
+        message: `Rule '${varName}' is not defined in '${name.module.name}'`,
+        node: name.module,
+      });
+    }
   }
   if (scope.rules[varName]) {
     return scope.rules[varName];
@@ -48,11 +81,11 @@ const resolveVar = (name, scope) => {
  * @param {Scope} scope The scope to use
  */
 const resolveRuleScope = (name, scope) => {
-  const varName = typeof name === "string" ? name : name.name;
+  const varName = typeof name === "string" ? name : name.name.name;
   if (!scope) {
     throw new BrowseError({
       message: `Rule '${varName}' is not defined`,
-      node: typeof name === "string" ? null : name,
+      node: typeof name === "string" ? null : name.name,
     });
   }
   if (scope.rules[varName]) {

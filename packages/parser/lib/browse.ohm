@@ -63,6 +63,7 @@ Browse {
               // | keyword
               // | futureReservedWord
               | booleanLiteral
+              | nilLiteral
   
   // Note: keywords that are the complete prefix of another keyword should
   // be prioritized (e.g. 'in' should come before 'instanceof')
@@ -274,9 +275,12 @@ Browse {
 
   Options = (lineTerminator* Option)+ lineTerminator*
 
+
+  ruleName = (word ":")? word
+
   InitRule
-  	= #(word "(") Options ")"   -- withOpts
-    | word                      -- vanilla
+  	= #(ruleName "(") Options ")"   -- withOpts
+    | ruleName                      -- vanilla
     
 
   Rule

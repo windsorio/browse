@@ -8,7 +8,7 @@ const { help, stringify } = require("./utils");
 const { BrowseError } = require("./error");
 
 // Rules that are not allowed to be overriden:
-const IMMUTABLE_RULES = ["rule", "id", "return", "eval"]; // if and for?
+const IMMUTABLE_RULES = ["rule", "import", "id", "return", "eval"]; // if and for?
 
 const defRule = (evalRuleSet) => (scope) => (_opts) => (name, body) => {
   scope.rules[name] = (_ruleEvalScope) => (ruleOpts) => (...args) =>
@@ -48,6 +48,7 @@ module.exports = ({
   parent: null, // This is the root
   vars: {},
   internal: {},
+  modules: {},
   close: async () => {},
   rules: {
     help: (scope) => (_) => (key) => {
@@ -333,6 +334,10 @@ module.exports = ({
       });
 
       return dict;
+    },
+    import: (_) => (_) => async (...mods) => {
+      // evalRule should catch imports and handle them specially
+      throw new Error("Unexpected browse error");
     },
   },
 });

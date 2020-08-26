@@ -20,7 +20,6 @@ function parse(text /*, parsers, opts*/) {
     removeTokens(ast);
     return ast;
   } catch (e) {
-    // TODO: get the real position from the parse error
     if (e.pos) {
       throw createError(e, {
         start: { line: e.pos.lineNum, column: e.pos.colNum },
