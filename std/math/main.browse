@@ -1,0 +1,49 @@
+import "./native.js"
+
+set E 2.718281828459045
+set LN10 2.302585092994046
+set LN2 0.6931471805599453
+set LOG10E 0.4342944819032518
+set LOG2E 1.4426950408889634
+set PI 3.141592653589793
+set SQRT1_2 0.7071067811865476
+set SQRT2 1.4142135623730951
+
+rule abs { bind x; return (native:fn abs $x) }
+rule acos { bind x; return (native:fn acos $x) }
+rule acosh { bind x; return (native:fn acosh $x) }
+rule asin { bind x; return (native:fn asin $x) }
+rule asinh { bind x; return (native:fn asinh $x) }
+rule atan { bind x; return (native:fn atan $x) }
+rule atanh { bind x; return (native:fn atanh $x) }
+rule atan2 { bind y x; return (native:fn atan2 $y $x) }
+rule cbrt { bind x; return (native:fn cbrt $x) }
+rule ceil { bind x; return (native:fn ceil $x) }
+rule clz32 { bind x; return (native:fn clz32 $x) }
+rule cos { bind x; return (native:fn cos $x) }
+rule cosh { bind x; return (native:fn cosh $x) }
+rule exp { bind x; return (native:fn exp $x) }
+rule expm1 { bind x; return (native:fn expm1 $x) }
+rule floor { bind x; return (native:fn floor $x) }
+rule fround { bind x; return (native:fn fround $x) }
+# TODO: support more than 2 arguments, like in the JS native version
+rule hypot { bind x y; return (native:fn hypot $x $y) }
+rule imul { bind x y; return (native:fn imul $x $y) }
+rule log { bind x; return (native:fn log $x) }
+rule log1p { bind x; return (native:fn log1p $x) }
+rule log10 { bind x; return (native:fn log10 $x) }
+rule log2 { bind x; return (native:fn log2 $x) }
+# TODO: support more than 2 arguments, like in the JS native version
+rule max { bind x y; return (native:fn max $x $y) }
+# TODO: support more than 2 arguments, like in the JS native version
+rule min { bind x y; return (native:fn min $x $y) }
+rule pow { bind x y; return (native:fn pow $x $y) }
+rule random { return (native:fn random) }
+rule round { bind x; return (native:fn round $x) }
+rule sign { bind x; return (native:fn sign $x) }
+rule sin { bind x; return (native:fn sin $x) }
+rule sinh { bind x; return (native:fn sinh $x) }
+rule sqrt { bind x; return (native:fn sqrt $x) }
+rule tan { bind x; return (native:fn tan $x) }
+rule tanh { bind x; return (native:fn tanh $x) }
+rule trunc { bind x; return (native:fn trunc $x) }
