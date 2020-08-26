@@ -1,4 +1,4 @@
-import "./main" as dt
+import "." as dt
 
 set d (dt:Date "2020-08-01T07:00:00.000Z")
 

@@ -137,13 +137,12 @@ const evalRule = async (rule, scope) => {
       }
       if (scope.modules[to])
         throw new Error(`Module ${to} was already imported`);
-      const document = path.resolve(
-        fn.source.basedir,
-        resolvedArgs[0] + (fname.includes(".") ? "" : ".browse")
-      );
-      scope.modules[to] = await loadModule(document, {
-        basedir: path.dirname(document),
-      });
+
+      let requestedPath;
+      if (/^[\.\/]/.test(resolvedArgs[0]))
+        requestedPath = path.resolve(fn.source.basedir, resolvedArgs[0]);
+      else requestedPath = resolvedArgs[0];
+      scope.modules[to] = await loadModule(requestedPath);
       return null;
     } else {
       // It's possible for the fn call itself to throw in the case that it's not
@@ -219,12 +218,29 @@ const evalProgram = async (program, { scope, document, basedir }) => {
   );
 };
 
-const loadModule = async (document, { basedir }) => {
+const loadModule = async (req) => {
+  let document = req;
+
+  // TODO: support github files, or other remotely hosted files?
+
+  // Resolve the actual module filename
+  try {
+    const stats = await fs.promises.lstat(document);
+    if (stats.isDirectory()) {
+      document = path.join(document, "main.browse");
+    }
+  } catch (e) {
+    document += ".browse";
+  }
+  try {
+    await fs.promises.access(document);
+  } catch (e) {
+    throw new Error(`Cannot find module '${document}'`);
+  }
+
   if (moduleCache.has(document)) {
     return moduleCache.get(document);
   }
-
-  // TODO: support github files, or other remotely hosted files?
 
   const ext = path.extname(document);
   if (ext === ".browse") {
@@ -240,7 +256,7 @@ const loadModule = async (document, { basedir }) => {
     await evalProgram(program, {
       scope,
       document,
-      basedir,
+      basedir: path.dirname(document),
     });
     return scope;
   } else if (ext === ".js") {
