@@ -23,8 +23,7 @@
   -
   #### Description
   Get the value of the variable 'key'
-  -
-  #### Parameters:
+  - #### Parameters:
   - - **key** ( _string_ ) An identifer
   - #### Returns
     ( _any_ ) The value stored in the variable if there is one.
@@ -32,8 +31,7 @@
   -
   #### Description
   Set the variable 'key' to the value 'value'
-  -
-  #### Parameters:
+  - #### Parameters:
   - - **key** ( _string_ ) An identifer
 - **value** ( _any_ ) The value to set the variable to
   - #### Returns
@@ -42,8 +40,7 @@
   -
   #### Description
   Unset the variable 'key'
-  -
-  #### Parameters:
+  - #### Parameters:
   - - **key** ( _string_ ) An identifer
   - #### Returns
     ( _any_ ) The value stored in the variable key
@@ -51,8 +48,7 @@
   -
   #### Description
   Define a new rule 'name'. The 'body' has access to two additional rules, 'bind' and 'return' to take arguments and return a value
-  -
-  #### Parameters:
+  - #### Parameters:
   - - **name** ( _string_ ) An identifer
 - **body** ( _RuleSet_ ) The behavior that should be executed when rule is called with arguments
   - #### Returns
@@ -61,8 +57,7 @@
   -
   #### Description
   Sleep for the 'ms'
-  -
-  #### Parameters:
+  - #### Parameters:
   - - **ms** ( _number_ ) The number of ms to sleep for
   - #### Returns
     ( _number_ ) TODO: Should return the number of ms slept for
@@ -70,8 +65,7 @@
   -
   #### Description
   Print values to stdout
-  -
-  #### Parameters:
+  - #### Parameters:
   - - **...values** ( _Array<any>_ ) The values to print
   - #### Returns
     ( _nil_ ) nil (TODO: Should return the string printed? something else but null)
@@ -87,8 +81,7 @@ TODO: Implement example
   -
   #### Description
   If 'condition' is truthy, evaluate the 'then' RuleSet, else evaluate the 'else' rule set
-  -
-  #### Parameters:
+  - #### Parameters:
   - - **condition** ( _Array<any>_ ) The values to print
 - **then** ( _"then"_ ) The string constant then
 - **thenRuleSet** ( _RuleSet_ ) The ruleset that will be executed if condition evaluates to true
@@ -108,8 +101,7 @@ TODO: Implement example
   -
   #### Description
   If 'condition' is truthy, evaluate the 'then' RuleSet, else evaluate the 'else' rule set
-  -
-  #### Parameters:
+  - #### Parameters:
   - - **iterator** ( _RuleSet_ ) The iteration criteria
 - **body** ( _RuleSet_ ) The body of the loop
   - #### Returns
