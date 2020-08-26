@@ -1,0 +1,3 @@
+set PI 3.14
+
+rule circumference { bind r; return 2 * $PI * $r }

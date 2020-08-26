@@ -1,3 +1,5 @@
-import './second' as s 
+import "./second" as s
+import "./third"
 
-print (s:area 2)
+print (third:circumference 4)
+print (s:area 4)

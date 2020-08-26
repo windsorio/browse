@@ -1,11 +1,6 @@
 # basic data structures
-#
-# Maps are a composition of primitives, much like the RuleSet is a composition
-# of Rules. Since Rules can easily wrap a primitive (using the 'el' rule), we
-# can use RuleSets to compose primitives too into arrays and maps
 
 # arrays
-
 set a1 (arr {
   el 1
   el 2

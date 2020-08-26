@@ -1,4 +1,6 @@
-set MY_PI 3.14
+import "./third" as circle
 
-rule area { bind r; return $MY_PI * $r * $r }
-rule circumference { bind r; return 2 * $MY_PI * $r }
+rule area { 
+  bind r
+  return ((circle:circumference $r) / 2) * $r 
+}
