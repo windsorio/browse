@@ -7,25 +7,9 @@
     },
     {
       "include": "#rule"
-    },
-    {
-      "include": "#expr"
     }
   ],
   "repository": {
-    "rule": {
-      "match": "^\\s*([a-zA-Z_@][a-zA-Z_@\\?\\d]*)\\s*",
-      "captures": {
-        "1": {
-          "name": "entity.name.function.browse",
-          "patterns": [
-            {
-              "include": "#builtins"
-            }
-          ]
-        }
-      }
-    },
     "expr": {
       "patterns": [
         {
@@ -45,42 +29,130 @@
         },
         {
           "include": "#operators"
+        },
+        {
+          "include": "#parens"
+        },
+        {
+          "include": "#ruleset"
+        }
+      ]
+    },
+    "parens": {
+      "begin": "\\s*\\(",
+      "end": "\\)",
+      "contentName": "meta.parens.browse",
+      "patterns": [
+        {
+          "include": "#rule"
+        },
+        {
+          "include": "#expr"
+        }
+      ]
+    },
+    "rule": {
+      "begin": "\\s*([a-zA-Z_@][a-zA-Z_@\\?\\$\\d]*)",
+      "end": ";?",
+      "applyEndPatternLast": 1,
+      "comment": "Anything at all will let the rule end. This is intentional",
+      "captures": {
+        "1": {
+          "name": "entity.name.function.browse",
+          "patterns": [
+            {
+              "include": "#builtins"
+            }
+          ]
+        }
+      },
+      "patterns": [
+        {
+          "include": "#options"
+        },
+        {
+          "include": "#expr"
+        }
+      ]
+    },
+    "options": {
+      "begin": "\\(",
+      "end": "\\)",
+      "name": "meta.options.browse",
+      "patterns": [
+        {
+          "match": "\\s*(\\!)?([a-zA-Z_@][a-zA-Z_@\\?\\$\\d]*)(?=(\\)|\\s))",
+          "name": "variable.parameter.browse",
+          "captures": {
+            "1": { "name": "keyword.operator.browse" },
+            "3": { "name": "keyword.operator.browse" }
+          }
+        },
+        {
+          "begin": "\\s*([a-zA-Z_@][a-zA-Z_@\\?\\$\\d]*)(=)",
+          "beginCaptures": {
+            "1": { "name": "variable.parameter.browse" },
+            "2": { "name": "keyword.operator.browse" }
+          },
+          "end": "(?<!=)",
+          "patterns": [
+            {
+              "include": "#expr"
+            }
+          ]
+        }
+      ]
+    },
+    "ruleset": {
+      "begin": "\\s*{",
+      "end": "}",
+      "contentName": "meta.block.browse",
+      "patterns": [
+        {
+          "include": "#comment"
+        },
+        {
+          "include": "#rule"
         }
       ]
     },
     "operators": {
       "name": "keyword.operator.browse",
-      "match": "\\!|-|\\*|/|%|\\+|>=|<=|>|<|\\!=|=="
+      "match": "\\s*(\\!|-|\\*|/|%|\\+|>=|<=|>|<|\\!=|==)"
     },
     "builtins": {
       "patterns": [
         {
           "name": "keyword.control.browse",
-          "match": "\\b(if|for|rule|return|bind)\\b"
+          "match": "\\b(?<![_@])(if|for|return)(?![_@\\$\\?])\\b"
         },
         {
           "name": "storage.type.browse",
-          "match": "\\b(set|get)\\b"
+          "match": "\\b(?<![_@])(get|set|update|unset|rule|bind|arr|dict)(?![_@\\$\\?])\\b"
         },
         {
           "name": "keyword.other.browse",
-          "match": "\\b(print|help|scope)\\b"
+          "match": "\\b(?<![_@])(import)(?![_@\\$\\?])\\b"
+        },
+        {
+          "name": "support.class.browse",
+          "match": "\\b(?<![_@])(scope|id|push|pop|sleep|print|eval)(?![_@\\$\\?])\\b"
         }
       ]
     },
 
     "literals": {
       "name": "constant.language.browse",
-      "match": "\\b(nil|true|false)\\b"
+      "match": "\\s*\\b(nil|true|false)\\b"
     },
     "number": {
       "name": "constant.numeric.browse",
-      "match": "(\\d+\\.\\d*|\\.?\\d+)(e[+-]?\\d+)?"
+      "match": "\\s*(\\d+\\.\\d*|\\.?\\d+)(e[+-]?\\d+)?"
     },
 
     "identifier": {
       "name": "variable.other.browse",
-      "match": "\\$[a-zA-Z_@][a-zA-Z_@\\?\\d]*"
+      "match": "\\s*\\$[a-zA-Z_@][a-zA-Z_@\\?\\$\\d]*"
     },
 
     "strings": {
@@ -104,7 +176,7 @@
     },
     "dstrings": {
       "name": "string.quoted.single.browse",
-      "begin": "'",
+      "begin": "\\s*'",
       "end": "'",
       "patterns": [
         {
@@ -114,7 +186,7 @@
     },
     "sstrings": {
       "name": "string.quoted.double.browse",
-      "begin": "\"",
+      "begin": "\\s*\"",
       "end": "\"",
       "patterns": [
         {
@@ -124,35 +196,28 @@
     },
     "cssselector": {
       "name": "string.quoted.other.browse",
-      "begin": "`",
+      "begin": "\\s*`",
       "end": "`",
       "patterns": [
-        {
-          "include": "source.css#selector"
-        },
         {
           "include": "#escape"
         }
       ]
     },
     "multilinestring": {
-      "begin": "\\|",
+      "begin": "\\s*\\|",
       "end": "\\|",
       "name": "string.quoted.other.browse",
-      "contentName": "meta.embedded.block.javascript",
       "patterns": [
         {
           "include": "#escape"
-        },
-        {
-          "include": "source.js"
         }
       ]
     },
     "implicitstring": {
       "name": "string.unquoted.browse",
-      "begin": "[a-zA-Z]",
-      "end": "\\s",
+      "begin": "(?<!;)\\s*[a-zA-Z]",
+      "end": "(?=[\\;\\(\\){}\\s])",
       "patterns": [
         {
           "include": "#escape"
@@ -161,7 +226,7 @@
     },
     "escape": {
       "name": "constant.character.escape.browse",
-      "match": "\\\\(u\\h{4}|x\\h{2}|\\d{2, 3}|.)"
+      "match": "\\\\(u\\h{4}|x\\h{2}|\\d{2,3}|.)"
     },
 
     "comment": {
