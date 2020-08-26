@@ -1,6 +1,3 @@
 import "./third" as circle
 
-rule area { 
-  bind r
-  return ((circle:circumference $r) / 2) * $r 
-}
+rule area { bind r; return ((circle:circumference $r) / 2) * $r }

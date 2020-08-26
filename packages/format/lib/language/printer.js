@@ -76,6 +76,7 @@ function genericPrint(path, options, print) {
     }
     case "InitRule": {
       return concat([
+        ...(n.module ? [path.call(print, "module"), ":"] : []),
         path.call(print, "name"),
         n.options.length
           ? group(
