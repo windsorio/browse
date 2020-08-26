@@ -1,5 +1,6 @@
+import "math"
+
 import "./native.js"
-import "../math" as math
 
 set SECOND 1000
 set MINUTE $SECOND * 60
