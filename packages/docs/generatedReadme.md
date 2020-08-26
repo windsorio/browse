@@ -29,7 +29,7 @@
 
   #### Parameters
 
-  - **key** ( _string_ ) An identifer
+- **key** ( _string_ ) An identifer
 
   #### Returns
 
@@ -43,8 +43,8 @@
 
   #### Parameters
 
-  - **key** ( _string_ ) An identifer
-  - **value** ( _any_ ) The value to set the variable to
+- **key** ( _string_ ) An identifer
+- **value** ( _any_ ) The value to set the variable to
 
   #### Returns
 
@@ -58,7 +58,7 @@
 
   #### Parameters
 
-  - **key** ( _string_ ) An identifer
+- **key** ( _string_ ) An identifer
 
   #### Returns
 
@@ -72,8 +72,8 @@
 
   #### Parameters
 
-  - **name** ( _string_ ) An identifer
-  - **body** ( _RuleSet_ ) The behavior that should be executed when rule is called with arguments
+- **name** ( _string_ ) An identifer
+- **body** ( _RuleSet_ ) The behavior that should be executed when rule is called with arguments
 
   #### Returns
 
@@ -87,7 +87,7 @@
 
   #### Parameters
 
-  - **ms** ( _number_ ) The number of ms to sleep for
+- **ms** ( _number_ ) The number of ms to sleep for
 
   #### Returns
 
@@ -101,7 +101,7 @@
 
   #### Parameters
 
-  - **...values** ( _Array<any>_ ) The values to print
+- **...values** ( _Array<any>_ ) The values to print
 
   #### Returns
 
@@ -125,11 +125,11 @@ TODO: Implement example
 
   #### Parameters
 
-  - **condition** ( _Array<any>_ ) The values to print
-  - **then** ( _"then"_ ) The string constant then
-  - **thenRuleSet** ( _RuleSet_ ) The ruleset that will be executed if condition evaluates to true
-  - **else** ( _"else"_ ) The string constant else
-  - **elseRuleSet** ( _RuleSet_ ) The ruleset that will be executed if condition evaluates to false
+- **condition** ( _Array<any>_ ) The values to print
+- **then** ( _"then"_ ) The string constant then
+- **thenRuleSet** ( _RuleSet_ ) The ruleset that will be executed if condition evaluates to true
+- **else** ( _"else"_ ) The string constant else
+- **elseRuleSet** ( _RuleSet_ ) The ruleset that will be executed if condition evaluates to false
 
   #### Returns
 
@@ -153,8 +153,8 @@ TODO: Implement example
 
   #### Parameters
 
-  - **iterator** ( _RuleSet_ ) The iteration criteria
-  - **body** ( _RuleSet_ ) The body of the loop
+- **iterator** ( _RuleSet_ ) The iteration criteria
+- **body** ( _RuleSet_ ) The body of the loop
 
   #### Returns
 
