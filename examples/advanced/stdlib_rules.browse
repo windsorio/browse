@@ -1,8 +1,8 @@
 # This example doesnt' include all the stdlib modules and functions. It's just
 # an example on how to use the stlib modules available to you
 
-import "math"
-import "datetime" as dt
+import math
+import datetime as dt
 
 print toExponential: (math:toExponential 123456 2)
 print toFixed: (math:toFixed 123.456 2)
