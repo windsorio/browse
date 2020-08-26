@@ -1,7 +1,7 @@
 # Documentation
 
-- Scope: Browser
-- Scope: std
+- [Scope: Browser](#Browser)
+- [Scope: std](#std)
 
 ## Browser
 
