@@ -344,5 +344,7 @@ module.exports = ({
       // evalRule should catch imports and handle them specially
       throw new Error("Unexpected browse error");
     },
+
+    string: (_) => (_) => (v) => String(v),
   },
 });

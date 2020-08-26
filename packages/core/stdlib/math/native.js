@@ -7,6 +7,7 @@ exports.browse = (parent) => {
   };
 
   mathScope.rules = {
+    proto: (_) => (_) => (fn, num, ...args) => num[fn](...args),
     fn: (_) => (_) => (fn, ...args) => Math[fn](...args),
   };
 

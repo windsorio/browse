@@ -9,6 +9,19 @@ set PI 3.141592653589793
 set SQRT1_2 0.7071067811865476
 set SQRT2 1.4142135623730951
 
+# built in number functions
+rule toExponential {
+  bind n digits; return (native:proto toExponential $n $digits)
+}
+rule toFixed { bind n digits; return (native:proto toFixed $n $digits) }
+rule toLocaleString {
+  bind n locale; return (native:proto toLocaleString $n $locale)
+}
+rule toPrecision {
+  bind n precision; return (native:proto toPrecision $n $precision)
+}
+
+# Math.* fns
 rule abs { bind x; return (native:fn abs $x) }
 rule acos { bind x; return (native:fn acos $x) }
 rule acosh { bind x; return (native:fn acosh $x) }
