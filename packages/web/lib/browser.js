@@ -24,7 +24,7 @@ const newBrowser = async (headless) => {
   return puppeteer.launch({
     ...(isDocker()
       ? {
-          headless: false,
+          headless: true,
           args: [
             // Required for Docker version of Puppeteer
             "--no-sandbox",
