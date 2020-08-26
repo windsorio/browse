@@ -1,5 +1,8 @@
 # Documentation
 
+- Scope: Browser
+- Scope: std
+
 ## Browser
 
 A scope containing all the web-scraping rules and variables
