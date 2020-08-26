@@ -138,11 +138,16 @@ const evalRule = async (rule, scope) => {
       if (scope.modules[to])
         throw new Error(`Module ${to} was already imported`);
 
-      let requestedPath;
       if (/^[\.\/]/.test(resolvedArgs[0]))
-        requestedPath = path.resolve(fn.source.basedir, resolvedArgs[0]);
-      else requestedPath = resolvedArgs[0];
-      scope.modules[to] = await loadModule(requestedPath);
+        scope.modules[to] = await loadModule(
+          path.resolve(fn.source.basedir, resolvedArgs[0]),
+          { library: false }
+        );
+      else
+        scope.modules[to] = await loadModule(resolvedArgs[0], {
+          library: true,
+        });
+
       return null;
     } else {
       // It's possible for the fn call itself to throw in the case that it's not
@@ -218,10 +223,15 @@ const evalProgram = async (program, { scope, document, basedir }) => {
   );
 };
 
-const loadModule = async (req) => {
+const loadModule = async (req, { library }) => {
   let document = req;
 
   // TODO: support github files, or other remotely hosted files?
+
+  if (library) {
+    // TODO: support libraries outside of stdlib?
+    document = path.resolve(__dirname, "..", "stdlib", document);
+  }
 
   // Resolve the actual module filename
   try {
