@@ -3,7 +3,18 @@ const parser = require("@babel/parser");
 const fs = require("fs");
 const assert = require("assert");
 const util = require("util");
-const { h1, h2, h3, h4, bullet, bold, italics } = require("./readmeWriter");
+const {
+  h1,
+  h2,
+  h3,
+  h4,
+  bullet,
+  bold,
+  italics,
+  indentAll,
+  code,
+  quote,
+} = require("./readmeWriter");
 const directories = ["web", "core"];
 const show = (obj) =>
   console.log(
@@ -67,9 +78,9 @@ const parseParams = (paramString) => {
     const [nameAndType, description] = arr;
     const [name, type] = nameAndType.split(":");
     return {
-      name,
-      type,
-      description,
+      name: name.trim(),
+      type: type.trim(),
+      description: description.trim(),
     };
   });
 };
@@ -98,6 +109,68 @@ const generateHelp = (rules) => {
   return rtn;
 };
 
+/*
+ * Process a single annotated rule
+ */
+const processRule = (rule) => {
+  const rtn = {};
+  const tags = pullAllTags(rule.leadingComments);
+  /* Parse the help tag */
+  if (tags["@help"] === undefined && tags["@desc"] === undefined) {
+    //If the help and desc tags have no data we grab all of the text
+    //TODO: Return just the comments not within a tag
+    rtn.help = rule.leadingComments
+      .map((node) => cleanComment(node.value))
+      .join("\n");
+  } else {
+    //else we just extract data from @help tags
+    rtn.help = tags["@help"] || tags["@desc"];
+  }
+
+  /* Parse the desc tag */
+  if (tags["@desc"] === undefined && tags["@help"] === undefined) {
+    //If the help and desc tags have no data we grab all of the text
+    //TODO: Return just the comments not within a tag
+    rtn.help = rule.leadingComments
+      .map((node) => cleanComment(node.value))
+      .join("\n");
+  } else {
+    //else we just extract data from @help tags
+    rtn.help = tags["@desc"] || tags["@help"];
+  }
+
+  /* Parse the params tag */
+  if (tags["@params"] !== undefined) {
+    rtn.params = parseParams(tags["@params"]);
+  }
+
+  /* Parse the returns tag */
+  if (tags["@return"] !== undefined) {
+    rtn.rtn = parseRtn(tags["@return"]);
+  }
+
+  /* Parse the example tag */
+  if (tags["@example"] !== undefined) {
+    rtn.example = tags["@example"];
+  }
+
+  /* Parse the example tag */
+  if (tags["@notes"] !== undefined) {
+    rtn.notes = tags["@notes"];
+  }
+  return rtn;
+};
+
+/*
+ * Process multiple rules inside an object
+ *
+ * A rule consists of a
+ * {
+ *   node,
+ *   leadingComment,
+ *   name
+ * }
+ */
 const processRules = (rules) => {
   const rtn = {};
   const commentedRules = rules.filter(
@@ -151,6 +224,16 @@ const processRules = (rules) => {
     if (tags["@return"] !== undefined) {
       rtn[ruleName].rtn = parseRtn(tags["@return"]);
     }
+
+    /* Parse the example tag */
+    if (tags["@example"] !== undefined) {
+      rtn[ruleName].example = tags["@example"];
+    }
+
+    /* Parse the example tag */
+    if (tags["@notes"] !== undefined) {
+      rtn[ruleName].notes = tags["@notes"];
+    }
   });
   return rtn;
 };
@@ -179,143 +262,144 @@ const processConfig = (config) => {
   return rtn;
 };
 
-const rtn = {};
-const commentArr = [];
+module.exports = () => {
+  const rtn = {};
+  const commentArr = [];
 
-directories.map((directory) => {
-  console.log("ENTERING DIR", directory);
-  return fileMap[directory].map((file) => {
-    console.log("ENTERING FILE", file);
-    const code = fs.readFileSync(`../${directory}/lib/${file}`, "utf8");
-    const ast = parser.parse(code);
-    traverse(ast, {
-      enter(path) {
-        /*
-         * This is for the 'const getBrowserScope = () => ({})) style
-         */
-        if (
-          path.isVariableDeclaration() &&
-          path.node.leadingComments !== undefined
-        ) {
-          //Find the scope tag
-          const tags = pullAllTags(path.node.leadingComments);
-          if (tags["@scope"]) {
-            const scopeName = tags["@name"] || file.split(".")[0];
-            rtn[scopeName] = {};
+  directories.map((directory) => {
+    console.log("ENTERING DIR", directory);
+    return fileMap[directory].map((file) => {
+      console.log("ENTERING FILE", file);
+      const code = fs.readFileSync(`../${directory}/lib/${file}`, "utf8");
+      const ast = parser.parse(code);
+      let scope;
+      traverse(ast, {
+        enter(path) {
+          /*
+           * This is for the 'const getBrowserScope = () => ({})) style
+           */
+          if (
+            path.isVariableDeclaration() &&
+            path.node.declarations &&
+            path.node.declarations.init &&
+            path.node.declarations.init.type === "ArrowFunctionExpression" &&
+            path.node.leadingComments !== undefined
+          ) {
+            //Find the scope tag
+            const tags = pullAllTags(path.node.leadingComments);
+            if (tags["@scope"]) {
+              assert(
+                !scope,
+                "There can only be one scope declaration per file"
+              );
+              const scopeName = tags["@name"] || file.split(".")[0];
+              scope = scopeName;
+              rtn[scopeName] = {};
 
-            /* Deal with the Rule annotations */
+              /* Deal with the Rule annotations */
 
-            //We won't use the path.findChild since we're looking for a very specific child
-            const fns = path.node.declarations[0].init.body.properties.filter(
-              (property) => property.key.name === "fns"
-            );
-            assert(fns.length <= 1, "There can only be one fn property");
-            //Rules
-            const rules = fns[0].value.properties;
+              //We won't use the path.findChild since we're looking for a very specific child
+              console.log(path.node.declarations[0].init.body);
+              const ruleNode = path.node.declarations[0].init.body.properties.filter(
+                (property) => property.key.name === "rules"
+              );
+              assert(ruleNode.length <= 1, "There can only be one fn property");
+              //Rules
+              const rules = ruleNode[0].value.properties;
 
-            rtn[scopeName]["rules"] = processRules(rules);
-            /* Deal with the Config annotations */
+              rtn[scopeName]["rules"] = processRules(rules);
+              /* Deal with the Config annotations */
 
-            const configDeclarations = path.node.declarations[0].init.body.properties.filter(
-              (property) => property.key.name === "config"
-            );
-            assert(
-              configDeclarations.length <= 1,
-              "There can only be one config property"
-            );
-            const config = configDeclarations[0];
-            rtn[scopeName]["config"] = processConfig(config);
-          }
-        }
-
-        /*
-         * This is for the 'module.exports = () => ({})) style
-         */
-        if (
-          path.isExpressionStatement() &&
-          path.node.leadingComments !== undefined
-        ) {
-          //Find the scope tag
-          const tags = pullAllTags(path.node.leadingComments);
-          if (tags["@scope"]) {
-            const scopeName = tags["@name"] || file.split(".")[0];
-            rtn[scopeName] = {};
-
-            /* Deal with the Rule annotations */
-
-            //We won't use the path.findChild since we're looking for a very specific child
-            const fns = path.node.expression.right.body.properties.filter(
-              (property) => property.key.name === "fns"
-            );
-            assert(fns.length <= 1, "There can only be one fn property");
-            //Rules
-            const rules = fns[0].value.properties;
-
-            rtn[scopeName]["rules"] = processRules(rules);
-            /* Deal with the Config annotations */
-
-            const configDeclarations = path.node.expression.right.body.properties.filter(
-              (property) => property.key.name === "config"
-            );
-            assert(
-              configDeclarations.length <= 1,
-              "There can only be one config property"
-            );
-            const config = configDeclarations[0];
-            rtn[scopeName]["config"] = processConfig(config);
-          }
-        }
-
-        //Take anything with leading comments
-        /*    if (path.node.leadingComments) {
-          const commentNodes = path.node.leadingComments;
-          const docComments = commentNodes.filter(commentNode => commentNode.value.startsWith("*"));
-          console.log("CommentNodesParent", path.findParent(path => path.isObjectProperty() && path.node.key.name === 'fns'));
-          if(docComments.length) {
-            const data = {
-              node: path.node,
-              comments: docComments.map(comment => comment.value).map(pullTags).reduce((o1, o2) => safeMergeObjs(o1, o2), {})
+              const configDeclarations = path.node.declarations[0].init.body.properties.filter(
+                (property) => property.key.name === "config"
+              );
+              assert(
+                configDeclarations.length <= 1,
+                "There can only be one config property"
+              );
+              const config = configDeclarations[0];
+              rtn[scopeName]["config"] = processConfig(config);
             }
-    	commentArr.push(data)
+          } else if (
+
+          /*
+           * This is for the 'module.exports = () => ({})) style
+           */
+            path.isExpressionStatement() &&
+            path.node.leadingComments !== undefined
+          ) {
+            //Find the scope tag
+            const tags = pullAllTags(path.node.leadingComments);
+            if (tags["@scope"]) {
+              assert(
+                !scope,
+                "There can only be one scope declaration per file"
+              );
+              const scopeName = tags["@name"] || file.split(".")[0];
+              scope = scopeName;
+              rtn[scopeName] = {};
+
+              /* Deal with the Rule annotations */
+
+              //We won't use the path.findChild since we're looking for a very specific child
+              const ruleNode = path.node.expression.right.body.properties.filter(
+                (property) => property.key.name === "rules"
+              );
+              assert(ruleNode.length <= 1, "There can only be one fn property");
+              //Rules
+              const rules = ruleNode[0].value.properties;
+
+              rtn[scopeName]["rules"] = processRules(rules);
+              /* Deal with the Config annotations */
+
+              const configDeclarations = path.node.expression.right.body.properties.filter(
+                (property) => property.key.name === "config"
+              );
+              assert(
+                configDeclarations.length <= 1,
+                "There can only be one config property"
+              );
+              const config = configDeclarations[0];
+              rtn[scopeName]["config"] = processConfig(config);
+            }
           }
-        }*/
-      },
+
+          //If the structure is not recognized, we can search for tags manually and do our best
+          //In this case the function must also have an '@scope' tag
+          else if (path.node.leadingComments !== undefined) {
+            //Find the scope tag
+            const tags = pullAllTags(path.node.leadingComments);
+            //          console.log("TAGS", tags);
+            if (tags["@scope"] != undefined && tags["@rule"] != undefined) {
+              //In the context of a single rule, scope is used to tell us which scope it belongs to, else we'll use any scope tag we have already
+              const scopeName = tags["@scope"] || scope;
+              rtn[scopeName] = {};
+
+              /* Deal with the Rule annotations */
+              //Rules
+              if (!rtn[scopeName]["rules"]) rtn[scopeName]["rules"] = {};
+
+              rtn[scopeName]["rules"][tags["@rule"]] = processRule(path.node);
+            }
+          }
+
+          //Take anything with leading comments
+          /*    if (path.node.leadingComments) {
+            const commentNodes = path.node.leadingComments;
+            const docComments = commentNodes.filter(commentNode => commentNode.value.startsWith("*"));
+            console.log("CommentNodesParent", path.findParent(path => path.isObjectProperty() && path.node.key.name === 'rules'));
+            if(docComments.length) {
+              const data = {
+                node: path.node,
+                comments: docComments.map(comment => comment.value).map(pullTags).reduce((o1, o2) => safeMergeObjs(o1, o2), {})
+              }
+      	commentArr.push(data)
+            }
+          }*/
+        },
+      });
     });
   });
-});
 
-/*const rules = commentArr.filter(commentStruct => commentStruct.comments['@rule'] !== undefined);
-console.log(generateHelp(rules));*/
-const readmeLines = [`${h1("Documentation")}`];
-Object.keys(rtn).map((scope) => {
-  readmeLines.push(h2(scope));
-  const { rules, config } = rtn[scope];
-  if (rules) {
-    readmeLines.push(h3("Rules"));
-    const ruleLines = Object.keys(rules).map((rule) => {
-      const ruleInfo = [];
-      const { help, desc, params, rtn } = rules[rule];
-      if (desc) {
-        ruleInfo.push(desc);
-      } else if (help) {
-        ruleInfo.push(help);
-      } else {
-        console.error(`Warning. Undocumented Rule ${rule}`);
-      }
-
-      if (params) {
-      }
-
-      if (rtn) {
-        ruleInfo.push(
-          ` ${bold("Returns")} ${italics(rtn.type)} ${rtn.description}`
-        );
-      }
-
-      return [h3(rule), ...ruleInfo].join("\n");
-    });
-    readmeLines.push(bullet(ruleLines));
-  }
-});
-show(rtn);
-console.log(readmeLines.join("\n"));
+  return rtn;
+};

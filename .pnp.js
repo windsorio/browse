@@ -31,6 +31,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         "reference": "workspace:packages/core"
       },
       {
+        "name": "docs",
+        "reference": "workspace:packages/docs"
+      },
+      {
         "name": "@browselang/format",
         "reference": "workspace:packages/format"
       },
@@ -51,7 +55,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       ["@browselang/format", ["workspace:packages/format"]],
       ["@browselang/parser", ["workspace:packages/parser"]],
       ["@browselang/web", ["workspace:packages/web"]],
-      ["browse", ["workspace:."]]
+      ["browse", ["workspace:."]],
+      ["docs", ["workspace:packages/docs"]]
     ],
     "fallbackPool": [
       [
@@ -63,12 +68,44 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         "npm:7.10.4"
       ],
       [
+        "@babel/generator",
+        "npm:7.11.4"
+      ],
+      [
+        "@babel/helper-function-name",
+        "npm:7.10.4"
+      ],
+      [
+        "@babel/helper-get-function-arity",
+        "npm:7.10.4"
+      ],
+      [
+        "@babel/helper-split-export-declaration",
+        "npm:7.11.0"
+      ],
+      [
         "@babel/helper-validator-identifier",
         "npm:7.10.4"
       ],
       [
         "@babel/highlight",
         "npm:7.10.4"
+      ],
+      [
+        "@babel/parser",
+        "npm:7.11.3"
+      ],
+      [
+        "@babel/template",
+        "npm:7.10.4"
+      ],
+      [
+        "@babel/traverse",
+        "npm:7.11.0"
+      ],
+      [
+        "@babel/types",
+        "npm:7.11.0"
       ],
       [
         "@browselang/cli",
@@ -121,6 +158,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       [
         "@types/babel__code-frame",
         "npm:7.0.1"
+      ],
+      [
+        "@types/babel__traverse",
+        "npm:7.0.13"
       ],
       [
         "@types/cacheable-request",
@@ -464,7 +505,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       ],
       [
         "chalk",
-        "npm:4.1.0"
+        "npm:3.0.0"
       ],
       [
         "chokidar",
@@ -667,6 +708,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         "npm:3.0.1"
       ],
       [
+        "docs",
+        "workspace:packages/docs"
+      ],
+      [
         "dot-prop",
         "npm:5.2.0"
       ],
@@ -812,7 +857,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       ],
       [
         "fs-minipass",
-        "npm:2.1.0"
+        "npm:1.2.7"
       ],
       [
         "fs.realpath",
@@ -855,12 +900,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         "npm:2.0.1"
       ],
       [
+        "globals",
+        "npm:11.12.0"
+      ],
+      [
         "globby",
         "npm:11.0.1"
       ],
       [
         "got",
-        "npm:9.6.0"
+        "npm:11.5.2"
       ],
       [
         "graceful-fs",
@@ -1095,6 +1144,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         "npm:0.1.1"
       ],
       [
+        "jsesc",
+        "npm:2.5.2"
+      ],
+      [
         "json-buffer",
         "npm:3.0.1"
       ],
@@ -1152,7 +1205,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       ],
       [
         "locate-path",
-        "npm:3.0.0"
+        "npm:5.0.0"
       ],
       [
         "lodash",
@@ -1232,11 +1285,11 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       ],
       [
         "minipass",
-        "npm:3.1.3"
+        "npm:2.9.0"
       ],
       [
         "minizlib",
-        "npm:2.1.0"
+        "npm:1.3.3"
       ],
       [
         "mkdirp",
@@ -1376,7 +1429,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       ],
       [
         "p-locate",
-        "npm:3.0.0"
+        "npm:4.1.0"
       ],
       [
         "p-map",
@@ -1404,7 +1457,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       ],
       [
         "path-exists",
-        "npm:3.0.0"
+        "npm:4.0.0"
       ],
       [
         "path-is-absolute",
@@ -1592,7 +1645,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       ],
       [
         "resolve-from",
-        "npm:5.0.0"
+        "npm:4.0.0"
       ],
       [
         "responselike",
@@ -1748,7 +1801,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       ],
       [
         "tar",
-        "npm:6.0.2"
+        "npm:4.4.13"
       ],
       [
         "tar-fs",
@@ -1773,6 +1826,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       [
         "time-zone",
         "npm:1.0.0"
+      ],
+      [
+        "to-fast-properties",
+        "npm:2.0.0"
       ],
       [
         "to-readable-stream",
@@ -1988,6 +2045,50 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD",
         }]
       ]],
+      ["@babel/generator", [
+        ["npm:7.11.4", {
+          "packageLocation": "./.yarn/cache/@babel-generator-npm-7.11.4-1b12b2d728-1244facf6e.zip/node_modules/@babel/generator/",
+          "packageDependencies": [
+            ["@babel/generator", "npm:7.11.4"],
+            ["@babel/types", "npm:7.11.0"],
+            ["jsesc", "npm:2.5.2"],
+            ["source-map", "npm:0.5.7"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["@babel/helper-function-name", [
+        ["npm:7.10.4", {
+          "packageLocation": "./.yarn/cache/@babel-helper-function-name-npm-7.10.4-153d80f559-41ab8f48bb.zip/node_modules/@babel/helper-function-name/",
+          "packageDependencies": [
+            ["@babel/helper-function-name", "npm:7.10.4"],
+            ["@babel/helper-get-function-arity", "npm:7.10.4"],
+            ["@babel/template", "npm:7.10.4"],
+            ["@babel/types", "npm:7.11.0"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["@babel/helper-get-function-arity", [
+        ["npm:7.10.4", {
+          "packageLocation": "./.yarn/cache/@babel-helper-get-function-arity-npm-7.10.4-29a99c32bb-4f0ddd4340.zip/node_modules/@babel/helper-get-function-arity/",
+          "packageDependencies": [
+            ["@babel/helper-get-function-arity", "npm:7.10.4"],
+            ["@babel/types", "npm:7.11.0"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["@babel/helper-split-export-declaration", [
+        ["npm:7.11.0", {
+          "packageLocation": "./.yarn/cache/@babel-helper-split-export-declaration-npm-7.11.0-d39c69702f-ddfc44d0cf.zip/node_modules/@babel/helper-split-export-declaration/",
+          "packageDependencies": [
+            ["@babel/helper-split-export-declaration", "npm:7.11.0"],
+            ["@babel/types", "npm:7.11.0"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
       ["@babel/helper-validator-identifier", [
         ["npm:7.10.4", {
           "packageLocation": "./.yarn/cache/@babel-helper-validator-identifier-npm-7.10.4-0689d787fa-25098ef842.zip/node_modules/@babel/helper-validator-identifier/",
@@ -2005,6 +2106,57 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@babel/helper-validator-identifier", "npm:7.10.4"],
             ["chalk", "npm:2.4.2"],
             ["js-tokens", "npm:4.0.0"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["@babel/parser", [
+        ["npm:7.11.3", {
+          "packageLocation": "./.yarn/cache/@babel-parser-npm-7.11.3-6f623fe67c-3979528522.zip/node_modules/@babel/parser/",
+          "packageDependencies": [
+            ["@babel/parser", "npm:7.11.3"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["@babel/template", [
+        ["npm:7.10.4", {
+          "packageLocation": "./.yarn/cache/@babel-template-npm-7.10.4-521586243b-23a5c4f7ab.zip/node_modules/@babel/template/",
+          "packageDependencies": [
+            ["@babel/template", "npm:7.10.4"],
+            ["@babel/code-frame", "npm:7.10.4"],
+            ["@babel/parser", "npm:7.11.3"],
+            ["@babel/types", "npm:7.11.0"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["@babel/traverse", [
+        ["npm:7.11.0", {
+          "packageLocation": "./.yarn/cache/@babel-traverse-npm-7.11.0-f97e87ce5c-81e4bb3020.zip/node_modules/@babel/traverse/",
+          "packageDependencies": [
+            ["@babel/traverse", "npm:7.11.0"],
+            ["@babel/code-frame", "npm:7.10.4"],
+            ["@babel/generator", "npm:7.11.4"],
+            ["@babel/helper-function-name", "npm:7.10.4"],
+            ["@babel/helper-split-export-declaration", "npm:7.11.0"],
+            ["@babel/parser", "npm:7.11.3"],
+            ["@babel/types", "npm:7.11.0"],
+            ["debug", "virtual:eda34ac4461db21cdc027ff772dafd1b51a53802e9c823b8bbb2b08e4be4093580d9d99397458622d5d373f98008ac65093ca1c07fef4b7865dbb30553812932#npm:4.2.0"],
+            ["globals", "npm:11.12.0"],
+            ["lodash", "npm:4.17.19"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["@babel/types", [
+        ["npm:7.11.0", {
+          "packageLocation": "./.yarn/cache/@babel-types-npm-7.11.0-3a64f51f6c-46e2fcd49d.zip/node_modules/@babel/types/",
+          "packageDependencies": [
+            ["@babel/types", "npm:7.11.0"],
+            ["@babel/helper-validator-identifier", "npm:7.10.4"],
+            ["lodash", "npm:4.17.19"],
+            ["to-fast-properties", "npm:2.0.0"]
           ],
           "linkType": "HARD",
         }]
@@ -2202,6 +2354,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/@types-babel__code-frame-npm-7.0.1-d747ce7217-89c185cabe.zip/node_modules/@types/babel__code-frame/",
           "packageDependencies": [
             ["@types/babel__code-frame", "npm:7.0.1"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["@types/babel__traverse", [
+        ["npm:7.0.13", {
+          "packageLocation": "./.yarn/cache/@types-babel__traverse-npm-7.0.13-ada6dc334d-25d3cf96fc.zip/node_modules/@types/babel__traverse/",
+          "packageDependencies": [
+            ["@types/babel__traverse", "npm:7.0.13"],
+            ["@babel/types", "npm:7.11.0"]
           ],
           "linkType": "HARD",
         }]
@@ -3799,6 +3961,18 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD",
         }]
       ]],
+      ["docs", [
+        ["workspace:packages/docs", {
+          "packageLocation": "./packages/docs/",
+          "packageDependencies": [
+            ["docs", "workspace:packages/docs"],
+            ["@babel/parser", "npm:7.11.3"],
+            ["@babel/traverse", "npm:7.11.0"],
+            ["@types/babel__traverse", "npm:7.0.13"]
+          ],
+          "linkType": "SOFT",
+        }]
+      ]],
       ["dot-prop", [
         ["npm:5.2.0", {
           "packageLocation": "./.yarn/cache/dot-prop-npm-5.2.0-195360fa83-d2f62e0b5e.zip/node_modules/dot-prop/",
@@ -4345,6 +4519,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [
             ["global-dirs", "npm:2.0.1"],
             ["ini", "npm:1.3.5"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["globals", [
+        ["npm:11.12.0", {
+          "packageLocation": "./.yarn/cache/globals-npm-11.12.0-1fa7f41a6c-2563d3306a.zip/node_modules/globals/",
+          "packageDependencies": [
+            ["globals", "npm:11.12.0"]
           ],
           "linkType": "HARD",
         }]
@@ -4999,6 +5182,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/jsbn-npm-0.1.1-0eb7132404-b530d48a64.zip/node_modules/jsbn/",
           "packageDependencies": [
             ["jsbn", "npm:0.1.1"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["jsesc", [
+        ["npm:2.5.2", {
+          "packageLocation": "./.yarn/cache/jsesc-npm-2.5.2-c5acb78804-ca91ec33d7.zip/node_modules/jsesc/",
+          "packageDependencies": [
+            ["jsesc", "npm:2.5.2"]
           ],
           "linkType": "HARD",
         }]
@@ -6667,6 +6859,13 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]
       ]],
       ["source-map", [
+        ["npm:0.5.7", {
+          "packageLocation": "./.yarn/cache/source-map-npm-0.5.7-7c3f035429-737face965.zip/node_modules/source-map/",
+          "packageDependencies": [
+            ["source-map", "npm:0.5.7"]
+          ],
+          "linkType": "HARD",
+        }],
         ["npm:0.6.1", {
           "packageLocation": "./.yarn/cache/source-map-npm-0.6.1-1a3621db16-8647829a06.zip/node_modules/source-map/",
           "packageDependencies": [
@@ -7017,6 +7216,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/time-zone-npm-1.0.0-0522e3467f-eb2155a457.zip/node_modules/time-zone/",
           "packageDependencies": [
             ["time-zone", "npm:1.0.0"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["to-fast-properties", [
+        ["npm:2.0.0", {
+          "packageLocation": "./.yarn/cache/to-fast-properties-npm-2.0.0-0dc60cc481-40e6198424.zip/node_modules/to-fast-properties/",
+          "packageDependencies": [
+            ["to-fast-properties", "npm:2.0.0"]
           ],
           "linkType": "HARD",
         }]

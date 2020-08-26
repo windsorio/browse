@@ -8,6 +8,8 @@ const h6 = (str) => header(6, str);
 
 const space = (n) => new Array(n).fill(" ").join("");
 
+const indentAll = (lines, n) => lines.map((line) => `${space(n)}${line}`);
+
 const bullet = (arr, indent = 0) =>
   arr.map((str) => `${space(indent * 2)}* ${str}`).join("\n");
 
@@ -20,9 +22,9 @@ const shortcode = (str) => "`" + str + "`";
 
 const link = (str, link) => `[${str}](${link})`;
 
-const bold = (str) => `**${str}**`;
+const bold = (str) => `__${str}__`;
 
-const italics = (str) => `*${str}*`;
+const italics = (str) => `_${str}_`;
 
 const strikethrough = (str) => `~~${str}~~`;
 
@@ -80,4 +82,5 @@ module.exports = {
   bold,
   strikethrough,
   quote,
+  indentAll,
 };

@@ -56,6 +56,7 @@ module.exports = ({
   modules: {},
   close: async () => {},
   rules: {
+    //* A function which prints help information
     help: (scope) => (_) => (key) => {
       // Find the lowest scope that actually has the 'help' rule
       const helpScope = resolveRuleScope("help", scope);
@@ -73,20 +74,29 @@ module.exports = ({
             "<key> - Unset the variable 'key', and return a value if there is one",
           sleep: "<ms> - Sleep for the specifed amount of milliseconds",
           print: "<...vals> - Print values to stdout",
-          rule: `<name> <body> - Define a new rule 'name'. The 'body' has access to two additional rules, 'bind' and 'return' to take arguments and return a value
-                    bind <...keys> - for each value passed into the rule, store it as a variable using the names passed by 'keys'
-                    return <value> - return the value`,
+          rule: `<name> <body> - Define a new rule 'name'. The 'body' has access to two additional rules, 'bind' and 'return' to take arguments and return a value`,
+          bind: `<...keys> - for each value passed into the rule, store it as a variable using the names passed by 'keys'`,
+          return: `<value> - return the value`,
           if: `<condition> then <then> else <else> - If 'condition' is truthy, evaluate the 'then' RuleSet, else evaluate the 'else' rule set`,
           scope: "Internal: debug rule to print the current JS scope",
         },
       });
       return null;
     },
+    //Logs the current scope
     scope: (scope) => (_) => () => {
       console.log(scope);
       return null;
     },
     id: (_) => (_) => (v) => (v === undefined ? null : v),
+    /**
+     * @desc { Get the value of the variable 'key' }
+     * @params {
+     *   [key: string] An identifer
+     * }
+     * @return { [any] The value stored in the variable if there is one. }
+     * @throws { TODO: Implement Throws }
+     */
     get: (scope) => (_) => (name, source) => {
       if (!source) {
         return resolveVar(name, scope);
@@ -111,6 +121,14 @@ module.exports = ({
         }
       }
     },
+    /**
+     * @desc { Set the variable 'key' to the value 'value' }
+     * @params {
+     *   [key: string] An identifer
+     *   [value: any] The value to set the variable to
+     * }
+     * @return { [any] value }
+     */
     set: (scope) => (_) => (name, value, dest) => {
       if (!dest) {
         scope.vars[name] = value;
@@ -142,6 +160,13 @@ module.exports = ({
       varScope.vars[name] = value;
       return value;
     },
+    /**
+     * @desc { Unset the variable 'key' }
+     * @params {
+     *   [key: string] An identifer
+     * }
+     * @return { [any] The value stored in the variable key }
+     */
     unset: (scope) => (_) => (name, from) => {
       let value;
       if (!from) {
@@ -168,6 +193,14 @@ module.exports = ({
     },
     push: (_) => (_) => (value, dest) => dest.push(value),
     pop: (_) => (_) => (dest) => dest.pop(),
+    /**
+     * @desc { Define a new rule 'name'. The 'body' has access to two additional rules, 'bind' and 'return' to take arguments and return a value }
+     * @params {
+     *   [name: string] An identifer
+     *   [body: RuleSet] The behavior that should be executed when rule is called with arguments
+     * }
+     * @return { [RuleSet] The specified rule (TODO: Returns the entire function including a bunch of stuff that can only be used by the back end)  }
+     */
     rule: (scope) => (opts) => (name, body) => {
       let existingRule;
       try {
@@ -178,14 +211,43 @@ module.exports = ({
       }
       return defRule(evalRuleSet)(scope)(opts)(name, body);
     },
+    /**
+     * @desc { Sleep for the 'ms' }
+     * @params {
+     *   [ms: number] The number of ms to sleep for
+     * }
+     * @return { [number] TODO: Should return the number of ms slept for }
+     */
     sleep: (_) => (_) => async (ms) => {
       if (typeof ms !== "number") throw new Error("timeout is a not a number");
       return new Promise((resolve) => setTimeout(resolve, ms));
     },
+    /**
+     * @desc { Print values to stdout }
+     * @params {
+     *   [...values: Array<any>] The values to print
+     * }
+     * @return { [nil] nil (TODO: Should return the string printed? something else but null) }
+     * @notes { TODO: Implement additional notes }
+     * @example { TODO: Implement example }
+     */
     print: (_) => (_) => (...args) => {
       console.log(args.map(stringify).join(" "));
       return null;
     },
+    /**
+     * @desc { If 'condition' is truthy, evaluate the 'then' RuleSet, else evaluate the 'else' rule set }
+     * @params {
+     *   [condition: Array<any>] The values to print
+     *   [then: "then"] The string constant then
+     *   [thenRuleSet: RuleSet] The ruleset that will be executed if condition evaluates to true
+     *   [else: "else"] The string constant else
+     *   [elseRuleSet: RuleSet] The ruleset that will be executed if condition evaluates to false
+     * }
+     * @return { [any] The result of the if evaluated code }
+     * @notes { TODO: Implement additional notes }
+     * @example { TODO: Implement example }
+     */
     if: (_) => (_) => (cond, then, thenRS, el, elseRS) => {
       if (then !== "then") {
         throw new Error("Second argument to 'if' should be the word 'then'");
@@ -210,6 +272,19 @@ module.exports = ({
 
       return evalRuleSet(cond ? thenRS : elseRS);
     },
+    /**
+     * @desc { If 'condition' is truthy, evaluate the 'then' RuleSet, else evaluate the 'else' rule set }
+     * @params {
+     *   [iterator: RuleSet] The iteration criteria
+     *   [body: RuleSet] The body of the loop
+     * }
+     * @opts {
+     *   TODO: Implement optional arguments
+     * }
+     * @return { [nil] nil (TODO: Should return the value of the last evaluated statement, or the number of iterations? Not null.) }
+     * @notes { TODO: Implement additional notes }
+     * @example { TODO: Implement example }
+     */
     for: (_) => (_) => async (iterator, body) => {
       if (!iterator || iterator.type !== "RuleSet") {
         throw new Error(
