@@ -1,3 +1,5 @@
+const isNullish = (v) => v === undefined || v === null;
+
 /**
  * Convert a JS value to the corresponding browse value as a string. Used by the repl, or when printing a value
  * @param {any} jsValue Any JS Value
@@ -94,4 +96,4 @@ const throws = (fn) => (...args) => {
   }
 };
 
-module.exports = { stringify, help, throws };
+module.exports = { isNullish, stringify, help, throws };

@@ -4,7 +4,7 @@ const {
   resolveVar,
   resolveVarScope,
 } = require("./scope");
-const { help, stringify } = require("./utils");
+const { isNullish, help, stringify } = require("./utils");
 const { BrowseError } = require("./error");
 
 // Rules that are not allowed to be overriden:
@@ -23,9 +23,14 @@ const defRule = (evalRuleSet) => (scope) => (_opts) => (name, body) => {
                 message: `Options passed to bind can only have the value "true". Option '${opt}' has a different value`,
               });
             }
-            boundScope.vars[opt] = ruleOpts[opt] || null;
+            boundScope.vars[opt] = isNullish(ruleOpts[opt])
+              ? null
+              : ruleOpts[opt];
           });
-          names.forEach((name, i) => (boundScope.vars[name] = args[i] || null));
+          names.forEach(
+            (name, i) =>
+              (boundScope.vars[name] = isNullish(args[i]) ? null : args[i])
+          );
           return null;
         },
         // Same thing as id, but makes for better readability in rules
@@ -178,7 +183,7 @@ module.exports = ({
       return new Promise((resolve) => setTimeout(resolve, ms));
     },
     print: (_) => (_) => (...args) => {
-      console.log(...args.map(stringify));
+      console.log(args.map(stringify).join(" "));
       return null;
     },
     if: (_) => (_) => (cond, then, thenRS, el, elseRS) => {

@@ -1,0 +1,105 @@
+import "./native.js"
+
+set SECOND 1000
+set MINUTE $SECOND * 60
+set HOUR $MINUTE * 60
+set DAY $HOUR * 24
+set WEEK $DAY * 7
+set DAYS_PER_WEEK 7
+
+# A date looks like this:
+# dict { _ __type__ 'Date' ; _ value number }
+# `value` is in epoch ms
+
+########################
+### Date constructor ###
+########################
+rule Date { bind a b c d e f g; return (native:Date $a $b $c $d $e $f $g) }
+
+####################################
+### The Native JS Date functions ###
+####################################
+rule getDate { bind date; return (native:date_fn $date getDate) }
+rule getDay { bind date; return (native:date_fn $date getDay) }
+rule getFullYear { bind date; return (native:date_fn $date getFullYear) }
+rule getHours { bind date; return (native:date_fn $date getHours) }
+rule getMilliseconds {
+  bind date; return (native:date_fn $date getMilliseconds)
+}
+rule getMinutes { bind date; return (native:date_fn $date getMinutes) }
+rule getMonth { bind date; return (native:date_fn $date getMonth) }
+rule getSeconds { bind date; return (native:date_fn $date getSeconds) }
+rule getTime { bind date; return (native:date_fn $date getTime) }
+rule getTimezoneOffset {
+  bind date; return (native:date_fn $date getTimezoneOffset)
+}
+rule getUTCDate { bind date; return (native:date_fn $date getUTCDate) }
+rule getUTCDay { bind date; return (native:date_fn $date getUTCDay) }
+rule getUTCFullYear { bind date; return (native:date_fn $date getUTCFullYear) }
+rule getUTCMilliseconds {
+  bind date; return (native:date_fn $date getUTCMilliseconds)
+}
+rule getUTCMinutes { bind date; return (native:date_fn $date getUTCMinutes) }
+rule getUTCMonth { bind date; return (native:date_fn $date getUTCMonth) }
+rule getUTCSeconds { bind date; return (native:date_fn $date getUTCSeconds) }
+rule toDateString { bind date; return (native:date_fn $date toDateString) }
+rule toISOString { bind date; return (native:date_fn $date toISOString) }
+rule toLocaleDateString {
+  bind date tz; return (native:date_fn $date toLocaleDateString $tz)
+}
+rule toLocaleString {
+  bind date tz; return (native:date_fn $date toLocaleString $tz)
+}
+rule toLocaleTimeString {
+  bind date tz; return (native:date_fn $date toLocaleTimeString $tz)
+}
+rule toString { bind date; return (native:date_fn $date toString) }
+rule toTimeString { bind date; return (native:date_fn $date toTimeString) }
+rule toUTCString { bind date; return (native:date_fn $date toUTCString) }
+rule valueOf { bind date; return (native:date_fn $date valueOf) }
+
+#####################################
+### Porting the golib/deno stdlib ###
+#####################################
+
+# Get number of the day in the year
+# @return Number of the day in year
+rule dayOfYear {
+  bind date
+  set yearStart (Date (getFullYear $date) 0 0)
+  set diff (getTime $date) -
+    (getTime $yearStart) +
+    ((getTimezoneOffset $yearStart) - (getTimezoneOffset $date)) *
+      60 *
+      1000
+
+  # return Math.floor($diff / $DAY);
+  return $diff / $DAY
+}
+
+# TODO: Port the other date functions, especially the ones for parsing
+# https://deno.land/std@0.66.0/datetime/mod.ts
+
+#  Get number of the week in the year (ISO-8601)
+#  @return Number of the week in year
+#
+# rule weekOfYear {
+#   bind date
+#   set workingDate = ( Date (
+#     Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()),
+#   ))
+
+#   const day = workingDate.getUTCDay();
+
+#   const nearestThursday = workingDate.getUTCDate() +
+#     Day.Thu -
+#     (day === Day.Sun ? DAYS_PER_WEEK : day);
+
+#   workingDate.setUTCDate(nearestThursday);
+
+#   // Get first day of year
+#   const yearStart = new Date(Date.UTC(workingDate.getUTCFullYear(), 0, 1));
+
+#   // return the calculated full weeks to nearest Thursday
+#   return Math.ceil((workingDate.getTime() - yearStart.getTime() + DAY) / WEEK);
+# }
