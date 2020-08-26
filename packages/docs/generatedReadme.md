@@ -2,6 +2,8 @@
 
 ## Browser
 
+Browser
+
 ### Rules
 
 - ### Page:
@@ -9,6 +11,8 @@
     Sets up a page definition
 
 ## std
+
+The root scope that contains all the basic/standard functions and variables
 
 ### Rules
 
