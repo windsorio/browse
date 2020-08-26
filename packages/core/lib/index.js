@@ -224,17 +224,33 @@ const loadModule = async (document, { basedir }) => {
     return moduleCache.get(document);
   }
 
-  const scope = getNewScope();
-
   // TODO: support github files, or other remotely hosted files?
-  const code = fs.readFileSync(document, "utf8");
-  const program = parser.parse(code);
-  await evalProgram(program, {
-    scope,
-    document,
-    basedir,
-  });
-  return scope;
+
+  const ext = path.extname(document);
+  if (ext === ".browse") {
+    const scope = getNewScope();
+    const code = fs.readFileSync(document, "utf8");
+    let program;
+    try {
+      program = parser.parse(code);
+    } catch (e) {
+      e.message = `Error importing ${document}\n` + e.message;
+      throw e;
+    }
+    await evalProgram(program, {
+      scope,
+      document,
+      basedir,
+    });
+    return scope;
+  } else if (ext === ".js") {
+    const jsModule = require(document);
+
+    const stdScope = getNewScope().parent;
+    return getNewScope(jsModule.browse(stdScope));
+  } else {
+    throw new Error(`Cannot import module of type '${ext}'`);
+  }
 };
 
 module.exports = {

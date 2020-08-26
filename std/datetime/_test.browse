@@ -1,0 +1,34 @@
+import "./main" as dt
+
+set d (dt:Date "2020-08-01T07:00:00.000Z")
+
+print $d
+
+print getDate: (dt:getDate $d)
+print getDay: (dt:getDay $d)
+print getFullYear: (dt:getFullYear $d)
+print getHours: (dt:getHours $d)
+print getMilliseconds: (dt:getMilliseconds $d)
+print getMinutes: (dt:getMinutes $d)
+print getMonth: (dt:getMonth $d)
+print getSeconds: (dt:getSeconds $d)
+print getTime: (dt:getTime $d)
+print getTimezoneOffset: (dt:getTimezoneOffset $d)
+print getUTCDate: (dt:getUTCDate $d)
+print getUTCDay: (dt:getUTCDay $d)
+print getUTCFullYear: (dt:getUTCFullYear $d)
+print getUTCMilliseconds: (dt:getUTCMilliseconds $d)
+print getUTCMinutes: (dt:getUTCMinutes $d)
+print getUTCMonth: (dt:getUTCMonth $d)
+print getUTCSeconds: (dt:getUTCSeconds $d)
+print toDateString: (dt:toDateString $d)
+print toISOString: (dt:toISOString $d)
+print toLocaleDateString: (dt:toLocaleDateString $d ko-KR)
+print toLocaleString: (dt:toLocaleString $d ar-EG)
+print toLocaleTimeString: (dt:toLocaleTimeString $d it-IT)
+print toString: (dt:toString $d)
+print toTimeString: (dt:toTimeString $d)
+print toUTCString: (dt:toUTCString $d)
+print valueOf: (dt:valueOf $d)
+
+print dayOfYear: (dt:dayOfYear $d)

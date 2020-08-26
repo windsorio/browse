@@ -46,7 +46,7 @@ const resolveRule = (name, scope) => {
       });
     }
   }
-  if (scope.rules[varName]) {
+  if (scope.rules.hasOwnProperty(varName)) {
     return scope.rules[varName];
   }
 
@@ -67,7 +67,7 @@ const resolveVar = (name, scope) => {
     });
   }
 
-  if (scope.vars[varName] !== undefined) {
+  if (scope.vars.hasOwnProperty(varName) && scope.vars[varName] !== undefined) {
     return scope.vars[varName];
   }
 
@@ -88,7 +88,7 @@ const resolveRuleScope = (name, scope) => {
       node: typeof name === "string" ? null : name.name,
     });
   }
-  if (scope.rules[varName]) {
+  if (scope.rules.hasOwnProperty(varName)) {
     return scope;
   } else {
     return resolveRuleScope(name, scope.parent);
@@ -109,7 +109,7 @@ const resolveVarScope = (name, scope) => {
       node: typeof name === "string" ? null : name,
     });
   }
-  if (scope.vars[varName] !== undefined) {
+  if (scope.vars.hasOwnProperty(varName) && scope.vars[varName] !== undefined) {
     return scope;
   } else {
     return resolveVarScope(name, scope.parent);

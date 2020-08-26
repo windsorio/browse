@@ -113,7 +113,7 @@ const getBrowserScope = (parent) => {
     // Override print to stderr, so that stdout output is reserved for the
     // data extraction and can be piped easily
     print: (_) => (_) => (...args) => {
-      console.error(...args.map(stringify));
+      console.error(args.map(stringify).join(" "));
       return null;
     },
     page: (_) => ({ scrape = true }) => (pattern, ...ruleSets) => {
