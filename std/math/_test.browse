@@ -1,4 +1,4 @@
-import "./main" as math
+import "." as math
 
 print abs: (math:abs -1)
 print acos: (math:acos 8 / 10)
