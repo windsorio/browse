@@ -1,7 +1,19 @@
 # Documentation
 
-- [Scope: Browser](#Browser)
-- [Scope: std](#std)
+- [Scope: Browser
+  - [Rule: Page](#Page)
+  - [Rule: Visit](#Visit)](#Browser)
+- [Scope: std
+  - [Rule: help](#help)
+  - [Rule: scope](#scope)
+  - [Rule: get](#get)
+  - [Rule: set](#set)
+  - [Rule: unset](#unset)
+  - [Rule: rule](#rule)
+  - [Rule: sleep](#sleep)
+  - [Rule: print](#print)
+  - [Rule: if](#if)
+  - [Rule: for](#for)](#std)
 
 ## Browser
 
