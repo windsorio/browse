@@ -1,4 +1,5 @@
 import "./native.js"
+import "../math/main" as math
 
 set SECOND 1000
 set MINUTE $SECOND * 60
@@ -74,7 +75,7 @@ rule dayOfYear {
       1000
 
   # return Math.floor($diff / $DAY);
-  return $diff / $DAY
+  return (math:floor $diff / $DAY)
 }
 
 # TODO: Port the other date functions, especially the ones for parsing
