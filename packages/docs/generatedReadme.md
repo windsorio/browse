@@ -1,9 +1,9 @@
 # Documentation
 
-- [Scope: Browser
+- [Scope: Browser](#Browser)
   - [Rule: Page](#Page)
-  - [Rule: Visit](#Visit)](#Browser)
-- [Scope: std
+  - [Rule: Visit](#Visit)
+- [Scope: std](#std)
   - [Rule: help](#help)
   - [Rule: scope](#scope)
   - [Rule: get](#get)
@@ -13,7 +13,7 @@
   - [Rule: sleep](#sleep)
   - [Rule: print](#print)
   - [Rule: if](#if)
-  - [Rule: for](#for)](#std)
+  - [Rule: for](#for)
 
 ## Browser
 
