@@ -10,6 +10,7 @@ const {
   evalRule,
   getNewScope,
   evalRuleSet,
+  evalProgram,
   stringify,
   stringifyError,
 } = require("@browselang/core");
@@ -55,26 +56,22 @@ exports.handler = async (argv) => {
     const rep = () => {
       rl.question("> ", async (stmt) => {
         if (stmt === "quit") {
-          if (argv.web) {
-            const data = scope.internal.data;
-            if (Object.keys(data).length) {
-              data.url = await scope.internal.page.url();
-              console.log(JSON.stringify(data));
-            }
-            await scope.parent.internal.browser.close();
-          }
           rl.close();
           return;
         }
         try {
           const program = parser.parse(stmt);
-          const rule = program.rules[0];
-          const out = stringify(await evalRule(rule, scope));
+          const out = stringify(
+            await evalProgram(program, {
+              scope,
+              document: "repl",
+              basedir: process.cwd(),
+            })
+          );
           process.stdout.write("\u001b[32m" + out + "\u001b[0m");
         } catch (e) {
           process.stderr.write(
             stringifyError(e, {
-              document: "repl",
               color: process.stderr.isTTY,
             })
           );
@@ -87,25 +84,16 @@ exports.handler = async (argv) => {
   } else {
     const document = path.resolve(process.cwd(), script);
     try {
-      const code = fs.readFileSync(document, "utf8").trim();
-      if (!code) {
-        process.exit(0); // empty program so skip
-      }
+      const code = fs.readFileSync(document, "utf8");
       const program = parser.parse(code);
-
-      await evalRuleSet({
-        type: "RuleSet",
-        rules: program.rules,
+      await evalProgram(program, {
         scope,
+        document,
+        basedir: path.dirname(document),
       });
     } catch (err) {
       process.stderr.write(
         stringifyError(err, {
-          /*
-            TODO: Support multi-file stack traces (across imports)
-            BODY: document should be extracted from the AST so we can support multi-file stack traces
-          */
-          document,
           snippet: true,
           color: process.stderr.isTTY,
         })

@@ -298,17 +298,21 @@ semantics.addAttribute("asAST", {
   },
 
   InitRule_withOpts(w, _l, opts, _r) {
+    const { module, name } = w.asAST;
     return {
       type: "InitRule",
-      name: w.asAST,
+      module,
+      name,
       options: opts.asAST,
       source: this.source,
     };
   },
   InitRule_vanilla(w) {
+    const { module, name } = w.asAST;
     return {
       type: "InitRule",
-      name: w.asAST,
+      module,
+      name,
       options: [],
       source: this.source,
     };
@@ -365,6 +369,9 @@ semantics.addAttribute("asAST", {
     return literal(this.sourceString, this.source, "");
   },
 
+  ruleName: function (m, _, n) {
+    return { module: m.asAST[0], name: n.asAST }; // This is not an AST node
+  },
   word: function (_) {
     return {
       type: "Word",

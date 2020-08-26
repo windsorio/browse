@@ -1,0 +1,3 @@
+import './second' as s 
+
+print (s:area 2)
