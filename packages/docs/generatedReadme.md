@@ -27,7 +27,7 @@
 
   Get the value of the variable 'key'
 
-  #### Parameters
+  #### Parameters:
 
 - **key** ( _string_ ) An identifer
 
@@ -41,7 +41,7 @@
 
   Set the variable 'key' to the value 'value'
 
-  #### Parameters
+  #### Parameters:
 
 - **key** ( _string_ ) An identifer
 - **value** ( _any_ ) The value to set the variable to
@@ -56,7 +56,7 @@
 
   Unset the variable 'key'
 
-  #### Parameters
+  #### Parameters:
 
 - **key** ( _string_ ) An identifer
 
@@ -70,7 +70,7 @@
 
   Define a new rule 'name'. The 'body' has access to two additional rules, 'bind' and 'return' to take arguments and return a value
 
-  #### Parameters
+  #### Parameters:
 
 - **name** ( _string_ ) An identifer
 - **body** ( _RuleSet_ ) The behavior that should be executed when rule is called with arguments
@@ -85,7 +85,7 @@
 
   Sleep for the 'ms'
 
-  #### Parameters
+  #### Parameters:
 
 - **ms** ( _number_ ) The number of ms to sleep for
 
@@ -99,7 +99,7 @@
 
   Print values to stdout
 
-  #### Parameters
+  #### Parameters:
 
 - **...values** ( _Array<any>_ ) The values to print
 
@@ -123,7 +123,7 @@ TODO: Implement example
 
   If 'condition' is truthy, evaluate the 'then' RuleSet, else evaluate the 'else' rule set
 
-  #### Parameters
+  #### Parameters:
 
 - **condition** ( _Array<any>_ ) The values to print
 - **then** ( _"then"_ ) The string constant then
@@ -151,7 +151,7 @@ TODO: Implement example
 
   If 'condition' is truthy, evaluate the 'then' RuleSet, else evaluate the 'else' rule set
 
-  #### Parameters
+  #### Parameters:
 
 - **iterator** ( _RuleSet_ ) The iteration criteria
 - **body** ( _RuleSet_ ) The body of the loop
