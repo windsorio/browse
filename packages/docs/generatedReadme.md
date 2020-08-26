@@ -2,7 +2,7 @@
 
 ## Browser
 
-Browser
+A scope containing all the web-scraping rules and variables
 
 ### Rules
 
