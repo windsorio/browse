@@ -87,9 +87,19 @@ The root scope that contains all the basic/standard functions and variables
   - #### Returns
     ( _any_ ) The value stored in the variable key
 - ### push:
-  - Push to an array
+  - Push an element to the back of an array
+  - #### Parameters:
+    - **value** ( _T_ ) The value to push
+  - #### Returns
+    ( _undefined_ ) undefined
 - ### pop:
-  - Pop from an array
+
+  - Remove the element at the back of the array and return it
+  - #### Parameters:
+
+  - #### Returns
+    ( _undefined_ ) undefined
+
 - ### rule:
   - Define a new rule 'name'. The 'body' has access to two additional rules, 'bind' and 'return' to take arguments and return a value
   - #### Parameters:
@@ -104,9 +114,10 @@ The root scope that contains all the basic/standard functions and variables
   - #### Returns
     ( _number_ ) TODO: Should return the number of ms slept for
 - ### print:
+
   - Print values to stdout
   - #### Parameters:
-    - **...values** ( _Array<any>_ ) The values to print
+
   - #### Returns
     ( _nil_ ) nil (TODO: Should return the string printed? something else but null)
   - #### example
@@ -120,10 +131,7 @@ TODO: Implement example
 - ### if:
   - If 'condition' is truthy, evaluate the 'then' RuleSet, else evaluate the 'else' rule set
   - #### Parameters:
-    - **condition** ( _Array<any>_ ) The values to print
-    - **then** ( _"then"_ ) The string constant then
     - **thenRuleSet** ( _RuleSet_ ) The ruleset that will be executed if condition evaluates to true
-    - **else** ( _"else"_ ) The string constant else
     - **elseRuleSet** ( _RuleSet_ ) The ruleset that will be executed if condition evaluates to false
   - #### Returns
     ( _any_ ) The result of the if evaluated code
@@ -136,20 +144,18 @@ TODO: Implement example
 - #### Additional Notes
   > TODO: Implement additional notes
 - ### for:
-  - If 'condition' is truthy, evaluate the 'then' RuleSet, else evaluate the 'else' rule set
+  - Execute the body while the post iteration rule in the iterator is true
   - #### Parameters:
     - **iterator** ( _RuleSet_ ) The iteration criteria
     - **body** ( _RuleSet_ ) The body of the loop
   - #### Returns
-    ( _nil_ ) nil (TODO: Should return the value of the last evaluated statement, or the number of iterations? Not null.)
+    ( _nil_ ) nil (TODO: Should return the value of the last evaluated statement, or the number of iterations?)
   - #### example
 
 ```
-TODO: Implement example
+for { set i 2; test $i < 5; set i $i + 1
 ```
 
-- #### Additional Notes
-  > TODO: Implement additional notes
 - ### eval:
   - #### Parameters:
     - **ruleset** ( _RuleSet_ )
