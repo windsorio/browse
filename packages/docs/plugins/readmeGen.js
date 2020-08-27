@@ -52,9 +52,11 @@ const genReadme = (file) => {
         const ruleInfo = [];
         const { help, desc, params, rtn, example, notes } = rules[rule];
         if (desc) {
-          ruleInfo.push(`${h4("Description")}\n${desc}`);
+          //          ruleInfo.push(`${h4("Description")}\n${desc}`);
+          ruleInfo.push(desc);
         } else if (help) {
-          ruleInfo.push(`${h4("Description")}\n${help}`);
+          //          ruleInfo.push(`${h4("Description")}\n${help}`);
+          ruleInfo.push(help);
         } else {
           console.error(`Warning. Undocumented Rule ${rule}`);
         }

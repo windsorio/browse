@@ -61,12 +61,14 @@ const cleanComment = (comment) =>
 const pullTags = (comment) => {
   const rtn = {};
   //Remove Blank Lines
-  const cleanCommentLines = cleanComment(comment)
-    .split(/[{}]/)
-    .map((line) => line.trim());
-  const kvps = split(cleanCommentLines, 2)
-    .filter((kvp) => kvp.length === 2)
-    .forEach((kvp) => (rtn[kvp[0]] = kvp[1]));
+  if (comment.startsWith("*")) {
+    const cleanCommentLines = cleanComment(comment)
+      .split(/[{}]/)
+      .map((line) => line.trim());
+    const kvps = split(cleanCommentLines, 2)
+      .filter((kvp) => kvp.length === 2)
+      .forEach((kvp) => (rtn[kvp[0]] = kvp[1]));
+  }
   return rtn;
 };
 
@@ -346,106 +348,7 @@ module.exports = () => {
           /*
            * This is for the 'const getBrowserScope = () => ({}) style
            */
-          if (
-            false &&
-            path.isVariableDeclaration() &&
-            path.node.declarations &&
-            path.node.declarations[0] &&
-            path.node.declarations[0].init &&
-            path.node.declarations[0].init.type === "ArrowFunctionExpression" &&
-            path.node.leadingComments !== undefined
-          ) {
-            //Find the scope tag
-            const tags = pullAllTags(path.node.leadingComments);
-            if (tags["@scope"] && tags["@rule"] === undefined) {
-              console.log("Parsing Strucuture 'getXScope = () => ({})'", file);
-              assert(
-                !scope,
-                "There can only be one scope declaration per file"
-              );
-              const scopeName = tags["@name"] || file.split(".")[0];
-              scope = scopeName;
-              rtn[scopeName] = {};
-              rtn[scopeName].description = tags["@scope"];
-
-              /* Deal with the Rule annotations */
-
-              //We won't use the path.findChild since we're looking for a very specific child
-
-              console.log(path.node.declarations[0].init.body);
-              const ruleNode = path.node.declarations[0].init.body.properties.filter(
-                (property) => property.key.name === "rules"
-              );
-              assert(ruleNode.length <= 1, "There can only be one fn property");
-              //Rules
-              const rules = ruleNode[0].value.properties;
-
-              rtn[scopeName]["rules"] = processRules(rules);
-              /* Deal with the Config annotations */
-
-              const configDeclarations = path.node.declarations[0].init.body.properties
-                .filter((property) => property.key.name === "internal")[0]
-                .value.properties.filter(
-                  (property) => property.key.name === "config"
-                );
-              assert(
-                configDeclarations.length <= 1,
-                "There can only be one config property"
-              );
-              const config = configDeclarations[0];
-              rtn[scopeName]["config"] = processConfig(config);
-            }
-          } else if (
-            /*
-             * This is for the 'module.exports = () => ({}) style
-             */
-            false &&
-            path.isExpressionStatement() &&
-            path.node.leadingComments !== undefined
-          ) {
-            //Find the scope tag
-            const tags = pullAllTags(path.node.leadingComments);
-            if (tags["@scope"]) {
-              console.log(
-                "Parsing Strucuture 'module.exports = () => ({})'",
-                file
-              );
-              assert(
-                !scope,
-                "There can only be one scope declaration per file"
-              );
-              const scopeName = tags["@name"] || file.split(".")[0];
-              scope = scopeName;
-              rtn[scopeName] = {};
-              rtn[scopeName].description = tags["@scope"];
-
-              /* Deal with the Rule annotations */
-
-              //We won't use the path.findChild since we're looking for a very specific child
-              const ruleNode = path.node.expression.right.body.properties.filter(
-                (property) => property.key.name === "rules"
-              );
-              assert(ruleNode.length <= 1, "There can only be one fn property");
-              //Rules
-              const rules = ruleNode[0].value.properties;
-
-              rtn[scopeName]["rules"] = processRules(rules);
-              /* Deal with the Config annotations */
-
-              const configDeclarations = path.node.expression.right.body.properties
-                .filter((property) => property.key.name === "internal")[0]
-                .value.properties.filter(
-                  (property) => property.key.name === "config"
-                );
-
-              assert(
-                configDeclarations.length <= 1,
-                "There can only be one config property"
-              );
-              const config = configDeclarations[0];
-              rtn[scopeName]["config"] = processConfig(config);
-            }
-          } else if (path.node.leadingComments !== undefined) {
+          if (path.node.leadingComments !== undefined) {
             //Find the scope tag
             const tags = pullAllTags(path.node.leadingComments);
 
@@ -496,23 +399,9 @@ module.exports = () => {
               rtn[scopeName]["config"] = parseConfig(tags["@config"]);
             }
           }
-          //Take anything with leading comments
-          /*    if (path.node.leadingComments) {
-            const commentNodes = path.node.leadingComments;
-            const docComments = commentNodes.filter(commentNode => commentNode.value.startsWith("*"));
-            console.log("CommentNodesParent", path.findParent(path => path.isObjectProperty() && path.node.key.name === 'rules'));
-            if(docComments.length) {
-              const data = {
-                node: path.node,
-                comments: docComments.map(comment => comment.value).map(pullTags).reduce((o1, o2) => safeMergeObjs(o1, o2), {})
-              }
-      	commentArr.push(data)
-            }
-          }*/
         },
       });
     });
   });
-
   return rtn;
 };
