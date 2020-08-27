@@ -1,6 +1,6 @@
 {
   "name": "@browselang/parser",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Parser for Browse using the ohm parser generator",
   "keywords": [
     "browse",
@@ -31,7 +31,6 @@
     "url": "https://github.com/windsorio/browse/issues"
   },
   "dependencies": {
-    "binary-search": "1.3.6",
     "ohm-js": "15.0.1"
   },
   "devDependencies": {

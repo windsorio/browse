@@ -411,10 +411,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         "npm:2.1.0"
       ],
       [
-        "binary-search",
-        "npm:1.3.6"
-      ],
-      [
         "bl",
         "npm:4.0.2"
       ],
@@ -2091,7 +2087,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [
             ["@browselang/parser", "workspace:packages/parser"],
             ["ava", "npm:3.11.1"],
-            ["binary-search", "npm:1.3.6"],
             ["ohm-js", "npm:15.0.1"]
           ],
           "linkType": "SOFT",
@@ -3050,15 +3045,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/binary-extensions-npm-2.1.0-0681d7e2ce-12bee28179.zip/node_modules/binary-extensions/",
           "packageDependencies": [
             ["binary-extensions", "npm:2.1.0"]
-          ],
-          "linkType": "HARD",
-        }]
-      ]],
-      ["binary-search", [
-        ["npm:1.3.6", {
-          "packageLocation": "./.yarn/cache/binary-search-npm-1.3.6-b150a83e72-cfca2b6ef7.zip/node_modules/binary-search/",
-          "packageDependencies": [
-            ["binary-search", "npm:1.3.6"]
           ],
           "linkType": "HARD",
         }]
