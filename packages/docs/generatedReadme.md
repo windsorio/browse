@@ -4,7 +4,8 @@
   - [Rule: Page](#Page)
   - [Rule: Visit](#Visit)
 - [Scope: page](#page)
-
+  - [[Config: output](#output)](undefined)
+  - [[Config: writeStream](#writeStream)](undefined)
 - [Scope: std](#std)
   - [Rule: help](#help)
   - [Rule: scope](#scope)
