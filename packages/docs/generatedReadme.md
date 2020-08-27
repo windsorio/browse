@@ -31,13 +31,9 @@ A scope containing all the web-scraping rules and variables
   - #### Description
     Open a new tab/page with the given url and checks for matches on that URL. If there are matches the corresponding ruleSets will be run. If there is no match The new tab/page is opened in the browser scope and no actions will be taken
 
-### Config
-
 ## page
 
 A scope accessible within a `page` RuleSet
-
-### Rules
 
 ### Config
 
@@ -142,5 +138,3 @@ TODO: Implement example
 
 - #### Additional Notes
   > TODO: Implement additional notes
-
-### Config
