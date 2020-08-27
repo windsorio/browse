@@ -88,6 +88,13 @@ module.exports = ({
       console.log(scope);
       return null;
     },
+    /**
+     * @desc { Returns the value passed in }
+     * @params {
+     *   [value: any] Any value
+     * }
+     * @return { [any] Retuns the value passed in }
+     */
     id: (_) => (_) => (v) => (v === undefined ? null : v),
     /**
      * @desc { Get the value of the variable 'key' }
@@ -148,6 +155,9 @@ module.exports = ({
       }
       return value;
     },
+    /**
+     * TODO
+     */
     update: (scope) => (_) => (name, value) => {
       if (scope.vars[name] !== undefined) {
         throw new Error(
@@ -191,7 +201,13 @@ module.exports = ({
       if (value === undefined) value = null;
       return value;
     },
+    /**
+     * Push to an array
+     */
     push: (_) => (_) => (value, dest) => dest.push(value),
+    /**
+     * Pop from an array
+     */
     pop: (_) => (_) => (dest) => dest.pop(),
     /**
      * @desc { Define a new rule 'name'. The 'body' has access to two additional rules, 'bind' and 'return' to take arguments and return a value }
@@ -355,6 +371,19 @@ module.exports = ({
       }
       return null;
     },
+    /**
+     * @desc {   }
+     * @params {
+     *   [ruleset: RuleSet]
+     *   [inject: RuleSet] ???
+     * }
+     * @opts {
+     *   TODO: Implement optional arguments
+     * }
+     * @return { [any] The result of evaluating the ruleset }
+     * @notes { TODO: Implement additional notes }
+     * @example { TODO: Implement example }
+     */
     eval: (_) => (_) => async (ruleset, inject) => {
       if (inject) {
         const injectScope = getNewScope(inject.scope);
@@ -380,6 +409,7 @@ module.exports = ({
         return evalRuleSet(ruleset);
       }
     },
+    //* Interpret ruleset as array
     arr: (_) => (_) => async (ruleset) => {
       const arr = [];
       const el = (_) => (_) => (value, extra) => {
@@ -395,6 +425,7 @@ module.exports = ({
 
       return arr;
     },
+    //* Interpret ruleset as dictionary
     dict: (_) => (_) => async (ruleset) => {
       const dict = new Map();
       const record = (_) => (_) => (key, value, extra) => {
@@ -415,11 +446,12 @@ module.exports = ({
 
       return dict;
     },
+    //* Import passed in modules
     import: (_) => (_) => async (...mods) => {
       // evalRule should catch imports and handle them specially
       throw new Error("Unexpected browse error");
     },
-
+    //* create string from value
     string: (_) => (_) => (v) => String(v),
   },
 });
