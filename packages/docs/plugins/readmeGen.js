@@ -63,10 +63,10 @@ const genReadme = (file) => {
 
         if (params) {
           const paramList = bullet(
-            params.map(
+            Object.keys(params).map(
               (param) =>
-                `${bold(param.name)} ( ${italics(param.type)} ) ${
-                  param.description
+                `${bold(param)} ( ${italics(params[param].type)} ) ${
+                  params[param].description
                 }`
             ),
             2

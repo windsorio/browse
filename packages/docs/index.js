@@ -60,14 +60,16 @@ const cleanComment = (comment) =>
 
 const pullTags = (comment) => {
   const rtn = {};
+  const annotationMatch = /(@\w+) {([^}]*)}/g;
+  let matches;
   //Remove Blank Lines
   if (comment.startsWith("*")) {
-    const cleanCommentLines = cleanComment(comment)
-      .split(/[{}]/)
-      .map((line) => line.trim());
-    const kvps = split(cleanCommentLines, 2)
-      .filter((kvp) => kvp.length === 2)
-      .forEach((kvp) => (rtn[kvp[0]] = kvp[1]));
+    while ((matches = annotationMatch.exec(comment)) !== null) {
+      const tag = matches[1];
+      const value = matches[2].replace(/[\s\*]+/g, " ").trim();
+      const cleanCommentLines = cleanComment(value);
+      rtn[tag] = value;
+    }
   }
   return rtn;
 };
@@ -78,17 +80,20 @@ const pullTags = (comment) => {
 const pullAllTags = (comments) =>
   comments.map((comment) => pullTags(comment.value)).reduce(safeMergeObjs, {});
 
-//TODO: DRY these identical functions
 const parseParams = (paramString) => {
-  return split(paramString.split(/[\[\]]/).slice(1), 2).map((arr) => {
-    const [nameAndType, description] = arr;
-    const [name, type] = nameAndType.split(":");
-    return {
-      name: name.trim(),
-      type: type.trim(),
-      description: description.trim(),
+  const rtn = {};
+  const paramMatch = /\[(([\w|\s]*)\s*(:\s*([\w|<|>]+))?)\]([^\[]*)/g;
+  let matches;
+  while ((matches = paramMatch.exec(paramString)) !== null) {
+    const name = matches[2];
+    const type = matches[4];
+    const description = matches[5];
+    rtn[name] = {
+      type,
+      description,
     };
-  });
+  }
+  return rtn;
 };
 
 const parseConfig = (configString) => {
@@ -111,10 +116,14 @@ const parseConfig = (configString) => {
 };
 
 const parseRtn = (rtnString) => {
-  const [type, description] = rtnString.split(/[\[\]]/).slice(1);
+  const r = /(\[([\w|\s]*)\])?([\w|\s]+)/g;
+  console.log(rtnString);
+  const matches = r.exec(rtnString);
+  const type = matches[2] || "any";
+  const description = matches[3];
   return {
-    type,
-    description,
+    type: type.trim(),
+    description: description.trim(),
   };
 };
 
@@ -340,6 +349,7 @@ module.exports = () => {
 
   directories.map((directory) => {
     return fileMap[directory].map((file) => {
+      console.log("ENTERING", file);
       const code = fs.readFileSync(`../${directory}/lib/${file}`, "utf8");
       const ast = parser.parse(code);
       let scope;

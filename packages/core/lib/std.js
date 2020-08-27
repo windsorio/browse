@@ -202,11 +202,20 @@ module.exports = ({
       return value;
     },
     /**
-     * Push to an array
+     * @desc { Push an element to the back of an array }
+     * @params {
+     *   [value: T] The value to push
+     *   [dest: Array<T>] The array to push to
+     * }
+     * @return { The number of elements in the array after pushing to it }
      */
     push: (_) => (_) => (value, dest) => dest.push(value),
     /**
-     * Pop from an array
+     * @desc { Remove the element at the back of the array and return it }
+     * @params {
+     *   [dest: Array<T>] The array to remove an element from
+     * }
+     * @return { The value of the element removed }
      */
     pop: (_) => (_) => (dest) => dest.pop(),
     /**
@@ -215,7 +224,7 @@ module.exports = ({
      *   [name: string] An identifer
      *   [body: RuleSet] The behavior that should be executed when rule is called with arguments
      * }
-     * @return { [RuleSet] The specified rule (TODO: Returns the entire function including a bunch of stuff that can only be used by the back end)  }
+     * @return { [RuleSet] The specified rule (TODO: Returns the entire function including a bunch of stuff that can only be used by the back end) }
      */
     rule: (scope) => (opts) => (name, body) => {
       let existingRule;
@@ -254,7 +263,7 @@ module.exports = ({
     /**
      * @desc { If 'condition' is truthy, evaluate the 'then' RuleSet, else evaluate the 'else' rule set }
      * @params {
-     *   [condition: Array<any>] The values to print
+     *   [condition: Array<any>] The condition to be eevaluated
      *   [then: "then"] The string constant then
      *   [thenRuleSet: RuleSet] The ruleset that will be executed if condition evaluates to true
      *   [else: "else"] The string constant else
@@ -289,7 +298,7 @@ module.exports = ({
       return evalRuleSet(cond ? thenRS : elseRS);
     },
     /**
-     * @desc { If 'condition' is truthy, evaluate the 'then' RuleSet, else evaluate the 'else' rule set }
+     * @desc { Execute the body while the post iteration rule in the iterator is true }
      * @params {
      *   [iterator: RuleSet] The iteration criteria
      *   [body: RuleSet] The body of the loop
@@ -297,9 +306,9 @@ module.exports = ({
      * @opts {
      *   TODO: Implement optional arguments
      * }
-     * @return { [nil] nil (TODO: Should return the value of the last evaluated statement, or the number of iterations? Not null.) }
-     * @notes { TODO: Implement additional notes }
-     * @example { TODO: Implement example }
+     * @return { [nil] nil (TODO: Should return the value of the last evaluated statement, or the number of iterations?) }
+     * @example { for { set i 2; test $i < 5; set i $i + 1 } { print loop $i }
+ }
      */
     for: (_) => (_) => async (iterator, body) => {
       if (!iterator || iterator.type !== "RuleSet") {
