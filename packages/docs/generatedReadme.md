@@ -9,18 +9,27 @@
 - [Scope: std](#std)
   - [Rule: help](#help)
   - [Rule: scope](#scope)
+  - [Rule: id](#id)
   - [Rule: get](#get)
   - [Rule: set](#set)
+  - [Rule: update](#update)
   - [Rule: unset](#unset)
+  - [Rule: push](#push)
+  - [Rule: pop](#pop)
   - [Rule: rule](#rule)
   - [Rule: sleep](#sleep)
   - [Rule: print](#print)
   - [Rule: if](#if)
   - [Rule: for](#for)
+  - [Rule: eval](#eval)
+  - [Rule: arr](#arr)
+  - [Rule: dict](#dict)
+  - [Rule: import](#import)
+  - [Rule: string](#string)
 
 ## Browser
 
-A scope containing all the web-scraping rules and variables
+A scope containing all the web-scraping functions and variables
 
 ### Rules
 
@@ -50,6 +59,12 @@ The root scope that contains all the basic/standard functions and variables
   - A function which prints help information
 - ### scope:
 
+- ### id:
+  - Returns the value passed in
+  - #### Parameters:
+    - **value** ( _any_ ) Any value
+  - #### Returns
+    ( _any_ ) Retuns the value passed in
 - ### get:
   - Get the value of the variable 'key'
   - #### Parameters:
@@ -63,12 +78,18 @@ The root scope that contains all the basic/standard functions and variables
     - **value** ( _any_ ) The value to set the variable to
   - #### Returns
     ( _any_ ) value
+- ### update:
+  - TODO
 - ### unset:
   - Unset the variable 'key'
   - #### Parameters:
     - **key** ( _string_ ) An identifer
   - #### Returns
     ( _any_ ) The value stored in the variable key
+- ### push:
+  - Push to an array
+- ### pop:
+  - Pop from an array
 - ### rule:
   - Define a new rule 'name'. The 'body' has access to two additional rules, 'bind' and 'return' to take arguments and return a value
   - #### Parameters:
@@ -129,3 +150,25 @@ TODO: Implement example
 
 - #### Additional Notes
   > TODO: Implement additional notes
+- ### eval:
+  - #### Parameters:
+    - **ruleset** ( _RuleSet_ )
+    - **inject** ( _RuleSet_ ) ???
+  - #### Returns
+    ( _any_ ) The result of evaluating the ruleset
+  - #### example
+
+```
+TODO: Implement example
+```
+
+- #### Additional Notes
+  > TODO: Implement additional notes
+- ### arr:
+  - Interpret ruleset as array
+- ### dict:
+  - Interpret ruleset as dictionary
+- ### import:
+  - Import passed in modules
+- ### string:
+  - create string from value
