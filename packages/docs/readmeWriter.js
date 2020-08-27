@@ -22,9 +22,9 @@ const shortcode = (str) => "`" + str + "`";
 
 const link = (str, link) => `[${str}](${link})`;
 
-const bold = (str) => `__${str}__`;
+const bold = (str) => `**${str}**`;
 
-const italics = (str) => `_${str}_`;
+const italics = (str) => `*${str}*`;
 
 const strikethrough = (str) => `~~${str}~~`;
 

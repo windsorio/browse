@@ -70,9 +70,13 @@ const pullTags = (comment) => {
   return rtn;
 };
 
+/*
+ * TODO: Only pull from comments that start with *
+ */
 const pullAllTags = (comments) =>
   comments.map((comment) => pullTags(comment.value)).reduce(safeMergeObjs, {});
 
+//TODO: DRY these identical functions
 const parseParams = (paramString) => {
   return split(paramString.split(/[\[\]]/).slice(1), 2).map((arr) => {
     const [nameAndType, description] = arr;
@@ -83,6 +87,25 @@ const parseParams = (paramString) => {
       description: description.trim(),
     };
   });
+};
+
+const parseConfig = (configString) => {
+  const rtn = {};
+  split(configString.split(/[\[\]]/).slice(1), 2).map((arr) => {
+    const [nameAndType, description] = arr;
+    const [name, type] = nameAndType.split(":");
+    if (!rtn[name.trim()]) {
+      rtn[name.trim()] = {
+        type: type.trim(),
+        description: description.trim(),
+      };
+    } else {
+      throw new Error(
+        "Multiple variables of the same name defined in @config call. Check for typos"
+      );
+    }
+  });
+  return rtn;
 };
 
 const parseRtn = (rtnString) => {
@@ -262,32 +285,80 @@ const processConfig = (config) => {
   return rtn;
 };
 
+const ObjectExpressionVisitor = {
+  //It's more efficient to define only one visitor according to the babel docs so we switch
+
+  ObjectExpression(path) {
+    if (this.searchFor === "scope") {
+      //Looking for a scope obj
+      const ruleNode = path.node.properties.filter(
+        (property) => property.key.name === "rules"
+      );
+      assert(ruleNode.length <= 1, "There can only be one fn property");
+
+      /* Rule Annotations */
+      if (ruleNode.length) {
+        const rules = ruleNode[0].value.properties;
+        this.rtn[this.scopeName]["rules"] = processRules(rules);
+      } else {
+        this.rtn[this.scopeName]["rules"] = {};
+      }
+
+      const internal = path.node.properties.filter(
+        (property) => property.key.name === "internal"
+      )[0];
+      if (internal) {
+        const configDeclarations = internal.value.properties.filter(
+          (property) => property.key.name === "config"
+        );
+
+        assert(
+          configDeclarations.length <= 1,
+          "There can only be one config property"
+        );
+
+        /* Config Annotations */
+        if (configDeclarations.length) {
+          const config = configDeclarations[0];
+          this.rtn[this.scopeName]["config"] = processConfig(config);
+        } else {
+          this.rtn[this.scopeName]["config"] = {};
+        }
+      }
+      path.stop();
+    } else if (this.searchFor === "config") {
+      //Looking for a config Obj
+    }
+  },
+};
+
 module.exports = () => {
   const rtn = {};
   const commentArr = [];
 
   directories.map((directory) => {
-    console.log("ENTERING DIR", directory);
     return fileMap[directory].map((file) => {
-      console.log("ENTERING FILE", file);
       const code = fs.readFileSync(`../${directory}/lib/${file}`, "utf8");
       const ast = parser.parse(code);
       let scope;
       traverse(ast, {
         enter(path) {
           /*
-           * This is for the 'const getBrowserScope = () => ({})) style
+           * This is for the 'const getBrowserScope = () => ({}) style
            */
           if (
+            false &&
             path.isVariableDeclaration() &&
             path.node.declarations &&
-            path.node.declarations.init &&
-            path.node.declarations.init.type === "ArrowFunctionExpression" &&
+            path.node.declarations[0] &&
+            path.node.declarations[0].init &&
+            path.node.declarations[0].init.type === "ArrowFunctionExpression" &&
             path.node.leadingComments !== undefined
           ) {
             //Find the scope tag
             const tags = pullAllTags(path.node.leadingComments);
-            if (tags["@scope"]) {
+            if (tags["@scope"] && tags["@rule"] === undefined) {
+              console.log("Parsing Strucuture 'getXScope = () => ({})'", file);
               assert(
                 !scope,
                 "There can only be one scope declaration per file"
@@ -295,10 +366,12 @@ module.exports = () => {
               const scopeName = tags["@name"] || file.split(".")[0];
               scope = scopeName;
               rtn[scopeName] = {};
+              rtn[scopeName].description = tags["@scope"];
 
               /* Deal with the Rule annotations */
 
               //We won't use the path.findChild since we're looking for a very specific child
+
               console.log(path.node.declarations[0].init.body);
               const ruleNode = path.node.declarations[0].init.body.properties.filter(
                 (property) => property.key.name === "rules"
@@ -310,9 +383,11 @@ module.exports = () => {
               rtn[scopeName]["rules"] = processRules(rules);
               /* Deal with the Config annotations */
 
-              const configDeclarations = path.node.declarations[0].init.body.properties.filter(
-                (property) => property.key.name === "config"
-              );
+              const configDeclarations = path.node.declarations[0].init.body.properties
+                .filter((property) => property.key.name === "internal")[0]
+                .value.properties.filter(
+                  (property) => property.key.name === "config"
+                );
               assert(
                 configDeclarations.length <= 1,
                 "There can only be one config property"
@@ -321,16 +396,20 @@ module.exports = () => {
               rtn[scopeName]["config"] = processConfig(config);
             }
           } else if (
-
-          /*
-           * This is for the 'module.exports = () => ({})) style
-           */
+            /*
+             * This is for the 'module.exports = () => ({}) style
+             */
+            false &&
             path.isExpressionStatement() &&
             path.node.leadingComments !== undefined
           ) {
             //Find the scope tag
             const tags = pullAllTags(path.node.leadingComments);
             if (tags["@scope"]) {
+              console.log(
+                "Parsing Strucuture 'module.exports = () => ({})'",
+                file
+              );
               assert(
                 !scope,
                 "There can only be one scope declaration per file"
@@ -338,6 +417,7 @@ module.exports = () => {
               const scopeName = tags["@name"] || file.split(".")[0];
               scope = scopeName;
               rtn[scopeName] = {};
+              rtn[scopeName].description = tags["@scope"];
 
               /* Deal with the Rule annotations */
 
@@ -352,9 +432,12 @@ module.exports = () => {
               rtn[scopeName]["rules"] = processRules(rules);
               /* Deal with the Config annotations */
 
-              const configDeclarations = path.node.expression.right.body.properties.filter(
-                (property) => property.key.name === "config"
-              );
+              const configDeclarations = path.node.expression.right.body.properties
+                .filter((property) => property.key.name === "internal")[0]
+                .value.properties.filter(
+                  (property) => property.key.name === "config"
+                );
+
               assert(
                 configDeclarations.length <= 1,
                 "There can only be one config property"
@@ -362,18 +445,42 @@ module.exports = () => {
               const config = configDeclarations[0];
               rtn[scopeName]["config"] = processConfig(config);
             }
-          }
-
-          //If the structure is not recognized, we can search for tags manually and do our best
-          //In this case the function must also have an '@scope' tag
-          else if (path.node.leadingComments !== undefined) {
+          } else if (path.node.leadingComments !== undefined) {
             //Find the scope tag
             const tags = pullAllTags(path.node.leadingComments);
-            //          console.log("TAGS", tags);
-            if (tags["@scope"] != undefined && tags["@rule"] != undefined) {
-              //In the context of a single rule, scope is used to tell us which scope it belongs to, else we'll use any scope tag we have already
-              const scopeName = tags["@scope"] || scope;
+
+            //In the case of just a scope declaration.
+            if (tags["@scope"] && tags["@rule"] === undefined) {
+              console.log("Parsing Generic Strucutre", file);
+              assert(
+                !scope,
+                "There can only be one scope declaration per file"
+              );
+              const scopeName = tags["@name"] || file.split(".")[0];
+              scope = scopeName;
               rtn[scopeName] = {};
+              rtn[scopeName].description = tags["@scope"];
+              //Whever the @scope tag is defined, we look for the closest object expression child for further parsing.
+              path.traverse(ObjectExpressionVisitor, {
+                rtn,
+                scopeName,
+                searchFor: "scope",
+              });
+            }
+
+            //In the case of a rule definition which has been tagged with a scope
+            else if (
+              tags["@scope"] !== undefined &&
+              tags["@rule"] !== undefined
+            ) {
+              const scopeName = tags["@scope"] || scope || file.split(".")[0];
+
+              if (!rtn[scopeName]) {
+                console.warn(
+                  `WARNING:: Scope ${scopeName} does not exist. Creating new scope definition.`
+                );
+                rtn[scopeName] = {};
+              }
 
               /* Deal with the Rule annotations */
               //Rules
@@ -381,8 +488,14 @@ module.exports = () => {
 
               rtn[scopeName]["rules"][tags["@rule"]] = processRule(path.node);
             }
-          }
 
+            //In the case of a config definition
+            else if (tags["@config"] !== undefined) {
+              const scopeName = tags["@scope"] || scope || file.split(".")[0];
+              //If there is a scope tag and a config tag we are dealing with a floating config definition
+              rtn[scopeName]["config"] = parseConfig(tags["@config"]);
+            }
+          }
           //Take anything with leading comments
           /*    if (path.node.leadingComments) {
             const commentNodes = path.node.leadingComments;
