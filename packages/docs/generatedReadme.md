@@ -90,16 +90,15 @@ The root scope that contains all the basic/standard functions and variables
   - Push an element to the back of an array
   - #### Parameters:
     - **value** ( _T_ ) The value to push
+    - **dest** ( _Array<T>_ ) The array to push to
   - #### Returns
     ( _undefined_ ) undefined
 - ### pop:
-
   - Remove the element at the back of the array and return it
   - #### Parameters:
-
+    - **dest** ( _Array<T>_ ) The array to remove an element from
   - #### Returns
     ( _undefined_ ) undefined
-
 - ### rule:
   - Define a new rule 'name'. The 'body' has access to two additional rules, 'bind' and 'return' to take arguments and return a value
   - #### Parameters:
@@ -131,6 +130,7 @@ TODO: Implement example
 - ### if:
   - If 'condition' is truthy, evaluate the 'then' RuleSet, else evaluate the 'else' rule set
   - #### Parameters:
+    - **condition** ( _Array<any>_ ) The condition to be eevaluated
     - **thenRuleSet** ( _RuleSet_ ) The ruleset that will be executed if condition evaluates to true
     - **elseRuleSet** ( _RuleSet_ ) The ruleset that will be executed if condition evaluates to false
   - #### Returns
