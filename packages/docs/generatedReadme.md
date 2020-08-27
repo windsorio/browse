@@ -25,11 +25,9 @@ A scope containing all the web-scraping rules and variables
 ### Rules
 
 - ### Page:
-  - #### Description
-    Instantiates a page definition which matches on the url-pattern passed in as the first argument, and which executes the rule set passed in as the second argument on every matching page
+  - Instantiates a page definition which matches on the url-pattern passed in as the first argument, and which executes the rule set passed in as the second argument on every matching page
 - ### Visit:
-  - #### Description
-    Open a new tab/page with the given url and checks for matches on that URL. If there are matches the corresponding ruleSets will be run. If there is no match The new tab/page is opened in the browser scope and no actions will be taken
+  - Open a new tab/page with the given url and checks for matches on that URL. If there are matches the corresponding ruleSets will be run. If there is no match The new tab/page is opened in the browser scope and no actions will be taken
 
 ## page
 
@@ -49,50 +47,43 @@ The root scope that contains all the basic/standard functions and variables
 ### Rules
 
 - ### help:
-  - #### Description
-    A function which prints help information
+  - A function which prints help information
 - ### scope:
 
 - ### get:
-  - #### Description
-    Get the value of the variable 'key'
+  - Get the value of the variable 'key'
   - #### Parameters:
     - **key** ( _string_ ) An identifer
   - #### Returns
     ( _any_ ) The value stored in the variable if there is one.
 - ### set:
-  - #### Description
-    Set the variable 'key' to the value 'value'
+  - Set the variable 'key' to the value 'value'
   - #### Parameters:
     - **key** ( _string_ ) An identifer
     - **value** ( _any_ ) The value to set the variable to
   - #### Returns
     ( _any_ ) value
 - ### unset:
-  - #### Description
-    Unset the variable 'key'
+  - Unset the variable 'key'
   - #### Parameters:
     - **key** ( _string_ ) An identifer
   - #### Returns
     ( _any_ ) The value stored in the variable key
 - ### rule:
-  - #### Description
-    Define a new rule 'name'. The 'body' has access to two additional rules, 'bind' and 'return' to take arguments and return a value
+  - Define a new rule 'name'. The 'body' has access to two additional rules, 'bind' and 'return' to take arguments and return a value
   - #### Parameters:
     - **name** ( _string_ ) An identifer
     - **body** ( _RuleSet_ ) The behavior that should be executed when rule is called with arguments
   - #### Returns
     ( _RuleSet_ ) The specified rule (TODO: Returns the entire function including a bunch of stuff that can only be used by the back end)
 - ### sleep:
-  - #### Description
-    Sleep for the 'ms'
+  - Sleep for the 'ms'
   - #### Parameters:
     - **ms** ( _number_ ) The number of ms to sleep for
   - #### Returns
     ( _number_ ) TODO: Should return the number of ms slept for
 - ### print:
-  - #### Description
-    Print values to stdout
+  - Print values to stdout
   - #### Parameters:
     - **...values** ( _Array<any>_ ) The values to print
   - #### Returns
@@ -106,8 +97,7 @@ TODO: Implement example
 - #### Additional Notes
   > TODO: Implement additional notes
 - ### if:
-  - #### Description
-    If 'condition' is truthy, evaluate the 'then' RuleSet, else evaluate the 'else' rule set
+  - If 'condition' is truthy, evaluate the 'then' RuleSet, else evaluate the 'else' rule set
   - #### Parameters:
     - **condition** ( _Array<any>_ ) The values to print
     - **then** ( _"then"_ ) The string constant then
@@ -125,8 +115,7 @@ TODO: Implement example
 - #### Additional Notes
   > TODO: Implement additional notes
 - ### for:
-  - #### Description
-    If 'condition' is truthy, evaluate the 'then' RuleSet, else evaluate the 'else' rule set
+  - If 'condition' is truthy, evaluate the 'then' RuleSet, else evaluate the 'else' rule set
   - #### Parameters:
     - **iterator** ( _RuleSet_ ) The iteration criteria
     - **body** ( _RuleSet_ ) The body of the loop
