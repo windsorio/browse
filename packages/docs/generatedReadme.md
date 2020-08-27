@@ -37,8 +37,8 @@ A scope accessible within a `page` RuleSet
 
 ### Config
 
-- **output** ( _string_ ) The file to output to
-- **writeStream** ( _WriteStream_ ) A stream whose output is the file named by output
+- #### output ( _string_ ) The file to output to
+- #### writeStream ( _WriteStream_ ) A stream whose output is the file named by output
 
 ## std
 
