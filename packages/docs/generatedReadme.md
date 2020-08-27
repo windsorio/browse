@@ -70,7 +70,7 @@ The root scope that contains all the basic/standard functions and variables
   - #### Parameters:
     - **key** ( _string_ ) An identifer
   - #### Returns
-    ( _any_ ) The value stored in the variable if there is one.
+    ( _any_ ) The value stored in the variable if there is one
 - ### set:
   - Set the variable 'key' to the value 'value'
   - #### Parameters:
@@ -92,33 +92,33 @@ The root scope that contains all the basic/standard functions and variables
     - **value** ( _T_ ) The value to push
     - **dest** ( _Array<T>_ ) The array to push to
   - #### Returns
-    ( _undefined_ ) undefined
+    ( _any_ ) The number of elements in the array after pushing to it
 - ### pop:
   - Remove the element at the back of the array and return it
   - #### Parameters:
     - **dest** ( _Array<T>_ ) The array to remove an element from
   - #### Returns
-    ( _undefined_ ) undefined
+    ( _any_ ) The value of the element removed
 - ### rule:
   - Define a new rule 'name'. The 'body' has access to two additional rules, 'bind' and 'return' to take arguments and return a value
   - #### Parameters:
     - **name** ( _string_ ) An identifer
     - **body** ( _RuleSet_ ) The behavior that should be executed when rule is called with arguments
   - #### Returns
-    ( _RuleSet_ ) The specified rule (TODO: Returns the entire function including a bunch of stuff that can only be used by the back end)
+    ( _RuleSet_ ) The specified rule
 - ### sleep:
   - Sleep for the 'ms'
   - #### Parameters:
     - **ms** ( _number_ ) The number of ms to sleep for
   - #### Returns
-    ( _number_ ) TODO: Should return the number of ms slept for
+    ( _number_ ) TODO
 - ### print:
 
   - Print values to stdout
   - #### Parameters:
 
   - #### Returns
-    ( _nil_ ) nil (TODO: Should return the string printed? something else but null)
+    ( _nil_ ) nil
   - #### example
 
 ```
@@ -149,7 +149,7 @@ TODO: Implement example
     - **iterator** ( _RuleSet_ ) The iteration criteria
     - **body** ( _RuleSet_ ) The body of the loop
   - #### Returns
-    ( _nil_ ) nil (TODO: Should return the value of the last evaluated statement, or the number of iterations?)
+    ( _nil_ ) nil
   - #### example
 
 ```
