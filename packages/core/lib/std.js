@@ -42,7 +42,7 @@ const defRule = (evalRuleSet) => (scope) => (_opts) => (name, body) => {
 };
 
 /**
- * @scope { The root scope that contains all the basic/standard functions and variables }
+ * @scope { The root scope that contains all the basic/standard rules and variables }
  */
 module.exports = ({
   evalRule,

@@ -11,7 +11,7 @@ const { help, throws } = require("@browselang/core/lib/utils");
 const scope = require("@browselang/core/lib/scope");
 
 /**
- * Data extraction functions
+ * Data extraction rules
  * Explicitly return `null` if no data is available
  */
 const getString = (el) => el.textContent || el.innerText || null;

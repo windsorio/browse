@@ -78,7 +78,7 @@ const preparePage = async (browser, href) => {
 };
 
 /**
- * @scope { A scope containing all the web-scraping functions and variables }
+ * @scope { A scope containing all the web-scraping rules and variables }
  * @name { Browser }
  */
 const getBrowserScope = (parent) => {
