@@ -129,7 +129,8 @@ Browse {
   stringLiteral = "\"" doubleStringCharacter* "\""						            -- doubleQuote
                 | "'" singleStringCharacter* "'"							            -- singleQuote
                 | "`" cssSelectorCharacter* "`"								            -- cssSelector
-                | "|" javascriptCharacter* "|"								            -- javascript
+                // This needs 1 or more characters in between. Otherwise it becomes the or operator (||)
+                | "|" javascriptCharacter+ "|"								            -- javascript
                 | implicitStringStart implicitStringPart*		              -- implicit
   doubleStringCharacter = ~("\"" | "\\" | lineTerminator) sourceCharacter -- nonEscaped
                         | "\\" escapeSequence                             -- escaped
@@ -261,8 +262,16 @@ Browse {
     | EqExpr "===" noop CompExpr -- eqError
     | CompExpr
 
+  AndExpr
+    = AndExpr "&&" noop EqExpr -- and
+    | EqExpr
+  
+  OrExpr
+    = OrExpr "||" noop AndExpr -- or
+    | AndExpr
+
   Expr (an expression)
-    = EqExpr
+    = OrExpr
   
   /****************\
    ** Statements **

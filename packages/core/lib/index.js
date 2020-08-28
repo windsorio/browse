@@ -53,6 +53,16 @@ const evalExpr = async (expr, scope) => {
       }
     case "BinExpr":
       const l = await evalExpr(expr.left, scope);
+      // Handle && and || before evaluating the right side
+      switch (expr.op) {
+        case "&&": {
+          return l && (await evalExpr(expr.right, scope));
+        }
+        case "||": {
+          return l || (await evalExpr(expr.right, scope));
+        }
+      }
+      // Now evaluate the right side
       const r = await evalExpr(expr.right, scope);
       switch (expr.op) {
         case "*":
