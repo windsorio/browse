@@ -78,7 +78,8 @@ const preparePage = async (browser, href) => {
 };
 
 /**
- * A scope containing all the web-scraping rules and variables
+ * @scope { A scope containing all the web-scraping rules and variables }
+ * @name { Browser }
  */
 const getBrowserScope = (parent) => {
   const browserScope = {
@@ -116,6 +117,11 @@ const getBrowserScope = (parent) => {
       console.error(args.map(stringify).join(" "));
       return null;
     },
+    /**
+     * @rule { Page }
+     * @scope { Browser }
+     * @desc { Instantiates a page definition which matches on the url-pattern passed in as the first argument, and which executes the rule set passed in as the second argument on every matching page }
+     */
     page: (_) => ({ scrape = true }) => (pattern, ...ruleSets) => {
       const urlObj = url.parse(pattern);
 
@@ -150,6 +156,11 @@ const getBrowserScope = (parent) => {
       };
       return null;
     },
+    /**
+     * @rule { Visit }
+     * @scope { Browser }
+     * @desc { Open a new tab/page with the given url and checks for matches on that URL. If there are matches the corresponding ruleSets will be run. If there is no match The new tab/page is opened in the browser scope and no actions will be taken }
+     */
     visit: (scope) => (_opts) => async (href) => {
       // Check if any pageDefs exist
       let match = null;

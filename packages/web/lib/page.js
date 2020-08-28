@@ -11,7 +11,7 @@ const { help, throws } = require("@browselang/core/lib/utils");
 const scope = require("@browselang/core/lib/scope");
 
 /**
- * Data extraction functions
+ * Data extraction rules
  * Explicitly return `null` if no data is available
  */
 const getString = (el) => el.textContent || el.innerText || null;
@@ -24,16 +24,25 @@ const getNumber = (el) => {
 };
 const getUrl = (el) => el.href || null;
 
-/**
- * A scope accessible within a `page` RuleSet
- */
 const getPageScope = (parent) => {
+  /**
+   * @scope { A scope accessible within a `page` RuleSet }
+   */
   const pageScope = {
     parent,
     vars: {},
     internal: {
       page: null,
-      config: {},
+      /**
+       * @config {
+       *   [output: string] The file to output to
+       *   [writeStream: WriteStream] A stream whose output is the file named by output
+       * }
+       */
+      config: {
+        output: null,
+        writeStream: null,
+      },
       data: {},
       // If other pages are visited from this page, we track those here
       links: [],

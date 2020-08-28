@@ -1,0 +1,22 @@
+{
+  "name": "docs",
+  "description": "Parses browse docs and performs various actions based on them via plugins",
+  "license": "MIT",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/windsorio/browse.git"
+  },
+  "scripts": {
+    "generate-docs": "node plugins/readmeGen.js --out"
+  },
+  "dependencies": {
+    "@babel/parser": "7.11.3",
+    "@babel/traverse": "7.11.0",
+    "yargs": "15.4.1"
+  },
+  "devDependencies": {
+    "@types/babel__traverse": "7.0.13",
+    "@types/yargs": "15.0.5"
+  }
+}
