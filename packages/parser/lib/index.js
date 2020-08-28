@@ -97,10 +97,10 @@ semantics.addAttribute('asLisp', {
   CompExpr_lt:    function(l, _op, _, r)   { return ["<", l.asLisp, r.asLisp]; },
   EqExpr_ne:      function(l, _op, _, r)   { return ["!=", l.asLisp, r.asLisp]; },
   EqExpr_eq:      function(l, _op, _, r)   { return ["==", l.asLisp, r.asLisp]; },
-  AndExpr_and:    function(l, _, r)        { return ["&&", l.asLisp, r.asLisp]; },
-  OrExpr_or:      function(l, _, r)        { return ["||", l.asLisp, r.asLisp]; },
+  AndExpr_and:    function(l, _op, _, r)        { return ["&&", l.asLisp, r.asLisp]; },
+  OrExpr_or:      function(l, _op, _, r)        { return ["||", l.asLisp, r.asLisp]; },
 
-  ruleName:       function (m, _, n)       { return m.asLisp + ":" + n.asLisp; },
+  ruleName:       function (m, _, n)       { return (m.asLisp ? m.asLisp + ":" : "") + n.asLisp; },
 
   Rule:           function(w, es)     { return [w.asLisp, es.asLisp] },
   Rules:          function (_nl, first, _rs, rest, _s) 
@@ -271,7 +271,7 @@ semantics.addAttribute("asAST", {
       source: this.source,
     };
   },
-  AndExpr_and: function (l, _, r) {
+  AndExpr_and: function (l, _op, _, r) {
     return {
       type: "BinExpr",
       op: "&&",
@@ -280,7 +280,7 @@ semantics.addAttribute("asAST", {
       source: this.source,
     };
   },
-  OrExpr_or: function (l, _, r) {
+  OrExpr_or: function (l, _op, _, r) {
     return {
       type: "BinExpr",
       op: "||",
@@ -441,10 +441,10 @@ semantics.addOperation('interpret()', {
   CompExpr_lt:     function(l, _op, _, r)    { return l.interpret()  <  r.interpret(); },
   EqExpr_ne:     function(l, _op, _, r)      { return  l.interpret() !==  r.interpret(); },
   EqExpr_eq:     function(l, _op, _, r)      { return  l.interpret() === r.interpret(); },
-  AndExpr_and:     function(l, _, r)         { return  l.interpret() && r.interpret(); },
-  OrExpr_or:     function(l, _, r)         { return  l.interpret() || r.interpret(); },
+  AndExpr_and:     function(l, _op, _, r)         { return  l.interpret() && r.interpret(); },
+  OrExpr_or:     function(l, _op, _, r)         { return  l.interpret() || r.interpret(); },
 
-  ruleName:       function (m, _, n)       { return m.asLisp + ":" + n.asLisp; },
+  ruleName:       function (m, _, n)       { return n.interpret(); },
 
   Rule:           function(w, es)     { return [w.interpret(), es.interpret()] },
   Rules:          function (_nl, first, _rs, rest, _s) 
