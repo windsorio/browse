@@ -101,12 +101,22 @@ Examples:
     }
     ```
 
-  * `@return { [type] : A description of what is being returned}`
+  * `@rule { The name of the rule }`
 
-  * `@notes { Extra notes on the rule that are non-obvious }`
+    - The @rule tag is used to indicate that the following funciton or arrow funciton represets a rule. This is only necessary in the case that the rule is not in the rules array of a scope object.
 
-  * `@example { An example of usage of the documented rule }`
+  * `@scope { Name of the scope that the rule belongs to }`
+    > WARNING: When used above a rule this must always be used in conjuction with the @rule tag!!
+    - In the absense of @scope, if the rule belongs to the rules property of an object tagged with @scope, the scope of the rule is automatically set. Else the name of the scope defaults to the name of the file with the extension removed.
 
-  ```
+* `@return { [type] : A description of what is being returned}`
 
-  ```
+* `@notes { Extra notes on the rule that are non-obvious }`
+
+* `@example { An example of usage of the documented rule }`
+
+### Possibly important implementation details
+
+- The @rule tag uses nothing from the arrow function beneath it, so @rule tags can be placed anywhere. This might change in the future if we want to do more magical things.
+
+- The @scope tag, when not paired with the @rule tag, works by looking for the nearest ObjectExpression child and interpreting that as a scope definition. We specifically look for rule and config attributes on the object and do special things with them.
