@@ -1,4 +1,4 @@
-<img src="./images/full.png" width=400 />
+<img src="https://raw.githubusercontent.com/windsorio/browse/master/images/full.png" width=400 />
 
 The Browse Language
 
