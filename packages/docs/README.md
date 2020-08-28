@@ -101,11 +101,12 @@ Examples:
     }
     ```
 
-  ```
-
   * `@return { [type] : A description of what is being returned}`
 
   * `@notes { Extra notes on the rule that are non-obvious }`
 
   * `@example { An example of usage of the documented rule }`
+
+  ```
+
   ```
