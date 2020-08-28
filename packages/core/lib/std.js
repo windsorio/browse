@@ -295,7 +295,12 @@ module.exports = ({
         }
       }
 
-      return evalRuleSet(cond ? thenRS : elseRS);
+      if (cond) {
+        return evalRuleSet(thenRS);
+      } else {
+        if (elseRS) return evalRuleSet(elseRS);
+        else return null;
+      }
     },
     /**
      * @desc { Execute the body while the post iteration rule in the iterator is true }
