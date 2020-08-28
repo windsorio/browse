@@ -30,43 +30,6 @@ const strikethrough = (str) => `~~${str}~~`;
 
 const quote = (str) => `> ${str}`;
 
-/*console.log(h1('Hello World'));
-console.log(h2('Hello World'));
-console.log(h3('Hello World'));
-console.log(h4('Hello World'));
-console.log(h5('Hello World'));
-
-console.log(bullet('Hello World'.split('')))
-
-console.log(code('console.log("Hello World")'))*/
-
-//https://bulldogjob.com/news/449-how-to-write-a-good-readme-for-your-github-project
-console.log(`
-${h2("Table of Contents")}
-${bullet([
-  link("General info", "#general-info"),
-  link("Technologies", "#technologies"),
-  link("Setup", "#setup"),
-])}
-${h2("General Info")}
-This project is simple Lorem ipsum dolor generator.
-${h2("Technologies")}
-Project is created with:
-${bullet([
-  "Lorem version: 12.3",
-  "Ipsum version: 2.33",
-  "Ament library version: 999",
-])}
-${h2("Setup")}
-To run this project, install it locally using npm:
-
-${code(`
-$ cd ../lorem
-$ npm install
-$ npm start
-`)}
-`);
-
 module.exports = {
   header,
   h1,
