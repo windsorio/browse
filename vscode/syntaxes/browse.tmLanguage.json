@@ -118,7 +118,7 @@
     },
     "operators": {
       "name": "keyword.operator.browse",
-      "match": "\\s*(\\!|-|\\*|/|%|\\+|>=|<=|>|<|\\!=|==)"
+      "match": "\\s*(\\!|-|\\*|/|%|\\+|>=|<=|>|<|\\!=|==|&&|\\|\\|)"
     },
     "builtins": {
       "patterns": [
@@ -205,7 +205,7 @@
       ]
     },
     "multilinestring": {
-      "begin": "\\s*\\|",
+      "begin": "\\s*\\|(?!\\|)",
       "end": "\\|",
       "name": "string.quoted.other.browse",
       "patterns": [

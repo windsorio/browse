@@ -71,6 +71,9 @@ c|`,
   "implicit\\ string",
   "https://implicit.url/something?q=123&term=implcit%20string#withAHash",
   "stringWith$dollarSign",
+  "1 == 1 && 1 == 2",
+  "1 == 1 || 1 == 2",
+  "1 == 1 && 1 == 2 || 1 == 1 && 1== 2 || 1 == 1 && 1 == 2 || 1 == 1 && 1 == 2",
 ];
 
 expressions.forEach((expr) => {
