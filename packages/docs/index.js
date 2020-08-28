@@ -117,7 +117,6 @@ const parseConfig = (configString) => {
 
 const parseRtn = (rtnString) => {
   const r = /(\[([\w|\s]*)\])?([\w|\s]+)/g;
-  console.log(rtnString);
   const matches = r.exec(rtnString);
   const type = matches[2] || "any";
   const description = matches[3];
@@ -364,7 +363,6 @@ module.exports = () => {
 
             //In the case of just a scope declaration.
             if (tags["@scope"] && tags["@rule"] === undefined) {
-              console.log("Parsing Generic Strucutre", file);
               assert(
                 !scope,
                 "There can only be one scope declaration per file"
