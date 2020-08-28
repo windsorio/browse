@@ -464,7 +464,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       ],
       [
         "chalk",
-        "npm:4.1.0"
+        "npm:3.0.0"
       ],
       [
         "chokidar",
@@ -812,7 +812,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       ],
       [
         "fs-minipass",
-        "npm:2.1.0"
+        "npm:1.2.7"
       ],
       [
         "fs.realpath",
@@ -860,7 +860,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       ],
       [
         "got",
-        "npm:9.6.0"
+        "npm:11.5.2"
       ],
       [
         "graceful-fs",
@@ -1152,7 +1152,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       ],
       [
         "locate-path",
-        "npm:3.0.0"
+        "npm:5.0.0"
       ],
       [
         "lodash",
@@ -1232,11 +1232,11 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       ],
       [
         "minipass",
-        "npm:3.1.3"
+        "npm:2.9.0"
       ],
       [
         "minizlib",
-        "npm:2.1.0"
+        "npm:1.3.3"
       ],
       [
         "mkdirp",
@@ -1376,7 +1376,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       ],
       [
         "p-locate",
-        "npm:3.0.0"
+        "npm:4.1.0"
       ],
       [
         "p-map",
@@ -1404,7 +1404,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       ],
       [
         "path-exists",
-        "npm:3.0.0"
+        "npm:4.0.0"
       ],
       [
         "path-is-absolute",
@@ -1592,7 +1592,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       ],
       [
         "resolve-from",
-        "npm:5.0.0"
+        "npm:4.0.0"
       ],
       [
         "responselike",
@@ -1748,7 +1748,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       ],
       [
         "tar",
-        "npm:6.0.2"
+        "npm:4.4.13"
       ],
       [
         "tar-fs",
