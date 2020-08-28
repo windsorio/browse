@@ -71,6 +71,7 @@ function genericPrint(path, options, print) {
     case "Rule": {
       return concat([
         path.call(print, "fn"),
+        n.args.length > 0 ? " " : "",
         join(" ", path.map(print, "args")),
       ]);
     }
@@ -96,7 +97,6 @@ function genericPrint(path, options, print) {
               ])
             )
           : "",
-        " ",
       ]);
     }
     case "RuleExpr":
@@ -203,10 +203,11 @@ function printBinExpr(path, print, options, isNested, isInsideParenthesis) {
     // If there's only a single binary expression, we want to create a group in
     // order to avoid having a small right part like -1 be on its own line.
     const parent = path.getParentNode();
-    const shouldGroup =
-      parent.type !== node.type &&
-      node.left.type !== node.type &&
-      node.right.type !== node.type;
+    const shouldGroup = true;
+    // const shouldGroup =
+    //   parent.type !== node.type &&
+    //   node.left.type !== node.type &&
+    //   node.right.type !== node.type;
 
     parts.push(" ", shouldGroup ? group(right, { shouldBreak: false }) : right);
   } else {

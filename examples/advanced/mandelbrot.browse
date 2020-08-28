@@ -4,11 +4,9 @@ set maxIterations 40
 
 for { set py 0; test $py < 40; set py $py + 1 } {
   set line ""
-  set yScaled ($py / 20 -
-    1)
+  set yScaled ($py / 20 - 1)
   for { set px 0; test $px < 70; set px $px + 0.5 } {
-    set xScaled ($px / 20 -
-      2.5)
+    set xScaled ($px / 20 - 2.5)
     set x 0
     set y 0
     set i 0
@@ -18,29 +16,16 @@ for { set py 0; test $py < 40; set py $py + 1 } {
       test ((m:pow $x 2) + (m:pow $y 2)) <= (m:pow 2 2)
       update i $i + 1
     } {
-      set xTemp (m:pow $x 2) -
-        (m:pow $y 2) +
-        $xScaled
-      update y 2 * $x * $y +
-        $yScaled
+      set xTemp (m:pow $x 2) - (m:pow $y 2) + $xScaled
+      update y 2 * $x * $y + $yScaled
       update x $xTemp
     }
     set part $maxIterations / 8
-    if ($i >
-      $part *
-        7) then { update line $line + "@" } else {
-      if ($i >
-        $part *
-          6) then { update line $line + "#" } else {
-        if ($i >
-          $part *
-            5) then { update line $line + "0" } else {
-          if ($i >
-            $part *
-              4) then { update line $line + "!" } else {
-            if ($i >
-              $part *
-                2) then { update line $line + ";" } else {
+    if ($i > $part * 7) then { update line $line + "@" } else {
+      if ($i > $part * 6) then { update line $line + "#" } else {
+        if ($i > $part * 5) then { update line $line + "0" } else {
+          if ($i > $part * 4) then { update line $line + "!" } else {
+            if ($i > $part * 2) then { update line $line + ";" } else {
               if ($i > $part) then { update line $line + ";" } else {
                 update line $line + "."
               }
