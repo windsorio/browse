@@ -29,7 +29,7 @@
 
 ## Browser
 
-A scope containing all the web-scraping functions and variables
+A scope containing all the web-scraping rules and variables
 
 ### Rules
 
@@ -51,7 +51,7 @@ A scope accessible within a `page` RuleSet
 
 ## std
 
-The root scope that contains all the basic/standard functions and variables
+The root scope that contains all the basic/standard rules and variables
 
 ### Rules
 
@@ -64,20 +64,20 @@ The root scope that contains all the basic/standard functions and variables
   - #### Parameters:
     - **value** ( _any_ ) Any value
   - #### Returns
-    ( _any_ ) Retuns the value passed in
+    - ( _any_ ) Retuns the value passed in
 - ### get:
   - Get the value of the variable 'key'
   - #### Parameters:
     - **key** ( _string_ ) An identifer
   - #### Returns
-    ( _any_ ) The value stored in the variable if there is one
+    - ( _any_ ) The value stored in the variable if there is one
 - ### set:
   - Set the variable 'key' to the value 'value'
   - #### Parameters:
     - **key** ( _string_ ) An identifer
     - **value** ( _any_ ) The value to set the variable to
   - #### Returns
-    ( _any_ ) value
+    - ( _any_ ) value
 - ### update:
   - TODO
 - ### unset:
@@ -85,40 +85,40 @@ The root scope that contains all the basic/standard functions and variables
   - #### Parameters:
     - **key** ( _string_ ) An identifer
   - #### Returns
-    ( _any_ ) The value stored in the variable key
+    - ( _any_ ) The value stored in the variable key
 - ### push:
   - Push an element to the back of an array
   - #### Parameters:
     - **value** ( _T_ ) The value to push
     - **dest** ( _Array<T>_ ) The array to push to
   - #### Returns
-    ( _any_ ) The number of elements in the array after pushing to it
+    - ( _any_ ) The number of elements in the array after pushing to it
 - ### pop:
   - Remove the element at the back of the array and return it
   - #### Parameters:
     - **dest** ( _Array<T>_ ) The array to remove an element from
   - #### Returns
-    ( _any_ ) The value of the element removed
+    - ( _any_ ) The value of the element removed
 - ### rule:
   - Define a new rule 'name'. The 'body' has access to two additional rules, 'bind' and 'return' to take arguments and return a value
   - #### Parameters:
     - **name** ( _string_ ) An identifer
     - **body** ( _RuleSet_ ) The behavior that should be executed when rule is called with arguments
   - #### Returns
-    ( _RuleSet_ ) The specified rule
+    - ( _RuleSet_ ) The specified rule
 - ### sleep:
   - Sleep for the 'ms'
   - #### Parameters:
     - **ms** ( _number_ ) The number of ms to sleep for
   - #### Returns
-    ( _number_ ) TODO
+    - ( _number_ ) TODO
 - ### print:
 
   - Print values to stdout
   - #### Parameters:
 
   - #### Returns
-    ( _nil_ ) nil
+    - ( _nil_ ) nil
   - #### example
 
 ```
@@ -134,7 +134,7 @@ TODO: Implement example
     - **thenRuleSet** ( _RuleSet_ ) The ruleset that will be executed if condition evaluates to true
     - **elseRuleSet** ( _RuleSet_ ) The ruleset that will be executed if condition evaluates to false
   - #### Returns
-    ( _any_ ) The result of the if evaluated code
+    - ( _any_ ) The result of the if evaluated code
   - #### example
 
 ```
@@ -149,7 +149,7 @@ TODO: Implement example
     - **iterator** ( _RuleSet_ ) The iteration criteria
     - **body** ( _RuleSet_ ) The body of the loop
   - #### Returns
-    ( _nil_ ) nil
+    - ( _nil_ ) nil
   - #### example
 
 ```
@@ -161,7 +161,7 @@ for { set i 2; test $i < 5; set i $i + 1
     - **ruleset** ( _RuleSet_ )
     - **inject** ( _RuleSet_ ) ???
   - #### Returns
-    ( _any_ ) The result of evaluating the ruleset
+    - ( _any_ ) The result of evaluating the ruleset
   - #### example
 
 ```

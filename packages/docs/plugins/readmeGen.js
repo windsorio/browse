@@ -78,7 +78,10 @@ const genReadme = (file) => {
 
         if (rtn) {
           ruleInfo.push(
-            `${h4("Returns")}\n( ${italics(rtn.type)} ) ${rtn.description}`
+            `${h4("Returns")}\n${bullet(
+              [`( ${italics(rtn.type)} ) ${rtn.description}`],
+              3
+            )}`
           );
         }
 
