@@ -18,6 +18,8 @@ const {
   link,
 } = require("../readmeWriter");
 
+const { out } = require("yargs").argv;
+
 const genReadme = (file) => {
   const readmeLines = [`${h1("Documentation")}`];
 
@@ -108,4 +110,4 @@ const genReadme = (file) => {
   return readmeLines.join("\n");
 };
 
-genReadme("generatedReadme.md");
+genReadme(out);

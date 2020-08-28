@@ -3968,7 +3968,9 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["docs", "workspace:packages/docs"],
             ["@babel/parser", "npm:7.11.3"],
             ["@babel/traverse", "npm:7.11.0"],
-            ["@types/babel__traverse", "npm:7.0.13"]
+            ["@types/babel__traverse", "npm:7.0.13"],
+            ["@types/yargs", "npm:15.0.5"],
+            ["yargs", "npm:15.4.1"]
           ],
           "linkType": "SOFT",
         }]

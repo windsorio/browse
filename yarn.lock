@@ -1732,6 +1732,8 @@ __metadata:
     "@babel/parser": 7.11.3
     "@babel/traverse": 7.11.0
     "@types/babel__traverse": 7.0.13
+    "@types/yargs": 15.0.5
+    yargs: 15.4.1
   languageName: unknown
   linkType: soft
 
