@@ -1,6 +1,8 @@
 # See basic/fibonacci.browse for an example of a simple rule
 # This file consists of more advanced rules that take RuleSets as arguments
 
+import datetime as dt
+
 # doAfter executes a RuleSet after some time
 rule doAfter {
   bind ms ruleset
@@ -38,12 +40,7 @@ rule logTimestamps {
     set WITH_TS true
 
     rule print {
-      bind arg
-      stdPrint '[' +
-        # TODO: use a real timestamp
-        12345 +
-        '] ' +
-        $arg
+      bind arg; stdPrint '[' + (dt:toISOString (dt:Date )) + '] ' + $arg
     }
   }
 }
