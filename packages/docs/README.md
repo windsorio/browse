@@ -4,73 +4,108 @@
 @ignore
 @see
 @summary
+@param
 
 # docs
 
-In order for comments to be processed by the docs system they must begin with \*
+## Getting started
 
-Below these types of comments are referred to as 'starred' or 'starred comments' to differentiate them from ordinary comments
+    /**
+     * @desc { A getting started function }
+     * @params {
+     *  [string: getting] : A description
+     *  [string: started] : Of a parameter
+     * }
+     * @return { [string] returns "Getting started" }
+     * @notes { This function is really simple
+     * because we're just getting started }
+     * @example { gettingStarted('Getting', 'Started') }
+     */
 
-For ease of parsing, arguments are placed inside of
+Now lets break down some of the components of this example
 
-Examples
+## Valid SmartDoc comments
 
-//\* @help { This is a random help annotation beginning with \* in a single line comment }
+Notice how the first line in the example begins with `/**` rather than the typical `/*` that indicates a block comment. In order for comments to be processed by the docs system they must begin with \*
 
-/\*\*
-@help { This is a random help annotation beginning with \* in a multiline comment }
-\*/
+Another Example
 
-Types of annotations
+```
+/**
+ * After /* and */ are parsed out, this comment begins with * and will be parsed by the documentation system.
+ */
 
-##Above the getNewScope function
+ /*
+  * This comment will be ignore by SmartDoc
+  */
+```
 
-@scope { Description of scope here }
+Below these types of comments are referred to as 'starred' to differentiate them from ordinary comments
 
-@name { The name of the scope }
+## Valid SmartDoc Tags
 
-In the absense of a name, the file name without extensions will be used
+Tags are an indication to SmartDoc that the following text is special in some way. For readability, all text associated with a tag is placed inside of curly braces '{}'
 
-WARNING: THIS TAG IS REQUIRED FOR MOST THINGS TO WORK
+Examples:
 
-##Above any of the config variables
+- The @desc tag indicates the 'description' of a function will follow.
 
-@help { A description of what the variable does }
-In the absense of @help, the value of the description is an empty string
+```
+  @desc { A getting started function }
+```
 
-@type { The type of the config variable }
-In the absense of @type, we will attempt to grab the type of the initialized variable. If it is non-null we will set the type to be that type
-For example in the case of
+- The @params tag indiciates the list of parameters for a function will follow.
 
-In the absense of the @help tag, the plaintext is taken to be the @help tag
+```
+@params {
+  [string: getting] : A description
+  [string: started] : Of a parameter
+  }
+```
 
-Examples showing reason for design decisions. Some things are much simpler
+## Tag Catalog
 
-config: {
-/\*\* \* @help { Boolean indicating whether the browser should be run in headless mode } \* @type { Boolean }
-\*/
-headless: false
-}
+- ### Above the scope object
 
-config: {
-//\* Boolean indicating whether the browser should be run in headless mode
-headless: false
-}
+  - `@scope { Description of scope here }`
 
-These will both produce the same documentation because of automatic type evaluation and @help defaulting to plaintext
+    - This tag is required. Files without any @scope tags are ignored
 
-##Above any of the rules
+  - `@name { The name of the scope }`
 
-If there is no 'starred' comment above a rule an assertion error will be thrown on doc creation with the name(s) of the uncommented function(s)
+    - In the absence of a name, the file name with the extension removed will be used for the name
 
-@ help { A short description of the function }
-In the absense of @help, we will look for @description and if that is missing as well we use empty string as @help
+- ### Above the config declaration
 
-@ description { A longer description of the function }
-In the absense of @description, we will look for @help and if that is missing as well we use empty string as @description
+  - `@config { [type: varName]: description, ... }`
 
-@options { }
+    - (TODO) All config variables must be documented or an error will be thrown
 
-@params { }
+- ### Above a rule definition
 
-@return { }
+  > If there is no starred comment above a rule within an object commented with an @scope tag, an assertion error will be thrown on doc generation with the name(s) of the uncommented function(s)
+
+  - `@help { A short description of what the rule does }`
+
+    - In the absense of @help, the value of the short description will default to @desc. If @desc also does not exist the plaintext of the comment will be used.
+
+  - `@desc` { A longer description of what the rule does}
+
+    - In the absense of @desc, the value of the long description will default to @help.
+
+  - ```
+    @params {
+      [type1: param1] : Description of the first param
+      [type2: param2] : Description of the second param
+      ...
+    }
+    ```
+
+  ```
+
+  * `@return { [type] : A description of what is being returned}`
+
+  * `@notes { Extra notes on the rule that are non-obvious }`
+
+  * `@example { An example of usage of the documented rule }`
+  ```
