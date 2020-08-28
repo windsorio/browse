@@ -10,17 +10,17 @@
 
 ## Getting started
 
-    /**
-     * @desc { A getting started function }
-     * @params {
-     *  [string: getting] : A description
-     *  [string: started] : Of a parameter
-     * }
-     * @return { [string] returns "Getting started" }
-     * @notes { This function is really simple
-     * because we're just getting started }
-     * @example { gettingStarted('Getting', 'Started') }
-     */
+      /**
+      * @desc { A getting started function }
+      * @params {
+      *  [string: getting] : A description
+      *  [string: started] : Of a parameter
+      * }
+      * @return { [string] returns "Getting started" }
+      * @notes { This function is really simple
+      * because we're just getting started }
+      * @example { gettingStarted('Getting', 'Started') }
+      */
 
 Now lets break down some of the components of this example
 
@@ -32,10 +32,10 @@ Another Example
 
 ```
 /**
- * After /* and */ are parsed out, this comment begins with * and will be parsed by the documentation system.
- */
+* After /* and */ are parsed out, this comment begins with * and will be parsed by the documentation system.
+*/
 
- /*
+/*
   * This comment will be ignore by SmartDoc
   */
 ```
@@ -115,7 +115,7 @@ Examples:
 
 * `@example { An example of usage of the documented rule }`
 
-### Possibly important implementation details
+### Important implementation details
 
 - The @rule tag uses nothing from the arrow function beneath it, so @rule tags can be placed anywhere. This might change in the future if we want to do more magical things.
 
