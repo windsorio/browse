@@ -42,8 +42,6 @@ class BrowseError extends Error {
 }
 
 function stringifyError(err, opts = {}) {
-  const docment = opts.document || "unknown";
-
   let msg = "";
 
   if (err instanceof BrowseError) {

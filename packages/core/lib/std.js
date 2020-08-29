@@ -16,6 +16,50 @@ const defRule = (evalRuleSet) => (scope) => (_opts) => (name, body) => {
     evalRuleSet(body, {
       rules: {
         // TODO: bind should only be accessible at the top level
+        /**
+         * @rule { bind }
+         * @scope { std }
+         * @desc {
+         *    **Only used within a {@link rule} body**
+         *    'bind' lets the rule accept arguments. Strings passed to bind are used to
+         *    assign variables that track the incoming values
+         * }
+         * @params {
+         *    [...names: string] variables to assign for each incoming positional argument
+         * }
+         * @opts {[...names: true] every key used as an option is bound to
+         *    the value of an option passed in with the same name. The value for
+         *    each option passed to bin MUST be `true` as it gets ignore
+         * }
+         * @return { nil }
+         * @example {
+         *    # take 2 arguments and return the sum
+         *    rule add { bind x y; return $x + $y }
+         *
+         *    # accept options
+         *    rule add2 {
+         *      bind(print) x y
+         *      set z $x + $y
+         *      if $print then { print $z } else { return $z }
+         *    }
+         * }
+         * @notes {
+         *    The {@link return} rule doesn't work like `return` in other languages. `return` is just an
+         *    alias for {@link id} since the last value in a RuleSet is the implicit return value of the
+         *    RuleSet. For example
+         *
+         *    ```
+         *    rule f {
+         *      return foo
+         *      return bar
+         *    }
+         *    ```
+         *
+         *    In browse, this is valid and the return value is "bar". `return foo` is the same as `id foo`
+         *    Which basically does nothing (a.k.a it's a no-op). and the last rule in the body evaluates to
+         *    "bar"
+         * }
+         */
         bind: (boundScope) => (bindOpts) => (...names) => {
           Object.keys(bindOpts).forEach((opt) => {
             if (bindOpts[opt] !== true) {
@@ -44,19 +88,14 @@ const defRule = (evalRuleSet) => (scope) => (_opts) => (name, body) => {
 /**
  * @scope { The root scope that contains all the basic/standard rules and variables }
  */
-module.exports = ({
-  evalRule,
-  evalRuleSet,
-  getNewScope,
-  // evalArray,
-}) => ({
+module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
   parent: null, // This is the root
   vars: {},
   internal: {},
   modules: {},
   close: async () => {},
   rules: {
-    //* A function which prints help information
+    //* Run `help` in a repl, or add it to your code during debugging, to learn about all the rules you can use in a scope
     help: (scope) => (_) => (key) => {
       // Find the lowest scope that actually has the 'help' rule
       const helpScope = resolveRuleScope("help", scope);
@@ -75,88 +114,178 @@ module.exports = ({
           sleep: "<ms> - Sleep for the specifed amount of milliseconds",
           print: "<...vals> - Print values to stdout",
           rule: `<name> <body> - Define a new rule 'name'. The 'body' has access to two additional rules, 'bind' and 'return' to take arguments and return a value`,
-          bind: `<...keys> - for each value passed into the rule, store it as a variable using the names passed by 'keys'`,
-          return: `<value> - return the value`,
+          bind: `[Used within a rule definition] <...keys> - for each value passed into the rule, store it as a variable using the names passed by 'keys'`,
+          return: `[Used within a rule definition] <value> - return the value`,
           if: `<condition> then <then> else <else> - If 'condition' is truthy, evaluate the 'then' RuleSet, else evaluate the 'else' rule set`,
           scope: "Internal: debug rule to print the current JS scope",
         },
       });
       return null;
     },
-    //Logs the current scope
+    //* Internal: this dumps the current JS scope to stdout for debugging
     scope: (scope) => (_) => () => {
       console.log(scope);
       return null;
     },
     /**
-     * @desc { Returns the value passed in }
+     * @desc { Returns whatever value is passed in. This is the _identity_ rule }
      * @params {
-     *   [value: any] Any value
+     *   [value: T] Any value
      * }
-     * @return { [any] Retuns the value passed in }
+     * @return { [T] The value passed in, unchanged }
      */
     id: (_) => (_) => (v) => (v === undefined ? null : v),
     /**
-     * @desc { Get the value of the variable 'key' }
+     * @desc { Resolves to the value of the variable `key` }
      * @params {
      *   [key: string] An identifer
      * }
-     * @return { [any] The value stored in the variable if there is one. }
-     * @throws { TODO: Implement Throws }
+     * @return { [any] The value of `key` }
+     * @throws { If the variable is not defined, an error is thrown }
+     * @notes {
+     *    The shorthand for this rule is `$<key>`. So, `$someVar` is the
+     *    same as `(get someVar)`. The shorthand syntax is the preferred way to
+     *    read a value.
+     *  }
      */
-    get: (scope) => (_) => (name, source) => {
-      if (!source) {
-        return resolveVar(name, scope);
-      } else {
-        const err = new Error(
-          `Cannot get '${stringify(name)}' from ${stringify(source)}`
-        );
-        if (source instanceof Map) {
-          const v = source.get(name);
-          if (v === undefined) {
-            throw err;
-          }
-          return v;
-        } else if (Array.isArray(source) && typeof name === "number") {
-          const v = source[name];
-          if (v === undefined) {
-            throw err;
-          }
-          return v;
-        } else {
+    get: (scope) => (_) => (name) => resolveVar(name, scope),
+    /**
+     * @desc { Get the element at `index` in the `array` }
+     * @params {
+     *   [index: number] A valid 0-indexed position in the `array`
+     *   [array: arr<T>] The array to lookup
+     * }
+     * @return { [T] The element at `index` in the `array` }
+     * @throws { If the index is not valid or out of bounds, an error is thrown }
+     */
+    arr_get: (_) => (_) => (id, arr) => {
+      const err = new Error(
+        `Cannot get '${stringify(id)}' from ${stringify(arr)}`
+      );
+      if (Array.isArray(arr) && typeof id === "number") {
+        const v = arr[id];
+        if (v === undefined) {
           throw err;
         }
+        return v;
+      } else {
+        throw err;
       }
     },
     /**
-     * @desc { Set the variable 'key' to the value 'value' }
+     * @desc { Get the value of `key` in the `dict` dictionary }
      * @params {
-     *   [key: string] An identifer
-     *   [value: any] The value to set the variable to
+     *   [key: K] A valid key in the dictionary
+     *   [dict: dict<K, V> ] The dictionary to lookup
      * }
-     * @return { [any] value }
+     * @return { [V] The value of `key` in the `dict` dictionary }
+     * @throws { If the key is not defined in the dictionary, an error is thrown }
      */
-    set: (scope) => (_) => (name, value, dest) => {
-      if (!dest) {
-        scope.vars[name] = value;
-      } else if (dest instanceof Map) {
-        dest.set(name, value);
-      } else if (Array.isArray(dest) && typeof name === "number") {
-        if (name < 0 || name >= dest.length) {
-          throw new Error(
-            `Cannot set index ${name} in array of size ${dest.length}`
-          );
+    dict_get: (_) => (_) => (name, dict) => {
+      const err = new Error(
+        `Cannot get '${stringify(name)}' from ${stringify(dict)}`
+      );
+      if (dict instanceof Map) {
+        const v = dict.get(name);
+        if (v === undefined) {
+          throw err;
         }
-        dest[name] = value;
+        return v;
       } else {
-        throw new Error(
-          `Cannot set '${stringify(name)}' in ${stringify(dest)}`
-        );
+        throw err;
       }
+    },
+    /**
+     * @desc { sets to the value of the variable `key` to `value` }
+     * @params {
+     *   [key: string] An identifer (a.k.a variable name)
+     *   [value: T] The value to set the variable to
+     * }
+     * @return { [T] value }
+     * @notes {
+     *    'set' always creates/updates the variable in the immediate/local scope.
+     *    If a variable with the same name exists in a higher scope, it will be
+     *    'shadowed', not updated. To update a variable instead of creating a
+     *    new one, use the {@link update} rule.
+     * }
+     */
+    set: (scope) => (_) => (name, value) => {
+      scope.vars[name] = value;
       return value;
     },
     /**
-     * TODO
+     * @desc { Set the element at `index` in the `array` to `value` }
+     * @params {
+     *   [index: number] A valid 0-indexed position in the `array`
+     *   [value: T] The value to set in the array
+     *   [array: arr<T>] The array to write to
+     * }
+     * @return { [T] The value }
+     * @throws { If the index is not valid or out of bounds, an error is thrown }
+     * @notes { To increase the size of the array, see {@link push} or use the `array` library }
+     */
+    arr_set: (_) => (_) => (id, value, array) => {
+      if (id < 0 || id >= array.length) {
+        throw new Error(
+          `Cannot set index ${id} in array of size ${array.length}`
+        );
+      }
+      array[id] = value;
+      return value;
+    },
+    /**
+     * @desc { Set the value of `key` in the `dict` dictionary }
+     * @params {
+     *   [key: K] The key in the dictionary to set
+     *   [value: V] The value to set `key` to in the dictionary
+     *   [dict: dict<K, V> ] The dictionary to write to
+     * }
+     * @return { [V] The value }
+     */
+    dict_set: (_) => (_) => (name, value, dict) => {
+      dict.set(name, value);
+      return value;
+    },
+    /**
+     * @desc { Unset the variable 'key' }
+     * @params {
+     *   [key: string] An identifer
+     * }
+     * @return { [any] The value stored in the variable key }
+     */
+    unset: (scope) => (_) => (name) => {
+      let value = scope.vars[name];
+      delete scope.vars[name];
+      if (value === undefined) value = null;
+      return value;
+    },
+    /**
+     * @desc { Delete the key-value record matching `key` from the dictionary `dict` }
+     * @params {
+     *   [key: K] A valid key in dict
+     *   [dict: dict<K, V> ] The dictionary to update
+     * }
+     * @return { [V] The value from the deleted pair }
+     */
+    dict_unset: (_) => (_) => (key, dict) => {
+      let value = dict.get(key);
+      dict.delete(key);
+      if (value === undefined) value = null;
+      return value;
+    },
+    /**
+     * @desc { Updates the variable 'key' to the value 'value' }
+     * @params {
+     *   [key: string] An identifer (a.k.a variable name)
+     *   [value: V] The value to set the variable to
+     * }
+     * @return { [V] value }
+     * @notes {
+     *    'update' updates the value for the variable `key` in the closest ancestor scope.
+     *    If a variable with the name `key` already exists in the current scope, then
+     *    `update` throws an error. You should use {@link set} instead for such cases.
+     * }
+     * @throws { If the variable is defined in the local scope, an error is thrown telling you to use `set` instead }
      */
     update: (scope) => (_) => (name, value) => {
       if (scope.vars[name] !== undefined) {
@@ -171,60 +300,30 @@ module.exports = ({
       return value;
     },
     /**
-     * @desc { Unset the variable 'key' }
-     * @params {
-     *   [key: string] An identifer
-     * }
-     * @return { [any] The value stored in the variable key }
-     */
-    unset: (scope) => (_) => (name, from) => {
-      let value;
-      if (!from) {
-        value = scope.vars[name];
-        delete scope.vars[name];
-      } else if (from instanceof Map) {
-        value = from.get(name);
-        from.delete(name);
-      } else if (Array.isArray(from) && typeof name === "number") {
-        if (name < 0 || name >= dest.length) {
-          throw new Error(
-            `Cannot unset index ${name} from array of size ${from.length}`
-          );
-        }
-        value = from[name];
-        delete from[name];
-      } else {
-        throw new Error(
-          `Cannot unset '${stringify(name)}' from ${stringify(from)}`
-        );
-      }
-      if (value === undefined) value = null;
-      return value;
-    },
-    /**
      * @desc { Push an element to the back of an array }
      * @params {
      *   [value: T] The value to push
-     *   [dest: Array<T>] The array to push to
+     *   [dest: arr<T>] The array to push to
      * }
-     * @return { The number of elements in the array after pushing to it }
+     * @return { [number] The number of elements in the array after pushing to it }
      */
     push: (_) => (_) => (value, dest) => dest.push(value),
     /**
      * @desc { Remove the element at the back of the array and return it }
      * @params {
-     *   [dest: Array<T>] The array to remove an element from
+     *   [dest: arr<T>] The array to remove an element from
      * }
-     * @return { The value of the element removed }
+     * @return { [T] The value of the element removed }
      */
     pop: (_) => (_) => (dest) => dest.pop(),
     /**
-     * @desc { Define a new rule 'name'. The 'body' has access to two additional rules, 'bind' and 'return' to take arguments and return a value }
+     * @desc { Define a new rule 'name'. The 'body' has access to two additional rules, {@link bind} and {@link return} used to take arguments and return a value }
      * @params {
-     *   [name: string] An identifer
+     *   [name: string] An identifer to name the rule
      *   [body: RuleSet] The behavior that should be executed when rule is called with arguments
      * }
-     * @return { [RuleSet] The specified rule (TODO: Returns the entire function including a bunch of stuff that can only be used by the back end) }
+     * @return { [Rule] TODO: This value cannot be used by browse and is only understood by the runtime. Provide a better value }
+     * @throws { If a rule already exists with the same name }
      */
     rule: (scope) => (opts) => (name, body) => {
       let existingRule;
@@ -237,41 +336,62 @@ module.exports = ({
       return defRule(evalRuleSet)(scope)(opts)(name, body);
     },
     /**
-     * @desc { Sleep for the 'ms' }
+     * @desc { Sleep for 'ms' milliseconds }
      * @params {
-     *   [ms: number] The number of ms to sleep for
+     *   [ms: number] The number of milliseconds to sleep for
      * }
-     * @return { [number] TODO: Should return the number of ms slept for }
+     * @return { [number] ms }
+     * @notes { This is a blocking rule }
      */
     sleep: (_) => (_) => async (ms) => {
-      if (typeof ms !== "number") throw new Error("timeout is a not a number");
-      return new Promise((resolve) => setTimeout(resolve, ms));
+      // TODO: remove this check when we have static types
+      if (typeof ms !== "number") throw new Error("Argument is a not a number");
+      return new Promise((r) => setTimeout(r, ms)).then(() => ms);
     },
     /**
      * @desc { Print values to stdout }
      * @params {
-     *   [...values: Array<any>] The values to print
+     *   [...values: any] The values to print
      * }
-     * @return { [nil] nil (TODO: Should return the string printed? something else but null) }
-     * @notes { TODO: Implement additional notes }
-     * @example { TODO: Implement example }
+     * @return { [any] The value of the last argument passed to print }
+     * @example {
+     *    # Hello World
+     *    print Hello World
+     *
+     *    # Since 'print' evaluates to the last argument passed in, it makes
+     *    # it easy to compose `print` when debuggin complicated expressions
+     *    rule fact {
+     *         bind x
+     *         if $x <= 1 then { return $x } else {
+     *            return (print $x + '! =' $x * (fact $x - 1))
+     *         }
+     *    }
+     *    fact 4
+     *
+     *    # output =
+     *    # 2! = 2
+     *    # 3! = 6
+     *    # 4! = 24
      */
     print: (_) => (_) => (...args) => {
       console.log(args.map(stringify).join(" "));
-      return null;
+      return args.slice(-1)[0];
     },
     /**
      * @desc { If 'condition' is truthy, evaluate the 'then' RuleSet, else evaluate the 'else' rule set }
      * @params {
-     *   [condition: Array<any>] The condition to be eevaluated
-     *   [then: "then"] The string constant then
+     *   [condition: any] The condition to test
+     *   [then: "then"] The string "then"
      *   [thenRuleSet: RuleSet] The ruleset that will be executed if condition evaluates to true
-     *   [else: "else"] The string constant else
-     *   [elseRuleSet: RuleSet] The ruleset that will be executed if condition evaluates to false
+     *   ?[else: "else"] The string "else"
+     *   ?[elseRuleSet: RuleSet] The ruleset that will be executed if condition evaluates to false
      * }
-     * @return { [any] The result of the if evaluated code }
-     * @notes { TODO: Implement additional notes }
-     * @example { TODO: Implement example }
+     * @return { [any] The result of the RuleSet that was evaluated code. `nil` is no `else` claus is provided }
+     * @notes {
+     *    If `else` and `elseRuleSet` are not provided, then nothing is evaluated if the `condition`
+     *    is falsy. The entire `if` rule will evaluate to `nil` in this case
+     * }
+     * @throws { errors thrown when evaluating the thenRuleSet or elseRuleSet }
      */
     if: (_) => (_) => (cond, then, thenRS, el, elseRS) => {
       if (then !== "then") {
@@ -303,17 +423,25 @@ module.exports = ({
       }
     },
     /**
-     * @desc { Execute the body while the post iteration rule in the iterator is true }
+     * @desc { Execute the `body` while the `test` expressions in the `interator` do not fail }
      * @params {
      *   [iterator: RuleSet] The iteration criteria
      *   [body: RuleSet] The body of the loop
      * }
-     * @opts {
-     *   TODO: Implement optional arguments
-     * }
      * @return { [nil] nil (TODO: Should return the value of the last evaluated statement, or the number of iterations?) }
-     * @example { for { set i 2; test $i < 5; set i $i + 1 } { print loop $i }
- }
+     * @throws { Errors thrown by the iterator or body during evaluation }
+     * @notes {
+     *   The contents of the iterator is split into multiple parts:
+     *   * The very first rule is evaluated once, at the beginning, to setup the loop.
+     *     Usually used to set a iteration variable
+     *   * The remaining rules, except the last rule, are evaulated at the start of each
+     *     rule. A `test` rule is available here that causes the loop to end if the first
+     *     argument passed to `test` is falsy
+     *   * The last rule is run at the end of each loop, i.e. affter the `body` is evaluated,
+     *     but before the `test` rules (previous point) are evaluated again. Usually use to
+     *     increment the iteration variable defined in point 1
+     * }
+     * @example { for { set i 2; test $i < 5; set i $i + 1 } { print loop $i } }
      */
     for: (_) => (_) => async (iterator, body) => {
       if (!iterator || iterator.type !== "RuleSet") {
@@ -386,17 +514,22 @@ module.exports = ({
       return null;
     },
     /**
-     * @desc {   }
+     * @desc { Evaluate a RuleSet. Optionally, inject variables and additional rules into the evaluation context/scope }
      * @params {
-     *   [ruleset: RuleSet]
-     *   [inject: RuleSet] ???
-     * }
-     * @opts {
-     *   TODO: Implement optional arguments
+     *   [ruleset: RuleSet] The RuleSet to evaluate
+     *   ?[inject: RuleSet] A RuleSet that is evaluated in the scope before the ruleset is evaluated
      * }
      * @return { [any] The result of evaluating the ruleset }
-     * @notes { TODO: Implement additional notes }
-     * @example { TODO: Implement example }
+     * @throws { Errors thrown by the ruleset during evaluation }
+     * @notes {
+     *    inject is used to add additional variables and rules that can be used by the Ruleset
+     *    This is the "explicit" form of scope injection that's used to make a pleasant experience
+     *    for someone using a given library. See `examples/advanced/custom_rules.browse` in the browse
+     *    repo to see some good examples for this
+     * }
+     * @example {
+     *    # See https://github.com/windsorio/browse/blob/master/examples/advanced/custom_rules.browse
+     * }
      */
     eval: (_) => (_) => async (ruleset, inject) => {
       if (inject) {
@@ -423,7 +556,32 @@ module.exports = ({
         return evalRuleSet(ruleset);
       }
     },
-    //* Interpret ruleset as array
+    /**
+     * @desc { Create an Array from a RuleSet }
+     * @params {
+     *   [ruleset: RuleSet] The RuleSet used to instantiate the array
+     * }
+     * @return { [arr<any>] The array }
+     * @throws { Errors thrown by the ruleset during evaluation }
+     * @notes {
+     *    `arr` creates a new array, and then evaluates the RuleSet
+     *    A rule called `el` is available inside this RuleSet. It takes one argument
+     *    Each `el` call adds that element to the array before returning the final
+     *    array.
+     *
+     *    `e` and `_` are aliases for `el`
+     * }
+     * @example {
+     *    set a1 (arr { _ 1; _ 2; _ 3 })
+     *
+     *    # nested arrays
+     *    set a2 (arr {
+     *      _ (arr {
+     *        _ 1
+     *      })
+     *    })
+     * }
+     */
     arr: (_) => (_) => async (ruleset) => {
       const arr = [];
       const el = (_) => (_) => (value, extra) => {
@@ -439,7 +597,32 @@ module.exports = ({
 
       return arr;
     },
-    //* Interpret ruleset as dictionary
+    /**
+     * @desc { Create a Dictionary from a RuleSet }
+     * @params {
+     *   [ruleset: RuleSet] The RuleSet used to instantiate the dictionary
+     * }
+     * @return { [dict<K, V>] The dictionary }
+     * @throws { Errors thrown by the ruleset during evaluation }
+     * @notes {
+     *    `dict` creates a new dictionary, and then evaluates the RuleSet
+     *    A rule called `record` is available inside this RuleSet. It takes two arguments,
+     *    a `key` and `value`. Each `record` call adds a new record to the dictionary
+     *    mapping the `key` to the `value`. The final dictionary is `returned`.
+     *
+     *    `r` and `_` are aliases for `record`
+     * }
+     * @example {
+     *    set o1 (dict { _ k1 v1; _ k2 v2 })
+     *
+     *    # nested dictionaries
+     *    set o2 (dict {
+     *      _ k1 (dict {
+     *        _ k2 v2
+     *      })
+     *    })
+     * }
+     */
     dict: (_) => (_) => async (ruleset) => {
       const dict = new Map();
       const record = (_) => (_) => (key, value, extra) => {
@@ -460,12 +643,37 @@ module.exports = ({
 
       return dict;
     },
-    //* Import passed in modules
+    /**
+     * @desc { Import a module. Read the [Browse Modules](#) guide for more info (TODO) }
+     */
     import: (_) => (_) => async (...mods) => {
       // evalRule should catch imports and handle them specially
       throw new Error("Unexpected browse error");
     },
-    //* create string from value
-    string: (_) => (_) => (v) => String(v),
+    /**
+     * @desc { Serialize any value as a string }
+     * @params {
+     *  [value: any] Any value
+     * }
+     * @opts {
+     *  [depth: number] The max depth when serializing nested arrays and dictionaries. If 0, there's no max depth
+     * }
+     * @returns { [string] A string representation of the value passed in }
+     */
+    string: (_) => ({ depth = 3 }) => (v) =>
+      stringify(
+        v,
+        /*  number recusrively goes up till hitting the threshold of 3 */ depth
+          ? 2 - depth
+          : -Infinity
+      ),
+    /**
+     * @desc { Get the length of the string or number of elements in an array }
+     * @params {
+     *  [value: string | array<any>] A string or array
+     * }
+     * @returns { [number] length of the string or the number of elements in an array }
+     */
+    len: (_) => (_) => (v) => v.length,
   },
 });
