@@ -7,16 +7,18 @@ const h5 = (str) => header(5, str);
 const h6 = (str) => header(6, str);
 
 const space = (n) => new Array(n).fill(" ").join("");
+const indent = (n) => space(n * 2);
 
 const indentAll = (lines, n) => lines.map((line) => `${space(n)}${line}`);
 
-const bullet = (arr, indent = 0) =>
-  arr.map((str) => `${space(indent * 2)}* ${str}`).join("\n");
+const bullet = (arr, depth = 0) =>
+  arr.map((str) => `${indent(depth)}- ${str}`).join("\n");
 
-const orderedList = (arr, indent = 0) =>
-  arr.map((str, i) => `${space(indent * 2)}${i + 1}. ${str}`).join("\n");
+const orderedList = (arr, depth = 0) =>
+  arr.map((str, i) => `${indent(depth)}${i + 1}. ${str}`).join("\n");
 
-const code = (str) => "```\n" + str + "\n```";
+const code = (str, depth = 0) =>
+  indent(depth) + ["```", ...str.split("\n"), "```"].join(`\n${indent(depth)}`);
 
 const shortcode = (str) => "`" + str + "`";
 
@@ -28,7 +30,9 @@ const italics = (str) => `*${str}*`;
 
 const strikethrough = (str) => `~~${str}~~`;
 
-const quote = (str) => `> ${str}`;
+const quote = (str, depth = 0) => `${indent(depth)}> ${str}`;
+
+const line = "";
 
 module.exports = {
   header,
@@ -46,4 +50,5 @@ module.exports = {
   strikethrough,
   quote,
   indentAll,
+  line,
 };

@@ -7,8 +7,8 @@
     "type": "git",
     "url": "git+https://github.com/windsorio/browse.git"
   },
-  "scripts": {
-    "generate-docs": "node plugins/readmeGen.js --out"
+  "bin": {
+    "browsedoc": "plugins/markdownGen.js"
   },
   "dependencies": {
     "@babel/parser": "7.11.3",

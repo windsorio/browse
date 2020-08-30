@@ -2,29 +2,17 @@ const traverse = require("@babel/traverse").default;
 const parser = require("@babel/parser");
 const fs = require("fs");
 const assert = require("assert");
-const util = require("util");
-const {
-  h1,
-  h2,
-  h3,
-  h4,
-  bullet,
-  bold,
-  italics,
-  indentAll,
-  code,
-  quote,
-} = require("./readmeWriter");
-const directories = ["web", "core"];
-const show = (obj) =>
-  console.log(
-    console.log(util.inspect(obj, false, null, true /* enable colors */))
-  );
+const directories = [
+  "../core/lib",
+  "../web/lib",
+  // "../core/stdlib/datetime",
+  // "../core/stdlib/math",
+];
 
 const fileMap = Object.assign(
   {},
   ...directories.map((directory) => ({
-    [directory]: fs.readdirSync(`../${directory}/lib`),
+    [directory]: fs.readdirSync(directory),
   }))
 );
 
@@ -60,15 +48,27 @@ const cleanComment = (comment) =>
 
 const pullTags = (comment) => {
   const rtn = {};
-  const annotationMatch = /(@\w+) {([^}]*)}/g;
+  const annotationMatch = /(@\w+) {(((?:\\})|[^}])*)}/g;
   let matches;
-  //Remove Blank Lines
+
   if (comment.startsWith("*")) {
     while ((matches = annotationMatch.exec(comment)) !== null) {
       const tag = matches[1];
-      const value = matches[2].replace(/[\s\*]+/g, " ").trim();
-      const cleanCommentLines = cleanComment(value);
-      rtn[tag] = value;
+
+      let val = matches[2].replace(/^\s*\*/gm, "");
+      val = val.replace(/\\}/g, "}");
+
+      const [leadingWhitespace] = /^\s*/.exec(val);
+      val = val.replace(
+        new RegExp(`^[ \\t]{${leadingWhitespace.length}}`, "gm"),
+        ""
+      );
+      if (val.endsWith("\n")) val = val.slice(0, -1);
+
+      if (tag === "@desc") {
+        console.error(val);
+      }
+      rtn[tag] = val;
     }
   }
   return rtn;
@@ -116,8 +116,7 @@ const parseConfig = (configString) => {
 };
 
 const parseRtn = (rtnString) => {
-  const r = /(\[([\w|\s]*)\])?([\w|\s]+)/g;
-  const matches = r.exec(rtnString);
+  const matches = /(\[(.*)\])?\s*(.+)/g.exec(rtnString);
   const type = matches[2] || "any";
   const description = matches[3];
   return {
@@ -348,8 +347,7 @@ module.exports = () => {
 
   directories.map((directory) => {
     return fileMap[directory].map((file) => {
-      console.log("ENTERING", file);
-      const code = fs.readFileSync(`../${directory}/lib/${file}`, "utf8");
+      const code = fs.readFileSync(`${directory}/${file}`, "utf8");
       const ast = parser.parse(code);
       let scope;
       traverse(ast, {
@@ -361,7 +359,7 @@ module.exports = () => {
             //Find the scope tag
             const tags = pullAllTags(path.node.leadingComments);
 
-            //In the case of just a scope declaration.
+            // In the case of just a scope declaration.
             if (tags["@scope"] && tags["@rule"] === undefined) {
               assert(
                 !scope,
@@ -400,10 +398,10 @@ module.exports = () => {
               rtn[scopeName]["rules"][tags["@rule"]] = processRule(path.node);
             }
 
-            //In the case of a config definition
+            // In the case of a config definition
             else if (tags["@config"] !== undefined) {
               const scopeName = tags["@scope"] || scope || file.split(".")[0];
-              //If there is a scope tag and a config tag we are dealing with a floating config definition
+              // If there is a scope tag and a config tag we are dealing with a floating config definition
               rtn[scopeName]["config"] = parseConfig(tags["@config"]);
             }
           }

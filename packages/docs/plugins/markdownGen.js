@@ -1,5 +1,6 @@
+#!/usr/bin/env node
 /*
- * A plugin which uses the documentation tree to generate a readme
+ * A plugin which uses the documentation tree to generate a rreadme as markdown
  */
 
 const fs = require("fs");
@@ -12,30 +13,37 @@ const {
   bullet,
   bold,
   italics,
-  indentAll,
+  shortcode,
   code,
   quote,
   link,
-} = require("../readmeWriter");
+  line,
+} = require("../markdownPrinter");
 
 const { out } = require("yargs").argv;
 
 const genReadme = (file) => {
-  const readmeLines = [`${h1("Documentation")}`];
+  const readmeLines = [
+    quote(
+      "This was generated using BrowseDoc which is still very much a work in progress"
+    ),
+    line,
+    h1("Table of Contents"),
+    line,
+  ];
 
   //Build Documentation Directory (Inspired by https://nodejs.org/api/fs.html)
-  //
   readmeLines.push(
     bullet(
       Object.keys(docTree).map((scope) => {
-        //TODO: Will break if multiple rules have the same name in different scopes
+        // TODO: Will break if multiple rules have the same name in different scopes
         const rules = Object.keys(docTree[scope].rules).map((rule) =>
           link(`Rule: ${rule}`, `#${rule}`)
         );
 
-        const configVars = Object.keys(docTree[scope].config).map((configVar) =>
-          link(`Config: ${configVar}`, `#${configVar}`)
-        );
+        const configVars = Object.keys(
+          docTree[scope].config || {}
+        ).map((configVar) => link(`Config: ${configVar}`, `#${configVar}`));
 
         const entries = bullet([...configVars, ...rules], 1);
         return `${link(`Scope: ${scope}`, `#${scope}`)}\n${entries}`;
@@ -45,57 +53,47 @@ const genReadme = (file) => {
 
   //Build actual documentation
   Object.keys(docTree).map((scope) => {
-    readmeLines.push(h2(scope));
+    readmeLines.push(line);
+    readmeLines.push(h2(`Scope ${shortcode(scope)}`));
+    readmeLines.push(line);
     readmeLines.push(docTree[scope].description);
+    readmeLines.push(line);
+
     const { rules, config } = docTree[scope];
     if (rules && Object.keys(rules).length) {
       readmeLines.push(h3("Rules"));
       const ruleLines = Object.keys(rules).map((rule) => {
-        const ruleInfo = [];
         const { help, desc, params, rtn, example, notes } = rules[rule];
-        if (desc) {
-          //          ruleInfo.push(`${h4("Description")}\n${desc}`);
-          ruleInfo.push(desc);
-        } else if (help) {
-          //          ruleInfo.push(`${h4("Description")}\n${help}`);
-          ruleInfo.push(help);
-        } else {
-          console.error(`Warning. Undocumented Rule ${rule}`);
-        }
+
+        const out = {
+          header: rule,
+          desc: desc || help || "",
+          params: "",
+          return: rtn
+            ? bullet([`Returns: \\<${rtn.type}\\> ${rtn.description}`], 1)
+            : "",
+          example: example ? code(example, 1) : "",
+          notes: notes ? quote(notes, 1) : "",
+        };
 
         if (params) {
-          const paramList = bullet(
+          Object.keys(params).forEach((param) => (out.header += " " + param));
+          out.params = bullet(
             Object.keys(params).map(
               (param) =>
-                `${bold(param)} ( ${italics(params[param].type)} ) ${
+                `${shortcode(param)} \\<${params[param].type}\\> ${
                   params[param].description
                 }`
             ),
-            2
-          );
-          ruleInfo.push(`${h4("Parameters:")}\n${paramList}`);
-        }
-
-        if (rtn) {
-          ruleInfo.push(
-            `${h4("Returns")}\n${bullet(
-              [`( ${italics(rtn.type)} ) ${rtn.description}`],
-              3
-            )}`
+            1
           );
         }
 
-        if (example) {
-          ruleInfo.push(`${h4("example")}\n${code(example)}`);
-        }
-
-        if (notes) {
-          ruleInfo.push(`${h4("Additional Notes")}\n${quote(notes)}`);
-        }
-
-        return [h3(`${rule}:`), bullet(ruleInfo, 1)].join("\n");
+        return `${h3(shortcode(out.header))}\n${out.params}\n${out.return}\n\n${
+          out.desc
+        }\n${out.notes}\n${out.example}\n\n`;
       });
-      readmeLines.push(bullet(ruleLines));
+      readmeLines.push(...ruleLines);
     }
     if (config && Object.keys(config).length) {
       readmeLines.push(h3("Config"));
@@ -108,8 +106,11 @@ const genReadme = (file) => {
     }
   });
 
-  if (file) fs.writeFileSync(file, readmeLines.join("\n"));
-  console.log(readmeLines.join("\n"));
+  if (typeof file === "string") {
+    fs.writeFileSync(file, readmeLines.join("\n"));
+  } else {
+    console.log(readmeLines.join("\n"));
+  }
   return readmeLines.join("\n");
 };
 

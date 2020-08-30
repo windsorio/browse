@@ -22,12 +22,13 @@ Browse {
 
   lineTerminator (a line break) = "\n" | "\r" | "\u2028" | "\u2029"
   lineTerminatorSequence = "\n" | "\r" ~"\n" | "\u2028" | "\u2029" | "\r\n"
+  lineContinuation = "\\" lineTerminatorSequence
   
-  decimalDigit = "0".."9"
-  nonZeroDigit = "1".."9"
-  octalDigit = "0".."7"
-  zeroToThree = "0".."3"
-  fourToSeven = "4".."7"
+  decimalDigit (a digit) = "0".."9"
+  nonZeroDigit (a non-zero digit) = "1".."9"
+  octalDigit (an octal digit - between 0 to 7) = "0".."7"
+  zeroToThree (a digit between 0 to 3) = "0".."3"
+  fourToSeven (a digit between 4 to 7) = "4".."7"
   
   unicodeCategoryNl
     = "\u2160".."\u2182" | "\u3007" | "\u3021".."\u3029"
@@ -39,13 +40,15 @@ Browse {
 
   unicodeConnectorPunctuation = "\u005F" | "\u203F".."\u2040" | "\u30FB" | "\uFE33".."\uFE34" | "\uFE4D".."\uFE4F" | "\uFF3F" | "\uFF65"
   unicodeSpaceSeparator = "\u2000".."\u200B" | "\u3000"
+
+  letter += unicodeCategoryNl
   
   /*******************\
    ** Lexical Rules **
   \*******************/
   
   
-  comment = "#" (~lineTerminator sourceCharacter)*
+  comment (a comment) = "#" (~lineTerminator sourceCharacter)*
   
   identifier (an identifier) = "$" wordName
   word (a word) = ~reservedWord wordName
@@ -57,52 +60,21 @@ Browse {
             | unicodeCombiningMark | unicodeDigit
             | unicodeConnectorPunctuation
             | "\u200C" | "\u200D"
-  letter += unicodeCategoryNl
   
-  reservedWord = 
-              // | keyword
-              // | futureReservedWord
-              | booleanLiteral
-              | nilLiteral
+  reservedWord = booleanLiteral | nilLiteral
   
-  // Note: keywords that are the complete prefix of another keyword should
-  // be prioritized (e.g. 'in' should come before 'instanceof')
-  keyword = break    | do        | instanceof | typeof
-          | case     | new        | var
-          | catch    | finally   | void
-          | continue | switch     | while
-          | debugger | function  | this       | with
-          | default  | throw
-          | delete   | in        | try
-
-  futureReservedWordLax = class  | enum  | extends
-                        | super  | const | export
-                        | import
-
-  futureReservedWordStrict = futureReservedWordLax
-                           | implements | let     | private   | public
-                           | interface  | package | protected | static
-                           | yield
-
-  futureReservedWord = futureReservedWordStrict
-  
-  operator = "==" | "!=" |  "<=" | ">=" | "<" | ">" |"+" | "-" | "*" | "/"
-
-  /*
-    Note: Punctuator and DivPunctuator (see https://es5.github.io/x7.html#x7.7) are
-    not currently used by this grammar.
-  */
+  operator (an operator) = "==" | "!=" |  "<=" | ">=" | "<" | ">" |"+" | "-" | "*" | "/"
 
   literal = nilLiteral | booleanLiteral | numericLiteral | stringLiteral
 
-  nilLiteral = "nil" ~wordPart
-  booleanLiteral = ("true" | "false") ~wordPart
+  nilLiteral (nil) = "nil" ~wordPart
+  booleanLiteral (a boolean) = ("true" | "false") ~wordPart
   
 
-  // Note that the ordering of hexIntegerLiteral and decimalLiteral is reversed w.r.t. the spec
+  // hexIntegerLiteral must come before decimalLiteral
   // This is intentional: the order decimalLiteral | hexIntegerLiteral will parse
   // "0x..." as a decimal literal "0" followed by "x..."
-  numericLiteral = hexIntegerLiteral | decimalLiteral
+  numericLiteral (a number) = hexIntegerLiteral | decimalLiteral
 
   decimalLiteral = decimalIntegerLiteral "." decimalDigit* exponentPart -- bothParts
                  |                       "." decimalDigit+ exponentPart -- decimalsOnly
@@ -113,7 +85,7 @@ Browse {
 
   exponentPart = exponentIndicator signedInteger -- present
                |                                 -- absent
-  exponentIndicator = "e" | "E"
+  exponentIndicator (e) = "e" | "E"
   signedInteger (an integer)
                 = "+" decimalDigit* -- positive
                 | "-" decimalDigit* -- negative
@@ -125,8 +97,8 @@ Browse {
   // hexDigit defined in Ohm's built-in rules (otherwise: hexDigit = "0".."9" | "a".."f" | "A".."F")
 
 
-  // For semantics on how string literals are constructed, see section 7.8.4
-  stringLiteral = "\"" doubleStringCharacter* "\""						            -- doubleQuote
+  stringLiteral (a string) 
+                = "\"" doubleStringCharacter* "\""						            -- doubleQuote
                 | "'" singleStringCharacter* "'"							            -- singleQuote
                 | "`" cssSelectorCharacter* "`"								            -- cssSelector
                 // This needs 1 or more characters in between. Otherwise it becomes the or operator (||)
@@ -152,7 +124,6 @@ Browse {
                       ) sourceCharacter 	                                -- nonEscaped
                     | "\\" escapeSequence                                 -- escaped
   						
-  lineContinuation = "\\" lineTerminatorSequence
   escapeSequence = unicodeEscapeSequence
                  | hexEscapeSequence
                  | octalEscapeSequence
@@ -168,52 +139,6 @@ Browse {
                       | octalDigit ~decimalDigit             -- octal
   hexEscapeSequence = "x" hexDigit hexDigit
   unicodeEscapeSequence = "u" hexDigit hexDigit hexDigit hexDigit
-  
-  // does not accept lineTerminators, not even implicit ones in a multiLineComment (cf. section 7.4)
-  spacesNoNL = (whitespace | comment)*
-  
-  // Convenience rules for parsing keyword tokens.
-  break = "break" ~wordPart
-  do = "do" ~wordPart
-  instanceof = "instanceof" ~wordPart
-  typeof = "typeof" ~wordPart
-  case = "case" ~wordPart
-  new = "new" ~wordPart
-  var = "var" ~wordPart
-  catch = "catch" ~wordPart
-  finally = "finally" ~wordPart
-  void = "void" ~wordPart
-  continue = "continue" ~wordPart
-  for = "for" ~wordPart
-  switch = "switch" ~wordPart
-  while = "while" ~wordPart
-  debugger = "debugger" ~wordPart
-  function = "function" ~wordPart
-  this = "this" ~wordPart
-  with = "with" ~wordPart
-  default = "default" ~wordPart
-  throw = "throw" ~wordPart
-  delete = "delete" ~wordPart
-  in = "in" ~wordPart
-  try = "try" ~wordPart
-  get = "get" ~wordPart
-  set = "set" ~wordPart
-  class = "class" ~wordPart
-  enum = "enum" ~wordPart
-  extends = "extends" ~wordPart
-  super = "super" ~wordPart
-  const = "const" ~wordPart
-  export = "export" ~wordPart
-  import = "import" ~wordPart
-  implements = "implements" ~wordPart
-  let = "let" ~wordPart
-  private = "private" ~wordPart
-  public = "public" ~wordPart
-  interface = "interface" ~wordPart
-  package = "package" ~wordPart
-  protected = "protected" ~wordPart
-  static = "static" ~wordPart
-  yield = "yield" ~wordPart
 
   noop = (space | lineTerminator)*
 
@@ -293,7 +218,7 @@ Browse {
     
 
   Rule
-    = InitRule (Expr)*
+    = InitRule (Expr | lineContinuation)*
   
   Rules = noop Rule (sep Rule)* sep?
 

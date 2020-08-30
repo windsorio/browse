@@ -15,6 +15,8 @@ const programs = [
     }
     crawl \`a\`
   }`,
+  `print hello \\
+1`,
 ];
 
 programs.forEach((expr) => {

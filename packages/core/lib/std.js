@@ -10,83 +10,8 @@ const { BrowseError } = require("./error");
 // Rules that are not allowed to be overriden:
 const IMMUTABLE_RULES = ["rule", "import", "id", "return", "eval"]; // if and for?
 
-const defRule = (evalRuleSet) => (scope) => (_opts) => (name, body) => {
-  scope.rules[name] = (_ruleEvalScope) => (ruleOpts) => (...args) =>
-    // TODO: if body has `expects`, inject those from _ruleEvalScope
-    evalRuleSet(body, {
-      rules: {
-        // TODO: bind should only be accessible at the top level
-        /**
-         * @rule { bind }
-         * @scope { std }
-         * @desc {
-         *    **Only used within a {@link rule} body**
-         *    'bind' lets the rule accept arguments. Strings passed to bind are used to
-         *    assign variables that track the incoming values
-         * }
-         * @params {
-         *    [...names: string] variables to assign for each incoming positional argument
-         * }
-         * @opts {[...names: true] every key used as an option is bound to
-         *    the value of an option passed in with the same name. The value for
-         *    each option passed to bin MUST be `true` as it gets ignore
-         * }
-         * @return { nil }
-         * @example {
-         *    # take 2 arguments and return the sum
-         *    rule add { bind x y; return $x + $y }
-         *
-         *    # accept options
-         *    rule add2 {
-         *      bind(print) x y
-         *      set z $x + $y
-         *      if $print then { print $z } else { return $z }
-         *    }
-         * }
-         * @notes {
-         *    The {@link return} rule doesn't work like `return` in other languages. `return` is just an
-         *    alias for {@link id} since the last value in a RuleSet is the implicit return value of the
-         *    RuleSet. For example
-         *
-         *    ```
-         *    rule f {
-         *      return foo
-         *      return bar
-         *    }
-         *    ```
-         *
-         *    In browse, this is valid and the return value is "bar". `return foo` is the same as `id foo`
-         *    Which basically does nothing (a.k.a it's a no-op). and the last rule in the body evaluates to
-         *    "bar"
-         * }
-         */
-        bind: (boundScope) => (bindOpts) => (...names) => {
-          Object.keys(bindOpts).forEach((opt) => {
-            if (bindOpts[opt] !== true) {
-              throw new BrowseError({
-                message: `Options passed to bind can only have the value "true". Option '${opt}' has a different value`,
-              });
-            }
-            boundScope.vars[opt] = isNullish(ruleOpts[opt])
-              ? null
-              : ruleOpts[opt];
-          });
-          names.forEach(
-            (name, i) =>
-              (boundScope.vars[name] = isNullish(args[i]) ? null : args[i])
-          );
-          return null;
-        },
-        // Same thing as id, but makes for better readability in rules
-        return: (_) => (_) => (v) => (v === undefined ? null : v),
-      },
-    });
-
-  return scope.rules[name];
-};
-
 /**
- * @scope { The root scope that contains all the basic/standard rules and variables }
+ * @scope { This scope is available to every program and consists of all the core rules to write useful browse programs }
  */
 module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
   parent: null, // This is the root
@@ -206,7 +131,7 @@ module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
      *    'set' always creates/updates the variable in the immediate/local scope.
      *    If a variable with the same name exists in a higher scope, it will be
      *    'shadowed', not updated. To update a variable instead of creating a
-     *    new one, use the {@link update} rule.
+     *    new one, use the {@link update\} rule.
      * }
      */
     set: (scope) => (_) => (name, value) => {
@@ -222,7 +147,7 @@ module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
      * }
      * @return { [T] The value }
      * @throws { If the index is not valid or out of bounds, an error is thrown }
-     * @notes { To increase the size of the array, see {@link push} or use the `array` library }
+     * @notes { To increase the size of the array, see {@link push\} or use the `array` library }
      */
     arr_set: (_) => (_) => (id, value, array) => {
       if (id < 0 || id >= array.length) {
@@ -283,7 +208,7 @@ module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
      * @notes {
      *    'update' updates the value for the variable `key` in the closest ancestor scope.
      *    If a variable with the name `key` already exists in the current scope, then
-     *    `update` throws an error. You should use {@link set} instead for such cases.
+     *    `update` throws an error. You should use {@link set\} instead for such cases.
      * }
      * @throws { If the variable is defined in the local scope, an error is thrown telling you to use `set` instead }
      */
@@ -317,7 +242,7 @@ module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
      */
     pop: (_) => (_) => (dest) => dest.pop(),
     /**
-     * @desc { Define a new rule 'name'. The 'body' has access to two additional rules, {@link bind} and {@link return} used to take arguments and return a value }
+     * @desc { Define a new rule 'name'. The 'body' has access to two additional rules, {@link bind\} and {@link return\} used to take arguments and return a value }
      * @params {
      *   [name: string] An identifer to name the rule
      *   [body: RuleSet] The behavior that should be executed when rule is called with arguments
@@ -362,16 +287,17 @@ module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
      *    # it easy to compose `print` when debuggin complicated expressions
      *    rule fact {
      *         bind x
-     *         if $x <= 1 then { return $x } else {
+     *         if $x <= 1 then { return $x \} else {
      *            return (print $x + '! =' $x * (fact $x - 1))
-     *         }
-     *    }
+     *         \}
+     *    \}
      *    fact 4
      *
      *    # output =
      *    # 2! = 2
      *    # 3! = 6
      *    # 4! = 24
+     * }
      */
     print: (_) => (_) => (...args) => {
       console.log(args.map(stringify).join(" "));
@@ -441,7 +367,7 @@ module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
      *     but before the `test` rules (previous point) are evaluated again. Usually use to
      *     increment the iteration variable defined in point 1
      * }
-     * @example { for { set i 2; test $i < 5; set i $i + 1 } { print loop $i } }
+     * @example { for { set i 2; test $i < 5; set i $i + 1 \} { print loop $i \} }
      */
     for: (_) => (_) => async (iterator, body) => {
       if (!iterator || iterator.type !== "RuleSet") {
@@ -572,14 +498,14 @@ module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
      *    `e` and `_` are aliases for `el`
      * }
      * @example {
-     *    set a1 (arr { _ 1; _ 2; _ 3 })
+     *    set a1 (arr { _ 1; _ 2; _ 3 \})
      *
      *    # nested arrays
      *    set a2 (arr {
      *      _ (arr {
      *        _ 1
-     *      })
-     *    })
+     *      \})
+     *    \})
      * }
      */
     arr: (_) => (_) => async (ruleset) => {
@@ -613,14 +539,14 @@ module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
      *    `r` and `_` are aliases for `record`
      * }
      * @example {
-     *    set o1 (dict { _ k1 v1; _ k2 v2 })
+     *    set o1 (dict { _ k1 v1; _ k2 v2 \})
      *
      *    # nested dictionaries
      *    set o2 (dict {
      *      _ k1 (dict {
      *        _ k2 v2
-     *      })
-     *    })
+     *      \})
+     *    \})
      * }
      */
     dict: (_) => (_) => async (ruleset) => {
@@ -677,3 +603,80 @@ module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
     len: (_) => (_) => (v) => v.length,
   },
 });
+
+// Intentionally defined at the end for BrowseDoc
+
+const defRule = (evalRuleSet) => (scope) => (_opts) => (name, body) => {
+  scope.rules[name] = (_ruleEvalScope) => (ruleOpts) => (...args) =>
+    // TODO: if body has `expects`, inject those from _ruleEvalScope
+    evalRuleSet(body, {
+      rules: {
+        // TODO: bind should only be accessible at the top level
+        /**
+         * @rule { bind }
+         * @scope { rule }
+         * @desc {
+         *    **Only used within a {@link rule\} body**
+         *    'bind' lets the rule accept arguments. Strings passed to bind are used to
+         *    assign variables that track the incoming values
+         * }
+         * @params {
+         *    [...names: string] variables to assign for each incoming positional argument
+         * }
+         * @opts {[...names: true] every key used as an option is bound to
+         *    the value of an option passed in with the same name. The value for
+         *    each option passed to bin MUST be `true` as it gets ignore
+         * }
+         * @return { nil }
+         * @example {
+         *    # take 2 arguments and return the sum
+         *    rule add { bind x y; return $x + $y \}
+         *
+         *    # accept options
+         *    rule add2 {
+         *      bind(print) x y
+         *      set z $x + $y
+         *      if $print then { print $z \} else { return $z \}
+         *    \}
+         * }
+         * @notes {
+         *    The {@link return\} rule doesn't work like `return` in other languages. `return` is just an
+         *    alias for {@link id\} since the last value in a RuleSet is the implicit return value of the
+         *    RuleSet. For example
+         *
+         *    ```
+         *    rule f {
+         *      return foo
+         *      return bar
+         *    \}
+         *    ```
+         *
+         *    In browse, this is valid and the return value is "bar". `return foo` is the same as `id foo`
+         *    Which basically does nothing (a.k.a it's a no-op). and the last rule in the body evaluates to
+         *    "bar"
+         * }
+         */
+        bind: (boundScope) => (bindOpts) => (...names) => {
+          Object.keys(bindOpts).forEach((opt) => {
+            if (bindOpts[opt] !== true) {
+              throw new BrowseError({
+                message: `Options passed to bind can only have the value "true". Option '${opt}' has a different value`,
+              });
+            }
+            boundScope.vars[opt] = isNullish(ruleOpts[opt])
+              ? null
+              : ruleOpts[opt];
+          });
+          names.forEach(
+            (name, i) =>
+              (boundScope.vars[name] = isNullish(args[i]) ? null : args[i])
+          );
+          return null;
+        },
+        // Same thing as id, but makes for better readability in rules
+        return: (_) => (_) => (v) => (v === undefined ? null : v),
+      },
+    });
+
+  return scope.rules[name];
+};
