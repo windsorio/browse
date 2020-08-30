@@ -25,6 +25,11 @@ const { out } = require("yargs").argv;
 const type = (str) =>
   `\\<${bold(str.trim().replace(/</, "\\<").replace(/>/, "\\>"))}\\>`;
 
+const subLinks = (str, map) =>
+  str.replace(/{@link\s*(\w+)}/g, (_, rule) =>
+    link(rule.trim(), `#${map[rule.trim()] || rule.trim()}`)
+  );
+
 const genReadme = (file) => {
   const readmeLines = [
     quote(
@@ -34,6 +39,9 @@ const genReadme = (file) => {
     h1("Table of Contents"),
     line,
   ];
+
+  // mapping of a rulename to a link slug
+  const ruleMap = {};
 
   //Build Documentation Directory (Inspired by https://nodejs.org/api/fs.html)
   readmeLines.push(
@@ -51,6 +59,8 @@ const genReadme = (file) => {
               slug += "-" + param.trim();
             });
           }
+
+          ruleMap[rule.trim()] = slug;
           return link(shortcode(text), `#${slug}`);
         });
 
@@ -59,7 +69,10 @@ const genReadme = (file) => {
         ).map((configVar) => link(`Config: ${configVar}`, `#${configVar}`));
 
         const entries = bullet([...configVars, ...rules], 1);
-        return `${link(`Scope: ${scope}`, `#${scope}`)}\n${entries}`;
+        return `${link(
+          `Scope: ${scope.trim()}`,
+          `#scope-${scope.trim()}`
+        )}\n${entries}`;
       })
     )
   );
@@ -67,9 +80,9 @@ const genReadme = (file) => {
   //Build actual documentation
   Object.keys(docTree).map((scope) => {
     readmeLines.push(line);
-    readmeLines.push(h2(`Scope ${shortcode(scope)}`));
+    readmeLines.push(h2(`Scope ${shortcode(scope.trim())}`));
     readmeLines.push(line);
-    readmeLines.push(docTree[scope].description);
+    readmeLines.push(subLinks(docTree[scope].description || "", ruleMap));
     readmeLines.push(line);
 
     const { rules, config } = docTree[scope];
@@ -80,13 +93,21 @@ const genReadme = (file) => {
 
         const out = {
           header: rule.trim(),
-          desc: desc || help || "",
+          desc: subLinks(desc || help || "", ruleMap),
           params: "",
           return: rtn
-            ? bullet([`Returns: ${type(rtn.type)} ${rtn.description}`], 1)
+            ? bullet(
+                [
+                  `Returns: ${type(rtn.type)} ${subLinks(
+                    rtn.description,
+                    ruleMap
+                  )}`,
+                ],
+                1
+              )
             : "",
           example: example ? code(example, 1) : "",
-          notes: notes ? quote(notes, 1) : "",
+          notes: subLinks(notes ? quote(notes, 1) : "", ruleMap),
         };
 
         if (params) {
@@ -96,9 +117,10 @@ const genReadme = (file) => {
           out.params = bullet(
             Object.keys(params).map(
               (param) =>
-                `${shortcode(param)} ${type(params[param].type)} ${
-                  params[param].description
-                }`
+                `${shortcode(param)} ${type(params[param].type)} ${subLinks(
+                  params[param].description || "",
+                  ruleMap
+                )}`
             ),
             1
           );
