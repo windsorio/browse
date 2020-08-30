@@ -169,7 +169,14 @@ const evalRule = async (rule, scope) => {
       return await promise.then((v) => (v === undefined ? null : v));
     }
   } catch (err) {
-    throw BrowseError.from(err, fn.name);
+    // If the rule cannot be interpreted, default to printing any variable with
+    // that name (the assumption being it might be a user trying to debug)
+    try {
+      console.log(resolveVar(fn.name, scope));
+      return null;
+    } catch (e) {
+      throw BrowseError.from(err, fn.name);
+    }
   }
 };
 
@@ -255,7 +262,7 @@ const loadModule = async (req, { library }) => {
   try {
     await fs.promises.access(document);
   } catch (e) {
-    throw new Error(`Cannot find module '${document}'`);
+    throw new Error(`Cannot AAAA find module '${document}'`);
   }
 
   if (moduleCache.has(document)) {

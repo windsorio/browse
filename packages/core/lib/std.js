@@ -263,7 +263,7 @@ module.exports = ({
     /**
      * @desc { If 'condition' is truthy, evaluate the 'then' RuleSet, else evaluate the 'else' rule set }
      * @params {
-     *   [condition: Array<any>] The condition to be eevaluated
+     *   [condition: Array<any>] The condition to be evaluated
      *   [then: "then"] The string constant then
      *   [thenRuleSet: RuleSet] The ruleset that will be executed if condition evaluates to true
      *   [else: "else"] The string constant else
