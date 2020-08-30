@@ -16,7 +16,7 @@ const {
   quote,
   link,
   line,
-} = require("../markdownPrinter");
+} = require("../utils/markdownPrinter");
 
 const type = (str) =>
   `\\<${bold(str.trim().replace(/</, "\\<").replace(/>/, "\\>"))}\\>`;

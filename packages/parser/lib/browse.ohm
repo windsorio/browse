@@ -100,9 +100,7 @@ Browse {
   stringLiteral (a string) 
                 = "\"" doubleStringCharacter* "\""						            -- doubleQuote
                 | "'" singleStringCharacter* "'"							            -- singleQuote
-                | "`" cssSelectorCharacter* "`"								            -- cssSelector
-                // This needs 1 or more characters in between. Otherwise it becomes the or operator (||)
-                | "|" javascriptCharacter+ "|"								            -- javascript
+                | "`" multilineCharacter* "`"								              -- multiline
                 | implicitStringStart implicitStringPart*		              -- implicit
   doubleStringCharacter = ~("\"" | "\\" | lineTerminator) sourceCharacter -- nonEscaped
                         | "\\" escapeSequence                             -- escaped
@@ -110,7 +108,7 @@ Browse {
   singleStringCharacter = ~("'" | "\\" | lineTerminator) sourceCharacter  -- nonEscaped
                         | "\\" escapeSequence                             -- escaped
                         | lineContinuation                                -- lineContinuation
-  cssSelectorCharacter = ~("`" | "\\" | lineTerminator) sourceCharacter   -- nonEscaped
+  multilineCharacter = ~("`" | "\\" | lineTerminator) sourceCharacter   -- nonEscaped
                         | "\\" escapeSequence                             -- escaped
                         | lineContinuation                                -- lineContinuation
   javascriptCharacter = ~("|" | "\\") sourceCharacter 					          -- nonEscaped

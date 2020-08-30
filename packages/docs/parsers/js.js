@@ -328,7 +328,8 @@ module.exports = (code, fileName) => {
           scope = scopeName;
           rtn[scopeName] = {};
           rtn[scopeName].description = tags["@scope"];
-          //Whenever the @scope tag is defined, we look for the closest object expression child for further parsing.
+          // Whenever the @scope tag is defined, we look for the closest object
+          // expression child for further parsing.
           path.traverse(ObjectExpressionVisitor, {
             rtn,
             scopeName,

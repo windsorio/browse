@@ -59,7 +59,7 @@ module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
      * }
      * @return { [T] The value passed in, unchanged }
      */
-    id: (_) => (_) => (v) => (v === undefined ? null : v),
+    id: (_) => (_) => (v = null) => v,
     /**
      * @desc { Resolves to the value of the variable `key` }
      * @params {
@@ -134,7 +134,7 @@ module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
      *    new one, use the {@link update\} rule.
      * }
      */
-    set: (scope) => (_) => (name, value) => {
+    set: (scope) => (_) => (name, value = null) => {
       scope.vars[name] = value;
       return value;
     },
@@ -149,7 +149,7 @@ module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
      * @throws { If the index is not valid or out of bounds, an error is thrown }
      * @notes { To increase the size of the array, see {@link push\} or use the `array` library }
      */
-    arr_set: (_) => (_) => (id, value, array) => {
+    arr_set: (_) => (_) => (id, value = null, array) => {
       if (id < 0 || id >= array.length) {
         throw new Error(
           `Cannot set index ${id} in array of size ${array.length}`
@@ -167,7 +167,7 @@ module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
      * }
      * @return { [V] The value }
      */
-    dict_set: (_) => (_) => (name, value, dict) => {
+    dict_set: (_) => (_) => (name, value = null, dict) => {
       dict.set(name, value);
       return value;
     },
@@ -212,7 +212,7 @@ module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
      * }
      * @throws { If the variable is defined in the local scope, an error is thrown telling you to use `set` instead }
      */
-    update: (scope) => (_) => (name, value) => {
+    update: (scope) => (_) => (name, value = null) => {
       if (scope.vars[name] !== undefined) {
         throw new Error(
           `Variable '${stringify(
@@ -232,7 +232,7 @@ module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
      * }
      * @return { [number] The number of elements in the array after pushing to it }
      */
-    push: (_) => (_) => (value, dest) => dest.push(value),
+    push: (_) => (_) => (value = null, dest) => dest.push(value),
     /**
      * @desc { Remove the element at the back of the array and return it }
      * @params {

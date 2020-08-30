@@ -5,6 +5,7 @@ const path = require("path");
 const mkdirp = require("mkdirp");
 
 const jsParser = require("./parsers/js");
+const browseParser = require("./parsers/browse");
 const markdownPlugin = require("./plugins/markdownGen");
 
 const outDir = process.argv[2];
@@ -44,7 +45,13 @@ const main = async () => {
               ];
             } else if (ext === ".browse") {
               const stem = path.basename(file, ".browse");
-              // TODO: implement
+              return [
+                stem,
+                browseParser(
+                  await fs.promises.readFile(`${directory}/${file}`, "utf8"),
+                  stem
+                ),
+              ];
             }
           })
         )
