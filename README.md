@@ -21,7 +21,7 @@ browse
 Or execute a browse script
 
 ```bash
-browse examples/fibonacci.browse
+browse examples/basic/fibonacci.browse
 ```
 
 Check the [Wiki](https://github.com/windsorio/browse/wiki) for more documentation. This is temporary, and a proper, comprehensive, documentation site for browse will be available soon
