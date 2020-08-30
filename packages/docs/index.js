@@ -64,10 +64,6 @@ const pullTags = (comment) => {
         ""
       );
       if (val.endsWith("\n")) val = val.slice(0, -1);
-
-      if (tag === "@desc") {
-        console.error(val);
-      }
       rtn[tag] = val;
     }
   }
@@ -82,12 +78,12 @@ const pullAllTags = (comments) =>
 
 const parseParams = (paramString) => {
   const rtn = {};
-  const paramMatch = /\[(([\w|\s]*)\s*(:\s*([\w|<|>]+))?)\]([^\[]*)/g;
+  const paramMatch = /\[(?:(\w*)(?::\s(.+))?)\]\s*([^\[]*)/g;
   let matches;
   while ((matches = paramMatch.exec(paramString)) !== null) {
-    const name = matches[2];
-    const type = matches[4];
-    const description = matches[5];
+    const name = matches[1];
+    const type = matches[2];
+    const description = matches[3];
     rtn[name] = {
       type,
       description,

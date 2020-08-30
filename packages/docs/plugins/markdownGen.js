@@ -22,6 +22,9 @@ const {
 
 const { out } = require("yargs").argv;
 
+const type = (str) =>
+  `\\<${bold(str.trim().replace(/</, "\\<").replace(/>/, "\\>"))}\\>`;
+
 const genReadme = (file) => {
   const readmeLines = [
     quote(
@@ -70,7 +73,7 @@ const genReadme = (file) => {
           desc: desc || help || "",
           params: "",
           return: rtn
-            ? bullet([`Returns: \\<${rtn.type}\\> ${rtn.description}`], 1)
+            ? bullet([`Returns: ${type(rtn.type)} ${rtn.description}`], 1)
             : "",
           example: example ? code(example, 1) : "",
           notes: notes ? quote(notes, 1) : "",
@@ -81,7 +84,7 @@ const genReadme = (file) => {
           out.params = bullet(
             Object.keys(params).map(
               (param) =>
-                `${shortcode(param)} \\<${params[param].type}\\> ${
+                `${shortcode(param)} ${type(params[param].type)} ${
                   params[param].description
                 }`
             ),

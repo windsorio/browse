@@ -317,6 +317,9 @@ module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
      *    If `else` and `elseRuleSet` are not provided, then nothing is evaluated if the `condition`
      *    is falsy. The entire `if` rule will evaluate to `nil` in this case
      * }
+     * @example {
+     *    if ($grade > 60) then { print pass } else { print fail }
+     * }
      * @throws { errors thrown when evaluating the thenRuleSet or elseRuleSet }
      */
     if: (_) => (_) => (cond, then, thenRS, el, elseRS) => {

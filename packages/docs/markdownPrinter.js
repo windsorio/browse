@@ -30,7 +30,8 @@ const italics = (str) => `*${str}*`;
 
 const strikethrough = (str) => `~~${str}~~`;
 
-const quote = (str, depth = 0) => `${indent(depth)}> ${str}`;
+const quote = (str, depth = 0) =>
+  `${indent(depth)}>` + str.split("\n").join(`\n${indent(depth)}>`);
 
 const line = "";
 
