@@ -3,7 +3,7 @@ import math as m
 set width 40
 set height 10
 set maxIterations 4000
-set prob_init_alive 0.2
+set prob_init_alive 0.35
 set board (arr {})
 
 # Print the board
@@ -53,7 +53,8 @@ rule nextGen {
   for { set px 0; test $px < $width; set px $px + 1 } {
     for { set py 0; test $py < $height; set py $py + 1 } {
       # Compute the number of cells around the cell
-      set alive_cells 0
+      # Alive cells are -1 to escape the current cell
+      set alive_cells (-1)
       set state (get $px (get $py $board))
 
       for { set conv_x (-1); test $conv_x < 2; set conv_x $conv_x + 1 } { 
