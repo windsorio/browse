@@ -40,9 +40,19 @@ const genReadme = (file) => {
     bullet(
       Object.keys(docTree).map((scope) => {
         // TODO: Will break if multiple rules have the same name in different scopes
-        const rules = Object.keys(docTree[scope].rules).map((rule) =>
-          link(`Rule: ${rule}`, `#${rule}`)
-        );
+        const rules = Object.keys(docTree[scope].rules).map((rule) => {
+          let text = rule;
+          let slug = rule;
+
+          const { params } = docTree[scope].rules[rule];
+          if (params) {
+            Object.keys(params).forEach((param) => {
+              text += " " + param;
+              slug += "-" + param;
+            });
+          }
+          return link(shortcode(text), `#${slug}`);
+        });
 
         const configVars = Object.keys(
           docTree[scope].config || {}
