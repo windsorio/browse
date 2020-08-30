@@ -4,7 +4,7 @@ const fs = require("fs");
 const assert = require("assert");
 const directories = [
   "../core/lib",
-  "../web/lib",
+  // "../web/lib",
   // "../core/stdlib/datetime",
   // "../core/stdlib/math",
 ];

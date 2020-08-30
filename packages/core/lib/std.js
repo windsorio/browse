@@ -642,22 +642,6 @@ const defRule = (evalRuleSet) => (scope) => (_opts) => (name, body) => {
          *      if $print then { print $z \} else { return $z \}
          *    \}
          * }
-         * @notes {
-         *    The {@link return\} rule doesn't work like `return` in other languages. `return` is just an
-         *    alias for {@link id\} since the last value in a RuleSet is the implicit return value of the
-         *    RuleSet. For example
-         *
-         *    ```
-         *    rule f {
-         *      return foo
-         *      return bar
-         *    \}
-         *    ```
-         *
-         *    In browse, this is valid and the return value is "bar". `return foo` is the same as `id foo`
-         *    Which basically does nothing (a.k.a it's a no-op). and the last rule in the body evaluates to
-         *    "bar"
-         * }
          */
         bind: (boundScope) => (bindOpts) => (...names) => {
           Object.keys(bindOpts).forEach((opt) => {
@@ -676,7 +660,36 @@ const defRule = (evalRuleSet) => (scope) => (_opts) => (name, body) => {
           );
           return null;
         },
-        // Same thing as id, but makes for better readability in rules
+        /**
+         * @rule { return }
+         * @scope { rule }
+         * @desc {
+         *    **Only used within a {@link rule\} body**
+         *    'return' is often used to make the return value for a rule explicit. It's often
+         *    unnecessary however since every rule uses the last evaluated value in its body
+         *    as the return value anyway.
+         * }
+         * @params {
+         *    [value: T] The value to return
+         * }
+         * @return { [T] The value passed in, unchanged }
+         * @notes {
+         *    The return rule doesn't work like `return` in other languages. `return` is just an
+         *    alias for {@link id\} since the last value in a RuleSet is the implicit return value of the
+         *    RuleSet. For example
+         *
+         *    ```
+         *    rule f {
+         *      return foo
+         *      return bar
+         *    \}
+         *    ```
+         *
+         *    In browse, this is valid and the return value is "bar". `return foo` is the same as `id foo`
+         *    Which basically does nothing (a.k.a it's a no-op). and the last rule in the body evaluates to
+         *    "bar"
+         * }
+         */
         return: (_) => (_) => (v) => (v === undefined ? null : v),
       },
     });
