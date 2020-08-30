@@ -262,7 +262,7 @@ const loadModule = async (req, { library }) => {
   try {
     await fs.promises.access(document);
   } catch (e) {
-    throw new Error(`Cannot AAAA find module '${document}'`);
+    throw new Error(`Cannot find module '${document}'`);
   }
 
   if (moduleCache.has(document)) {
