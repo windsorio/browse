@@ -248,6 +248,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         "npm:3.0.3"
       ],
       [
+        "@types/mkdirp",
+        "npm:1.0.1"
+      ],
+      [
         "@types/node",
         "npm:14.0.27"
       ],
@@ -1293,7 +1297,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       ],
       [
         "mkdirp",
-        "npm:0.5.5"
+        "npm:1.0.4"
       ],
       [
         "mkdirp-classic",
@@ -2569,6 +2573,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/@types-minimatch-npm-3.0.3-c8b0625f84-672ccdac19.zip/node_modules/@types/minimatch/",
           "packageDependencies": [
             ["@types/minimatch", "npm:3.0.3"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["@types/mkdirp", [
+        ["npm:1.0.1", {
+          "packageLocation": "./.yarn/cache/@types-mkdirp-npm-1.0.1-0568c0101a-075e821a8f.zip/node_modules/@types/mkdirp/",
+          "packageDependencies": [
+            ["@types/mkdirp", "npm:1.0.1"],
+            ["@types/node", "npm:14.0.27"]
           ],
           "linkType": "HARD",
         }]
@@ -3969,7 +3983,9 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@babel/parser", "npm:7.11.3"],
             ["@babel/traverse", "npm:7.11.0"],
             ["@types/babel__traverse", "npm:7.0.13"],
+            ["@types/mkdirp", "npm:1.0.1"],
             ["@types/yargs", "npm:15.0.5"],
+            ["mkdirp", "npm:1.0.4"],
             ["yargs", "npm:15.4.1"]
           ],
           "linkType": "SOFT",

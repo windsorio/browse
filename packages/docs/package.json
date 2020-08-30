@@ -8,15 +8,17 @@
     "url": "git+https://github.com/windsorio/browse.git"
   },
   "bin": {
-    "browsedoc": "plugins/markdownGen.js"
+    "browsedoc": "./index.js"
   },
   "dependencies": {
     "@babel/parser": "7.11.3",
     "@babel/traverse": "7.11.0",
+    "mkdirp": "1.0.4",
     "yargs": "15.4.1"
   },
   "devDependencies": {
     "@types/babel__traverse": "7.0.13",
+    "@types/mkdirp": "1.0.1",
     "@types/yargs": "15.0.5"
   }
 }

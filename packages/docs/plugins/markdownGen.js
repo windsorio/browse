@@ -1,10 +1,8 @@
-#!/usr/bin/env node
 /*
  * A plugin which uses the documentation tree to generate a rreadme as markdown
  */
 
 const fs = require("fs");
-const docTree = require("..")();
 const {
   h1,
   h2,
@@ -20,8 +18,6 @@ const {
   line,
 } = require("../markdownPrinter");
 
-const { out } = require("yargs").argv;
-
 const type = (str) =>
   `\\<${bold(str.trim().replace(/</, "\\<").replace(/>/, "\\>"))}\\>`;
 
@@ -30,7 +26,7 @@ const subLinks = (str, map) =>
     link(rule.trim(), `#${map[rule.trim()] || rule.trim()}`)
   );
 
-const genReadme = (file) => {
+module.exports = async (docTree, file) => {
   const readmeLines = [
     quote(
       "This was generated using BrowseDoc which is still very much a work in progress"
@@ -144,11 +140,7 @@ const genReadme = (file) => {
   });
 
   if (typeof file === "string") {
-    fs.writeFileSync(file, readmeLines.join("\n"));
-  } else {
-    console.log(readmeLines.join("\n"));
+    await fs.promises.writeFile(file, readmeLines.join("\n"));
   }
   return readmeLines.join("\n");
 };
-
-genReadme(out);

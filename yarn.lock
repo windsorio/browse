@@ -491,6 +491,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/mkdirp@npm:1.0.1":
+  version: 1.0.1
+  resolution: "@types/mkdirp@npm:1.0.1"
+  dependencies:
+    "@types/node": "*"
+  checksum: 075e821a8fe69349a3b642f798b4632139982f039c8890b83bcd9068bfac3787dd536c9f3bb18bb3f9c68277431514b38e6c57509cdb766c8d7ebff9a1427ecb
+  languageName: node
+  linkType: hard
+
 "@types/node@npm:*":
   version: 14.0.27
   resolution: "@types/node@npm:14.0.27"
@@ -1732,10 +1741,12 @@ __metadata:
     "@babel/parser": 7.11.3
     "@babel/traverse": 7.11.0
     "@types/babel__traverse": 7.0.13
+    "@types/mkdirp": 1.0.1
     "@types/yargs": 15.0.5
+    mkdirp: 1.0.4
     yargs: 15.4.1
   bin:
-    browsedoc: plugins/markdownGen.js
+    browsedoc: ./index.js
   languageName: unknown
   linkType: soft
 
@@ -3222,6 +3233,15 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
+"mkdirp@npm:1.0.4, mkdirp@npm:^1.0.3":
+  version: 1.0.4
+  resolution: "mkdirp@npm:1.0.4"
+  bin:
+    mkdirp: bin/cmd.js
+  checksum: 1aa3a6a2d7514f094a91329ec09994f5d32d2955a4985ecbb3d86f2aaeafc4aa11521f98d606144c1d49cd9835004d9a73342709b8c692c92e59eacf37412468
+  languageName: node
+  linkType: hard
+
 "mkdirp@npm:^0.5.0, mkdirp@npm:^0.5.1":
   version: 0.5.5
   resolution: "mkdirp@npm:0.5.5"
@@ -3230,15 +3250,6 @@ fsevents@~2.1.2:
   bin:
     mkdirp: bin/cmd.js
   checksum: 9dd9792e891927b14ca02226dbe1daeb717b9517a001620d5e2658bbc72c5e4f06887b6cbcbb60595fa5a56e701073cf250f1ed69c1988a6b89faf9fd6a4d049
-  languageName: node
-  linkType: hard
-
-"mkdirp@npm:^1.0.3":
-  version: 1.0.4
-  resolution: "mkdirp@npm:1.0.4"
-  bin:
-    mkdirp: bin/cmd.js
-  checksum: 1aa3a6a2d7514f094a91329ec09994f5d32d2955a4985ecbb3d86f2aaeafc4aa11521f98d606144c1d49cd9835004d9a73342709b8c692c92e59eacf37412468
   languageName: node
   linkType: hard
 
