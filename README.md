@@ -2,12 +2,20 @@
 
 The Browse Language
 
+> **IMPORTANT:** To use any of the scraping/web browser features, add `--web` when starting the browse repl or running a script
+
 # Installation
 
 To install locally, simply run
 
 ```bash
 npm i -g @browselang/cli
+```
+
+If you use VSCode, get the [extension](https://marketplace.visualstudio.com/items?itemName=pranaygp.browse-vscode)
+
+```bash
+code --install-extension pranaygp.browse-vscode
 ```
 
 # Usage
@@ -24,11 +32,15 @@ Or execute a browse script
 browse examples/basic/fibonacci.browse
 ```
 
-Check the [Wiki](https://github.com/windsorio/browse/wiki) for more documentation. This is temporary, and a proper, comprehensive, documentation site for browse will be available soon
+# Documentation
 
-# Docker
+### [It's all on the Wiki](https://github.com/windsorio/browse/wiki)
 
-There's also a docker image available called [pranaygp/browse](https://hub.docker.com/r/pranaygp/browse) that comes with browse and node preinstalled.
+---
+
+## Using browse with Docker
+
+There's a pre-build docker image available called [pranaygp/browse](https://hub.docker.com/r/pranaygp/browse) that comes with browse and node preinstalled.
 
 To hop into a browse repl, simply run
 
