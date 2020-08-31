@@ -169,13 +169,7 @@ const evalRule = async (rule, scope) => {
       return await promise.then((v) => (v === undefined ? null : v));
     }
   } catch (err) {
-    // If the rule cannot be interpreted, default to printing any variable with
-    // that name (the assumption being it might be a user trying to debug)
-    try {
-      return resolveVar(fn.name, scope);
-    } catch (e) {
-      throw BrowseError.from(err, fn.name);
-    }
+    throw BrowseError.from(err, fn.name);
   }
 };
 
