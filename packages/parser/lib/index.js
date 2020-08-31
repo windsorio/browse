@@ -13,6 +13,7 @@ const genUnknownParseError = () =>
   new Error(
     "Browse encountered an error while parsing your script but was unable\nto identify the specific issue. Check the syntax carefully"
   );
+const notUndefined = (v) => v !== undefined;
 
 // Instantiate the grammar.
 const contents = fs.readFileSync(path.join(__dirname, "browse.ohm"));
@@ -118,9 +119,11 @@ semantics.addAttribute('asLisp', {
   identifier:    function(_, _name)   { return this.sourceString; },
   literal:       function(_)          { return this.interpret(); },
 
+  lineContinuation: function (_1, _2) { return; },
+
   // Base Cases
   _iter(children) {
-    return children.map((c) => c.asLisp);
+    return children.map((c) => c.asLisp).filter(notUndefined);
   },
   _nonterminal:  function(children) {
     if (children.length === 1) {
@@ -409,8 +412,12 @@ semantics.addAttribute("asAST", {
     };
   },
 
+  lineContinuation: function (_1, _2) {
+    return;
+  },
+
   _iter(children) {
-    return children.map((c) => c.asAST);
+    return children.map((c) => c.asAST).filter(notUndefined);
   },
   _nonterminal: function (children) {
     if (children.length === 1) {
@@ -469,8 +476,10 @@ semantics.addOperation('interpret()', {
   word:          function(_)            { return this.sourceString; },
   identifier:    function(_, _name)     { return this.sourceString; },
 
+  lineContinuation: function (_1, _2) { return; },
+
   _iter(children) {
-    return children.map((c) => c.interpret());
+    return children.map((c) => c.interpret()).filter(notUndefined);
   },
   _nonterminal:  function(children) {
     if (children.length === 1) {

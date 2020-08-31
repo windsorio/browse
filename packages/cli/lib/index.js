@@ -53,6 +53,13 @@ exports.handler = async (argv) => {
       output: process.stdout,
     });
 
+    // Set headless to false
+    await evalProgram(parser.parse("set headless false"), {
+      scope,
+      document: "repl",
+      basedir: process.cwd(),
+    });
+
     const rep = () => {
       rl.question("> ", async (stmt) => {
         if (stmt === "quit") {

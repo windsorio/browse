@@ -24,7 +24,7 @@
 
 Now lets break down some of the components of this example
 
-## Valid SmartDoc comments
+## Valid BrowseDoc comments
 
 Notice how the first line in the example begins with `/**` rather than the typical `/*` that indicates a block comment. In order for comments to be processed by the docs system they must begin with \*
 
@@ -36,15 +36,15 @@ Another Example
 */
 
 /*
-  * This comment will be ignore by SmartDoc
+  * This comment will be ignore by BrowseDoc
   */
 ```
 
 Below these types of comments are referred to as 'starred' to differentiate them from ordinary comments
 
-## Valid SmartDoc Tags
+## Valid BrowseDoc Tags
 
-Tags are an indication to SmartDoc that the following text is special in some way. For readability, all text associated with a tag is placed inside of curly braces '{}'
+Tags are an indication to BrowseDoc that the following text is special in some way. For readability, all text associated with a tag is placed inside of curly braces '{}'
 
 Examples:
 
