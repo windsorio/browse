@@ -1,8 +1,10 @@
 # Pass `--web` to browse when running this example
 # $ browse --web ./examples/windsor.browse
 
+set headless false
+
 page https://windsor.io {
-  click input
+  click input # TODO: catch and ignore any errors from this
   wait 2000
   click input
   type test@windsor.io

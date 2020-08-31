@@ -28,7 +28,7 @@ page https://www.twitch.tv {
   type '1997'
   click '#email-input'
   type 'faust@windsor.io'
-  sleep 1000 * 10 # 10s
+  sleep 1000 * 3 # 3s
 }
 
 visit https://www.twitch.tv/
