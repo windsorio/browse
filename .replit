@@ -1,2 +1,2 @@
 language = "bash"
-run = "yarn install && yarn browse --web"
+run = "git pull origin master && yarn install && yarn browse --web"
