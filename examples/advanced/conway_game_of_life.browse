@@ -1,0 +1,110 @@
+import math as m
+
+set width 40
+set height 10
+set maxIterations 4000
+set prob_init_alive 0.35
+set board (arr {})
+
+# Print the board
+rule printBoard {
+  bind board width height
+
+  # Cheeky way to clear the screen
+  for { set nl 0; test $nl < 40; set nl $nl + 1 } {
+    print 
+  }
+
+  for { set py 0; test $py < $height; set py $py + 1 } {
+    set line ""
+    for { set px 0; test $px < $width; set px $px + 1 } {
+      set state (get $px (get $py $board))
+      if $state then {
+        update line $line + "@"
+      } else {
+        update line $line + " "
+      }
+    }
+    print $line
+  }
+}
+
+# Setting board
+rule setBoard {
+  bind width height
+  for { set px 0; test $px < $width; set px $px + 1 } {
+    for { set py 0; test $py < $height; set py $py + 1 } {
+      if ($px ==0) then {
+        push (arr {_ false}) $board
+      } else {
+        push false (get $py $board)
+      }
+      # Set initial state of the cell randomly
+      set initial_state (m:random) < $prob_init_alive
+      set $px $initial_state (get $py $board)
+    }
+  }
+  return $board
+}
+
+# Computing the next state of the board
+rule nextGen {
+  bind board width height
+  for { set px 0; test $px < $width; set px $px + 1 } {
+    for { set py 0; test $py < $height; set py $py + 1 } {
+      # Compute the number of cells around the cell
+      # Alive cells are -1 to escape the current cell
+      set alive_cells (-1)
+      set state (get $px (get $py $board))
+
+      for { set conv_x (-1); test $conv_x < 2; set conv_x $conv_x + 1 } { 
+        for { set conv_y (-1); test $conv_y < 2; set conv_y $conv_y + 1 } { 
+          set cell_counted_x ($px + $conv_x)
+          set cell_counted_y ($py + $conv_y)
+          
+          # Warp the field
+          if ($cell_counted_x == -1) then {
+            update cell_counted_x ($width - 1)
+          }
+          if ($cell_counted_y == -1) then {
+            update cell_counted_y ($height - 1)
+          }
+          if ($cell_counted_x == $width) then {
+            update cell_counted_x 0
+          }
+          if ($cell_counted_y == $height) then {
+            update cell_counted_y 0
+          }
+
+          if (get $cell_counted_x (get $cell_counted_y $board)) then {
+            update alive_cells ($alive_cells + 1)
+          }
+        }
+      }
+
+      # Compute next state cell
+      if ($alive_cells < 2) then {
+        update state false
+      }
+      if ($alive_cells == 3) then{
+        update state true
+      }
+      if ($alive_cells > 3) then{
+        update state false
+      }
+      set $px $state (get $py $board)
+    }
+  }
+  return $board
+}
+
+rule gameOfLife {
+  bind width height iterations
+  set board (setBoard $width $height)
+  for { set n_iterations 0; test $n_iterations < $iterations; set n_iterations $n_iterations + 1 } {
+    set board (nextGen $board $width $height)
+    printBoard $board $width $height
+  }
+}
+
+gameOfLife $width $height $maxIterations
