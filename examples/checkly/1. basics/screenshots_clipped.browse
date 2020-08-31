@@ -1,7 +1,7 @@
 page(width=1280 height=800) https://finance.yahoo.com/ {
   screenshot(
     fullPage
-    clip={ x 0; y 240; width 1000; height 100 }
+    clip=(dict { _ x 0; _ y 240; _ width 1000; _ height 100 })
   ) clipped_stocktickers.png
 }
 visit https://finance.yahoo.com/

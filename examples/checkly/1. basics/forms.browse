@@ -2,13 +2,11 @@ page(
   width=1280
   height=800
 ) https://getbootstrap.com/docs/4.3/components/forms/ {
-  # TODO: eval -> eval$  (i.e. page.$eval)
-  set checked (eval '#defaultCheck1' | input => input.checked |)
+  set checked (eval$ '#defaultCheck1' | input => input.checked |)
 
   print Checkbox checked status: ' ' $checked
 
-  # TODO: eval -> eval$$ (i.e. page.$$eval)
-  set radios (eval 'input[name="exampleRadios"]' |
+  set radios (eval$$ 'input[name="exampleRadios"]' |
     inputs => inputs.map(input => input.value)
   |)
   print Radio values: ' ' $radios
@@ -19,8 +17,7 @@ page(
   # scrollTo('#select-menu')
   visit https://getbootstrap.com/docs/4.3/components/forms/#select-menu
 
-  # TODO: eval -> eval$$ (i.e. page.$$eval)
-  set selectOptions (eval '.bd-example > select.custom-select.custom-select-lg.mb-3 > option' |
+  set selectOptions (eval$$ '.bd-example > select.custom-select.custom-select-lg.mb-3 > option' |
     options => options.map(option => option.value)
   |)
   print $selectOptions

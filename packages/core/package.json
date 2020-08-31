@@ -1,6 +1,6 @@
 {
   "name": "@browselang/core",
-  "version": "0.0.18",
+  "version": "0.0.19",
   "description": "Core utilities to be used by any browse runtime",
   "keywords": [
     "browse",
@@ -13,10 +13,12 @@
   "main": "lib/index.js",
   "directories": {
     "lib": "lib",
+    "stdlib": "stdlib",
     "test": "test"
   },
   "files": [
-    "lib"
+    "lib",
+    "stdlib"
   ],
   "publishConfig": {
     "registry": "https://registry.yarnpkg.com"

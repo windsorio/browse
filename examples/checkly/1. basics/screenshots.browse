@@ -1,4 +1,4 @@
-page(widht=1280 height=800) https://www.nytimes.com/ {
+page(width=1280 height=800) https://www.nytimes.com/ {
   screenshot(fullPage) nytimes.png
 }
 visit https://www.nytimes.com/

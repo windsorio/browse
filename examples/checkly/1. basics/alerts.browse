@@ -6,7 +6,7 @@ page https://www.google.com {
     }
   |
 
-  eval | () => alert('This message is inside an alert box') |
+  exec | () => alert('This message is inside an alert box') |
 }
 
 visit https://www.google.com

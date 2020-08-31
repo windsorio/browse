@@ -23,13 +23,13 @@
     chalk "^2.0.0"
     js-tokens "^4.0.0"
 
-"@browselang/format@^0.0.18":
-  version "0.0.18"
-  resolved "https://registry.yarnpkg.com/@browselang/format/-/format-0.0.18.tgz#2b9b83a5984e56362eefb1f86bb85c88170f20a3"
-  integrity sha512-iTb5imRGQDKuZuQNl0COb8TVu8VcJnfLkzWFo/5m9cRzGPGLb64EO2r91/8qTwJQaqlmEaUfcWXkyH7EkWjNvQ==
+"@browselang/format@^0.0.19":
+  version "0.0.19"
+  resolved "https://registry.yarnpkg.com/@browselang/format/-/format-0.0.19.tgz#f08c017097953498f1ca7fb04d988efc9cbd20e0"
+  integrity sha512-8acCeoEWOtsSDqsYyYjebcNNc3i4tO/KTsZp139zhjd5PCbNTDX8/duIekeXkzrKDpuBse5z55NEWZK3WGd0hQ==
   dependencies:
     "@babel/code-frame" "7.10.4"
-    "@browselang/parser" "0.0.18"
+    "@browselang/parser" "0.0.19"
     "@iarna/toml" "2.2.5"
     chalk "4.1.0"
     ci-info "2.0.0"
@@ -48,10 +48,10 @@
     string-width "4.2.0"
     vnopts "1.0.2"
 
-"@browselang/parser@0.0.18":
-  version "0.0.18"
-  resolved "https://registry.yarnpkg.com/@browselang/parser/-/parser-0.0.18.tgz#b12a050213098c5fe47f0371531afc21d6784db5"
-  integrity sha512-QuCm9VoUSIO/MK2NdYd/XyvVWf3wFg+wvF/hWVoqwozMs5GBwg++YWD8lUUB1yZROZpNqdo/7pOmmpAYwkEeEw==
+"@browselang/parser@0.0.19":
+  version "0.0.19"
+  resolved "https://registry.yarnpkg.com/@browselang/parser/-/parser-0.0.19.tgz#9958f8f8ee20330cc39f7f3e69b67c1f4ab33bac"
+  integrity sha512-Ve8SxygwJg+F92ZoHdTWMpr1MX/VPV/5USwuxAp3+LZGonTgwxO6KQRwr+Vc3z0jsJUF9PYF/OHGTJxQoor+JA==
   dependencies:
     ohm-js "15.0.1"
 
