@@ -1,6 +1,6 @@
 {
   "name": "@browselang/core",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Core utilities to be used by any browse runtime",
   "keywords": [
     "browse",
