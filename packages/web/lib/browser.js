@@ -115,7 +115,7 @@ const getBrowserScope = (parent) => {
     // data extraction and can be piped easily
     print: (_) => (_) => (...args) => {
       console.error(args.map(stringify).join(" "));
-      return null;
+      return args.slice(-1)[0];
     },
     /**
      * @rule { Page }
