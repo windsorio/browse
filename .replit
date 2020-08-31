@@ -1,2 +1,2 @@
 language = "bash"
-run = "yarn browse --web"
+run = "yarn install && yarn browse --web"
