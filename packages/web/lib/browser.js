@@ -20,20 +20,11 @@ const { BrowseError } = require("@browselang/core/lib/error");
 
 const getPageScope = require("./page");
 
-const isReplIt = async () => {
-  try {
-    await fs.promises.access("/usr/bin/polygott-surveys");
-    return true;
-  } catch (e) {
-    return false;
-  }
-};
-
 const newBrowser = async (headless) => {
   return puppeteer.launch({
     ...(isDocker()
       ? {
-          headless: !(await isReplIt()), // on repl.it, don't use headless
+          headless,
           args: [
             // Required for Docker version of Puppeteer
             "--no-sandbox",
