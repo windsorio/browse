@@ -2,6 +2,7 @@
 
 const fs = require("fs");
 const path = require("path");
+const pkg = require("../package.json");
 
 const yargs = require("yargs");
 
@@ -59,6 +60,18 @@ exports.handler = async (argv) => {
       document: "repl",
       basedir: process.cwd(),
     });
+
+    console.log(`browse repl v${pkg.version}`);
+    console.log(`Ctrl+C to exit`);
+    if (argv.web) {
+      console.log(`\x1B[2m--web rules are available\x1B[0m`);
+    }
+    console.log(
+      `\x1B[1m@Repl.it hackathon judge:\x1B[0m After trying to repl, Ctrl+C and try running an example script`
+    );
+    console.log(
+      `$ \x1B[33myarn browse --web \x1B[96;4mexamples/web/wikipedia.browse\x1B[0m`
+    );
 
     const rep = () => {
       rl.question("> ", async (stmt) => {
