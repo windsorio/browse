@@ -1,6 +1,6 @@
 {
   "name": "@browselang/web",
-  "version": "0.0.19",
+  "version": "0.0.20",
   "description": "Web utilities to be used by a browse runtime",
   "keywords": [
     "browse",

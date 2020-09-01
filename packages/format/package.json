@@ -1,6 +1,6 @@
 {
   "name": "@browselang/format",
-  "version": "0.0.19",
+  "version": "0.0.20",
   "description": "Formatter for browse. Used by the CLI",
   "keywords": [
     "browse",
