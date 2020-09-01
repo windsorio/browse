@@ -489,6 +489,19 @@ module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
         return evalRuleSet(ruleset, {}, { reverse });
       }
     },
+    rules_foldr: (_) => (_) => async (reducer, initial, ruleset) => {
+      const _foldr = async (red, l) => {
+        if (l.length === 0) return initial;
+        const acc = await _foldr(red, l.slice(1));
+        return await evalRuleSet(reducer, { vars: { acc, curr: l[0] } });
+      };
+      const newRules = await _foldr(reducer, ruleset);
+      return {
+        ...ruleset,
+        rules: newRules,
+        source: null, // TODO: some way to do this so we have good stack traces?
+      };
+    },
     /**
      * @desc { Create an Array from a RuleSet }
      * @params {
