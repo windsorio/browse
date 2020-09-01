@@ -173,8 +173,13 @@ const evalRule = async (rule, scope) => {
   }
 };
 
-const evalRuleSet = async (ruleSet, inject = {}) => {
+const evalRuleSet = async (ruleSet, inject = {}, options = {}) => {
   const rules = [...ruleSet.rules]; // Don't want to modify the original rules
+
+  // reverse is just a hack for now. The rules stdlib will replace this
+  if (options.reverse) {
+    rules.reverse();
+  }
 
   if (!rules.length) {
     return null;

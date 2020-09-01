@@ -460,7 +460,7 @@ module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
      *    # See https://github.com/windsorio/browse/blob/master/examples/advanced/custom_rules.browse
      * }
      */
-    eval: (_) => (_) => async (ruleset, inject) => {
+    eval: (_) => ({ reverse = false }) => async (ruleset, inject) => {
       if (inject) {
         const injectScope = getNewScope(inject.scope);
         injectScope.rules.rule = (scope) => (opts) => (name, body) => {
@@ -476,13 +476,17 @@ module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
         const { rule, ...newRules } = injectScope.rules;
 
         // And use it as the scope in which to eval ruleset
-        return evalRuleSet(ruleset, {
-          rules: newRules,
-          vars: injectScope.vars,
-          internal: injectScope.internal,
-        });
+        return evalRuleSet(
+          ruleset,
+          {
+            rules: newRules,
+            vars: injectScope.vars,
+            internal: injectScope.internal,
+          },
+          { reverse } // reverse is just a hack for now. The rules stdlib will replace this
+        );
       } else {
-        return evalRuleSet(ruleset);
+        return evalRuleSet(ruleset, {}, { reverse });
       }
     },
     /**
