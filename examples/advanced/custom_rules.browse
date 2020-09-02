@@ -24,7 +24,7 @@ rule while {
     # return is unncescessary since the result from the last rule in a RuleSet
     # is implicitly returned
     while $cond $body
-  } else { return null }
+  } else { return nil }
 }
 
 set i 0
