@@ -1,9 +1,11 @@
-import fs
+# import fs
 
-page https://checklyhq.com/ {
+page(width=1280 height=800) https://www.checklyhq.com {
   @string(attr=src) imageHref '.hero-image'
 
-  visit https://checklyhq.com/ + (replace '/' '' $imageHref)
+  visit $imageHref
 }
 
-page https://checklyhq.com/* { buffer buffer; fs write checkly.png $buffer }
+page https://www.checklyhq.com/* { download checkly.png }
+
+visit https://www.checklyhq.com

@@ -1,9 +1,10 @@
+set headless false
+
 page(
   width=1280
   height=800
 ) https://getbootstrap.com/docs/4.3/components/forms/ {
   set checked (eval$ '#defaultCheck1' | input => input.checked |)
-
   print Checkbox checked status: ' ' $checked
 
   set radios (eval$$ 'input[name="exampleRadios"]' |
@@ -23,4 +24,4 @@ page(
   print $selectOptions
 }
 
-print https://getbootstrap.com/docs/4.3/components/forms/#checkboxes-and-radios
+visit https://getbootstrap.com/docs/4.3/components/forms/#checkboxes-and-radios

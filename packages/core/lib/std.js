@@ -608,6 +608,8 @@ module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
      * @returns { [number] length of the string or the number of elements in an array }
      */
     len: (_) => (_) => (v) => v.length,
+    replace: (_) => (_) => (search, replace, str) =>
+      str.replace(search, replace),
   },
 });
 

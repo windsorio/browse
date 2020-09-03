@@ -1,8 +1,8 @@
 page https://www.google.com {
   on dialog |
-    () => {
+    async (dialog) => {
       console.log(dialog.message())
-      return dialog.dismiss()
+      await dialog.dismiss()
     }
   |
 

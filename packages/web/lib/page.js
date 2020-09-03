@@ -33,6 +33,7 @@ const getPageScope = (parent) => {
     vars: {},
     internal: {
       page: null,
+      req: null,
       /**
        * @config {
        *   [output: string] The file to output to
@@ -52,10 +53,21 @@ const getPageScope = (parent) => {
 
   const dataExtractionRule = (extractor, type, optional = false) => (
     scope
-  ) => ({ trim = true }) => async (key, selector) => {
+  ) => ({ trim = true, attr }) => async (key, selector) => {
     let value = null;
     try {
-      value = await pageScope.internal.page.$eval(selector, extractor);
+      if (attr) {
+        value = await pageScope.internal.page.$eval(
+          selector,
+          (el, a) => el[a],
+          attr
+        );
+      } else {
+        value = await pageScope.internal.page.$eval(selector, extractor);
+      }
+      if (type === "number") {
+        value = Number(value);
+      }
       if (value === null || value === undefined) {
         value = null; // We don't want undefined in the `finally` clause
         throw new Error(
@@ -239,6 +251,27 @@ const getPageScope = (parent) => {
       } else {
         return false;
       }
+      return true;
+    },
+    on: (_) => (_) => (event, jsFun) => {
+      const page = pageScope.internal.page;
+      if (!page) {
+        return false;
+      }
+      page.on(event, eval(jsFun));
+      return true;
+    },
+    exec: (_) => (_) => async (jsFun) => {
+      const page = pageScope.internal.page;
+      if (!page) {
+        return false;
+      }
+      await page.evaluate(eval(jsFun));
+      return true;
+    },
+    download: (_) => (_) => async (fName) => {
+      const buffer = await pageScope.internal.req.buffer();
+      await fs.promises.writeFile(fName, buffer);
       return true;
     },
   };

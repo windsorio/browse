@@ -56,8 +56,9 @@ const go = async (page, url) => {
 const preparePage = async (browser, href) => {
   const page = await browser.newPage();
 
+  let req;
   try {
-    await go(page, href);
+    req = await go(page, href);
   } catch (e) {
     throw new BrowseError({
       message: `Failed to goto url ${href}`,
@@ -65,7 +66,7 @@ const preparePage = async (browser, href) => {
     });
   }
 
-  return page;
+  return { page, req };
 };
 
 /**
@@ -113,7 +114,10 @@ const getBrowserScope = (parent) => {
      * @scope { Browser }
      * @desc { Instantiates a page definition which matches on the url-pattern passed in as the first argument, and which executes the rule set passed in as the second argument on every matching page }
      */
-    page: (_) => ({ scrape = true }) => (pattern, ...ruleSets) => {
+    page: (_) => ({ scrape = true, width = 1280, height = 800 }) => (
+      pattern,
+      ...ruleSets
+    ) => {
       const urlObj = url.parse(pattern);
 
       if (!urlObj || !urlObj.host) {
@@ -143,7 +147,7 @@ const getBrowserScope = (parent) => {
       browserScope.internal.pageDefs[finalPattern] = {
         matcher: new UrlPattern(finalPattern),
         ruleSets,
-        scrape,
+        opts: { scrape, width, height },
       };
       return null;
     },
@@ -161,13 +165,15 @@ const getBrowserScope = (parent) => {
 
           // TODO: Make this determinisitic
           for (const key in defs) {
-            const { matcher, ruleSets, scrape } = defs[key];
-            const matchObj = matcher.match(href.split("?")[0]);
+            const { matcher, ruleSets, opts } = defs[key];
+            const be4hash = href.split("#")[0];
+            const be4query = be4hash.split("?")[0];
+            const matchObj = matcher.match(be4query);
             if (matchObj) {
               const urlObj = url.parse(href);
               match = {
                 ruleSets,
-                scrape,
+                opts,
                 path: matchObj,
                 query: urlObj.query || null,
                 hash: urlObj.hash || null,
@@ -191,8 +197,14 @@ const getBrowserScope = (parent) => {
           match.ruleSets.map(async (ruleSet) => {
             const newPageScope = getPageScope(ruleSet.scope);
 
-            const page = await preparePage(browser, href);
+            const { page, req } = await preparePage(browser, href);
             newPageScope.internal.page = page;
+            newPageScope.internal.req = req;
+
+            await page.setViewport({
+              width: match.opts.width,
+              height: match.opts.height,
+            });
 
             // inject args and "url" as variables into the new page scope
             Object.assign(newPageScope.vars, match.path, {
@@ -207,7 +219,7 @@ const getBrowserScope = (parent) => {
             // pageDefs are resolved once more
             await evalRuleSet(ruleSet, newPageScope);
 
-            if (match.scrape) {
+            if (match.opts.scrape) {
               const data = newPageScope.internal.data;
               if (Object.keys(data).length) {
                 if (data.url !== undefined) {
