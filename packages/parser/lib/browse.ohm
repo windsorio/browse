@@ -56,7 +56,7 @@ Browse {
 
   wordStart = letter | "_" | "@"
             | "\\" unicodeEscapeSequence -- escaped
-  wordPart = wordStart | "?"  | "$"
+  wordPart = wordStart | "$"
             | unicodeCombiningMark | unicodeDigit
             | unicodeConnectorPunctuation
             | "\u200C" | "\u200D"
@@ -195,6 +195,13 @@ Browse {
     = OrExpr "||" noop AndExpr -- or
     | AndExpr
 
+  InvalidBinExpr
+    = InvalidBinExpr "&" noop OrExpr -- and
+    | InvalidBinExpr "^" noop OrExpr -- xor
+    // We can't do 'or' because `|` starts a string literal atm
+    // | InvalidBinExpr "|" noop OrExpr -- or
+    | OrExpr
+
   Expr (an expression)
     = OrExpr
   
@@ -209,12 +216,15 @@ Browse {
 
   Options = (lineTerminator* Option)+ lineTerminator*
 
-
   ruleName = (word ":")? word
 
+  errorRule
+          = ruleName "?"    -- optional
+          | ruleName        -- vanilla
+
   InitRule
-  	= #(ruleName "(") Options ")"   -- withOpts
-    | ruleName                      -- vanilla
+  	= #(errorRule "(") Options ")"   -- withOpts
+    | errorRule                      -- vanilla
     
 
   Rule
