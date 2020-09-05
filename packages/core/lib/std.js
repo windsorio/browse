@@ -3,6 +3,7 @@ const {
   resolveRuleScope,
   resolveVar,
   resolveVarScope,
+  resolveInternal,
 } = require("./scope");
 const { isNullish, help, stringify } = require("./utils");
 const { BrowseError } = require("./error");
@@ -608,6 +609,58 @@ module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
      * @returns { [number] length of the string or the number of elements in an array }
      */
     len: (_) => (_) => (v) => v.length,
+    /**
+     * @desc { Throw an error }
+     * @params {
+     *  [value: any] Any value to throw as an error
+     * }
+     * @throws { The value passed in }
+     */
+    throw: (_) => (_) => (v) => {
+      throw new Error(v);
+    },
+    /**
+     * @desc { Pattern match the value using the potential options in the
+     * RuleSet }
+     * @params {
+     *  [value: dict<string, any>] A value constructed using the `type` rule, or the return value of a rule used with the `?` modifier
+     *  [matchers: RuleSet] A ruleset where each rule name is tested against the value's type to find a rule that matches. The arguments to each rule should be the variable names to bind the type's value in case of a match, and the last argument is the RuleSet to evaluate (with the bound variables)
+     * }
+     * @throws { If an invalid value is passed, or the value has a type that isn't handled by the matchers RuleSet }
+     * @returns { [any] The return value from the matched RuleSet }
+     * @example {
+     *  rule test { throw error \}
+     *
+     *  match (test? x) {
+     *    Err e { print "Error:" $e \}
+     *    Ok v { print "Ok:" $v \}
+     *  \}
+     * }
+     */
+    match: (scope) => (_) => (/** @type Map */ val, rs) => {
+      const type = val.get("__type__");
+      if (!type) {
+        throw new Error("The value does not have a type constructor");
+      }
+      const matchedRule = rs.rules.find((rule) => rule.fn.name.name === type);
+      if (!matchedRule) {
+        throw new Error(`Unhandled type '${type}'`);
+      }
+      const boundVars = {};
+      const bindings = matchedRule.args.slice(0, -1);
+
+      bindings.forEach((binding, i) => {
+        if (binding.type !== "Literal") {
+          throw new Error(
+            `An argument for the match case '${type}' wasn't a string literal`
+          );
+        }
+        boundVars[binding.value] = val.get("" + i) || null;
+      });
+
+      const matchedRuleSet = matchedRule.args[matchedRule.args.length - 1];
+      return evalRuleSet(matchedRuleSet, { vars: boundVars });
+    },
   },
 });
 
