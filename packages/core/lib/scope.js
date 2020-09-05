@@ -122,7 +122,7 @@ const resolveVarScope = (name, scope) => {
  * @param {Scope} scope The scope to use
  * @param {any => boolean} predicate An optional predicate with which to test the resolved value
  */
-const resolveInternal = (name, scope, predicate = () => true) => {
+const resolveInternal = (name, scope, predicate = (_) => true) => {
   if (!scope) {
     throw new Error(`Internal:: Internal Variable '${name}' is not defined`);
   }

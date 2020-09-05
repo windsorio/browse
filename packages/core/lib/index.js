@@ -159,7 +159,9 @@ const evalRule = async (rule, scope) => {
           library: true,
         });
 
-      return optional ? { __type__: "Ok", [0]: null } : null;
+      return optional
+        ? new Map(Object.entries({ __type__: "Ok", [0]: null }))
+        : null;
     } else {
       // It's possible for the fn call itself to throw in the case that it's not
       // async The try...catch will handle that, and also any errors from a
@@ -168,12 +170,16 @@ const evalRule = async (rule, scope) => {
         resolveRule(fn, scope)(scope)(resolvedOpts)(...resolvedArgs)
       );
       const retVal = await promise.then((v) => (v === undefined ? null : v));
-      return optional ? { __type__: "Ok", [0]: retVal } : retVal;
+      return optional
+        ? new Map(Object.entries({ __type__: "Ok", [0]: retVal }))
+        : retVal;
     }
   } catch (err) {
     const errWithStackTrace = BrowseError.from(err, ruleWord);
     if (optional) {
-      return { __type__: "Err", [0]: errWithStackTrace };
+      return new Map(
+        Object.entries({ __type__: "Err", [0]: errWithStackTrace })
+      );
     } else {
       throw errWithStackTrace;
     }
