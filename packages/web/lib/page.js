@@ -83,7 +83,7 @@ const getPageScope = (parent) => {
         scope: helpScope,
         key,
         functions: {
-          config:
+          pageConfig:
             "Takes in a ruleSet and overrides the set rule so that any sets within the ruleSet set config variables",
           click:
             "Takes in a selector and clicks the argument indicated by the selector",
@@ -105,7 +105,7 @@ const getPageScope = (parent) => {
       });
       return null;
     },
-    config: (_) => (_) => async (ruleSet) => {
+    pageConfig: (_) => (_) => async (ruleSet) => {
       // Evaluate the ruleSet
       await evalRuleSet(ruleSet, {
         rules: {
@@ -121,7 +121,7 @@ const getPageScope = (parent) => {
           },
         },
       });
-      return pageScope.internal.config;
+      return new Map(Object.entries(pageScope.internal.config));
     },
     "@string": dataExtractionRule(getString, "string"),
     "@number": dataExtractionRule(getNumber, "number"),
