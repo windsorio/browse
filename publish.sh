@@ -13,7 +13,7 @@ fi
 for pkg in $PKG_DIRS; do
   rm -rf .yarn/versions
   cd "packages/$pkg"
-  yarn version $1
+  yarn version $@
   cd ../../
 done
 rm -rf .yarn/versions
@@ -31,11 +31,6 @@ done
 
 # Update "format" lib in vscode and publish
 cd vscode
-if [ "$1" == "prerelease" ]; then
-  yarn add @browselang/format@pre
-  vsce publish patch
-else
-  yarn add @browselang/format@latest
-  vsce publish $1
-fi
+yarn add @browselang/format
+vsce publish $@
 cd ..
