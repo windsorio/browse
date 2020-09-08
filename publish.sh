@@ -8,7 +8,7 @@ PKG_DIRS=$(ls packages)
 for pkg in $PKG_DIRS; do
   rm -rf .yarn/versions
   cd "packages/$pkg"
-  yarn version patch
+  yarn version $@
   cd ../../
 done
 rm -rf .yarn/versions
@@ -23,5 +23,5 @@ done
 # Update "format" lib in vscode and publish
 cd vscode
 yarn add @browselang/format
-vsce publish patch
+vsce publish $@
 cd ..
