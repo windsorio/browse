@@ -1,5 +1,6 @@
 const parser = require("@browselang/parser");
 const util = require("util");
+const { pullTags, parseRtn, parseParams } = require("./common");
 
 const show = (obj) =>
   console.log(util.inspect(obj, false, null, true /* enable colors */));
@@ -114,9 +115,6 @@ const assignLeadingComment = (ast, comments) => {
     const commentEnd = comment.source.endIdx;
     while (sortedTreeIdx < sortedTree.length) {
       const node = sortedTree[sortedTreeIdx];
-      /*      console.log(`Comment ${comment.source.startIdx}::${comment.source.endIdx}`);
-      console.log(`Node ${node.source.startIdx}::${node.source.endIdx}`);
-      console.log("Should discard?", node.source.startIdx < commentEnd); */
       //If the node starts before the comment ends, we don't want it
       if (node.source.startIdx < commentEnd) {
         sortedTreeIdx++;
@@ -131,6 +129,19 @@ const assignLeadingComment = (ast, comments) => {
   }
 };
 
+//Trim source for nicer debugging
+const trimSource = (ast) => {
+  dfsTraverse(ast, (node) => {
+    node.source = {
+      ...node.source,
+      sourceString: node.source.sourceString.slice(
+        node.source.startIdx,
+        node.source.endIdx
+      ),
+    };
+  });
+};
+
 module.exports = (code, fileName) => {
   const rtn = {};
 
@@ -138,6 +149,13 @@ module.exports = (code, fileName) => {
 
   assignLeadingComment(ast, parseComments(ast));
 
-  dfsTraverse(ast, (node) => node.leadingComments && console.log(node));
+  trimSource(ast);
+  dfsTraverse(ast, (node) => {
+    if (node.leadingComments) {
+      node.commentTags = pullTags(
+        leadingComments.map((comment) => comment.value)
+      );
+    }
+  });
   return rtn;
 };

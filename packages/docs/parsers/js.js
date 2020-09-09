@@ -1,6 +1,7 @@
 const traverse = require("@babel/traverse").default;
 const parser = require("@babel/parser");
 const assert = require("assert");
+const { pullTags, parseRtn, parseParams } = require("./common");
 
 const split = (arr, n) => {
   const rtn = [];
@@ -8,18 +9,6 @@ const split = (arr, n) => {
   for (let i = 0; i < length; i += n) {
     rtn.push(arr.slice(i, i + n));
   }
-  return rtn;
-};
-
-const safeMergeObjs = (o1, o2) => {
-  const rtn = { ...o2 };
-  Object.keys(o1).forEach((key) => {
-    if (rtn[key] !== undefined) {
-      const throwStr = `Cannot define key ${key} multiple times on the same structure`;
-      throw new Error(throwStr);
-    }
-    rtn[key] = o1[key];
-  });
   return rtn;
 };
 
@@ -31,52 +20,6 @@ const cleanComment = (comment) =>
     .filter(Boolean)
     .join("")
     .trim();
-
-const pullTags = (comment) => {
-  const rtn = {};
-  const annotationMatch = /(@\w+) {(((?:\\})|[^}])*)}/g;
-  let matches;
-
-  if (comment.startsWith("*")) {
-    while ((matches = annotationMatch.exec(comment)) !== null) {
-      const tag = matches[1];
-
-      let val = matches[2].replace(/^\s*\*/gm, "");
-      val = val.replace(/\\}/g, "}");
-
-      const [leadingWhitespace] = /^\s*/.exec(val);
-      val = val.replace(
-        new RegExp(`^[ \\t]{${leadingWhitespace.length}}`, "gm"),
-        ""
-      );
-      if (val.endsWith("\n")) val = val.slice(0, -1);
-      rtn[tag] = val;
-    }
-  }
-  return rtn;
-};
-
-/*
- * TODO: Only pull from comments that start with *
- */
-const pullAllTags = (comments) =>
-  comments.map((comment) => pullTags(comment.value)).reduce(safeMergeObjs, {});
-
-const parseParams = (paramString) => {
-  const rtn = {};
-  const paramMatch = /\[(?:(\w*)(?::\s(.+))?)\]\s*([^\[]*)/g;
-  let matches;
-  while ((matches = paramMatch.exec(paramString)) !== null) {
-    const name = matches[1];
-    const type = matches[2];
-    const description = matches[3];
-    rtn[name] = {
-      type,
-      description,
-    };
-  }
-  return rtn;
-};
 
 const parseConfig = (configString) => {
   const rtn = {};
@@ -97,22 +40,12 @@ const parseConfig = (configString) => {
   return rtn;
 };
 
-const parseRtn = (rtnString) => {
-  const matches = /(\[(.*)\])?\s*(.+)/g.exec(rtnString);
-  const type = matches[2] || "any";
-  const description = matches[3];
-  return {
-    type: type.trim(),
-    description: description.trim(),
-  };
-};
-
 /*
  * Process a single annotated rule
  */
 const processRule = (rule) => {
   const rtn = {};
-  const tags = pullAllTags(rule.leadingComments);
+  const tags = pullTags(rule.leadingComments);
   /* Parse the help tag */
   if (tags["@help"] === undefined && tags["@desc"] === undefined) {
     //If the help and desc tags have no data we grab all of the text
@@ -188,7 +121,7 @@ const processRules = (rules) => {
   commentedRules.forEach((rule) => {
     const ruleName = rule.key.name || rule.key.value;
     rtn[ruleName] = {};
-    const tags = pullAllTags(rule.leadingComments);
+    const tags = pullTags(rule.leadingComments);
     /* Parse the help tag */
     if (tags["@help"] === undefined && tags["@desc"] === undefined) {
       //If the help and desc tags have no data we grab all of the text
@@ -247,7 +180,7 @@ const processConfig = (config) => {
       //TODO: We should try to grab the name, type, and init value
       const propertyName = property.key.name;
 
-      const tags = pullAllTags(property.leadingComments || []);
+      const tags = pullTags(property.leadingComments || []);
 
       if (tags["@config"] === undefined) {
         rtn[propertyName] = (property.leadingComments || [])
@@ -319,7 +252,7 @@ module.exports = (code, fileName) => {
        */
       if (path.node.leadingComments !== undefined) {
         //Find the scope tag
-        const tags = pullAllTags(path.node.leadingComments);
+        const tags = pullTags(path.node.leadingComments);
 
         // In the case of just a scope declaration.
         if (tags["@scope"] && tags["@rule"] === undefined) {
