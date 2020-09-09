@@ -152,10 +152,14 @@ module.exports = (code, fileName) => {
   trimSource(ast);
   dfsTraverse(ast, (node) => {
     if (node.leadingComments) {
-      node.commentTags = pullTags(
-        leadingComments.map((comment) => comment.value)
-      );
+      node.commentTags = pullTags(node.leadingComments);
     }
   });
+  dfsTraverse(
+    ast,
+    (node) =>
+      node.leadingComments &&
+      console.log("Found", node.leadingComments, node.source, node.commentTags)
+  );
   return rtn;
 };

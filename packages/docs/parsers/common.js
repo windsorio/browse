@@ -11,7 +11,6 @@ const safeMergeObjs = (o1, o2) => {
 };
 
 const pullTags = (comment) => {
-  console.log("COMMENT", comment);
   const rtn = {};
   const annotationMatch = /(@\w+) {(((?:\\})|[^}])*)}/g;
   let matches;
@@ -35,6 +34,7 @@ const pullTags = (comment) => {
   return rtn;
 };
 
+//TODO: Doesn't seem to work if the @tag isn't the first thing in the comment
 const pullAllTags = (comments) =>
   comments.map((comment) => pullTags(comment.value)).reduce(safeMergeObjs, {});
 

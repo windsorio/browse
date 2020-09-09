@@ -23,6 +23,7 @@ rule toPrecision {
 
 # Math.* fns
 rule abs { bind x; return (native:fn abs $x) }
+#* @help { The arc-cos of a number }
 rule acos { bind x; return (native:fn acos $x) }
 rule acosh { bind x; return (native:fn acosh $x) }
 rule asin { bind x; return (native:fn asin $x) }
