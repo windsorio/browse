@@ -119,9 +119,10 @@ const evalExpr = async (expr, scope) => {
  */
 const evalRule = async (rule, scope) => {
   const { fn, args } = rule;
+  const { name: ruleWord, options, optional, source } = fn;
 
   const resolvedOpts = {};
-  for (const opt of fn.options) {
+  for (const opt of options) {
     if (resolvedOpts[opt.key.name] !== undefined) {
       throw new BrowseError({
         message: `Option '${opt.key.name}' has already been provided to this rule`,
@@ -139,7 +140,7 @@ const evalRule = async (rule, scope) => {
     }
   }
   try {
-    if (fn.name.name === "import") {
+    if (ruleWord.name === "import") {
       const fname = path.basename(resolvedArgs[0]);
       let to = fname.split(".")[0];
       if (resolvedArgs.length === 3) {
@@ -150,7 +151,7 @@ const evalRule = async (rule, scope) => {
 
       if (/^[\.\/]/.test(resolvedArgs[0]))
         scope.modules[to] = await loadModule(
-          path.resolve(fn.source.basedir, resolvedArgs[0]),
+          path.resolve(source.basedir, resolvedArgs[0]),
           { library: false }
         );
       else
@@ -158,18 +159,30 @@ const evalRule = async (rule, scope) => {
           library: true,
         });
 
-      return null;
+      return optional
+        ? new Map(Object.entries({ __type__: "Ok", [0]: null }))
+        : null;
     } else {
       // It's possible for the fn call itself to throw in the case that it's not
-      // async This try...catch will handle that, and also any errors from a
+      // async The try...catch will handle that, and also any errors from a
       // rejected promise
       const promise = Promise.resolve(
         resolveRule(fn, scope)(scope)(resolvedOpts)(...resolvedArgs)
       );
-      return await promise.then((v) => (v === undefined ? null : v));
+      const retVal = await promise.then((v) => (v === undefined ? null : v));
+      return optional
+        ? new Map(Object.entries({ __type__: "Ok", [0]: retVal }))
+        : retVal;
     }
   } catch (err) {
-    throw BrowseError.from(err, fn.name);
+    const errWithStackTrace = BrowseError.from(err, ruleWord);
+    if (optional) {
+      return new Map(
+        Object.entries({ __type__: "Err", [0]: errWithStackTrace })
+      );
+    } else {
+      throw errWithStackTrace;
+    }
   }
 };
 

@@ -1,0 +1,6 @@
+rule test { throw error }
+
+match (test? x) {
+  Err e { print "Error:" $e }
+  Ok v { print "Ok:" $v }
+}
