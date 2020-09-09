@@ -2,7 +2,7 @@
 # $ browse --web ./examples/twitch.browse
 
 browserConfig {
-  set headless true
+  set headless false
 }
 
 page https://www.twitch.tv {
