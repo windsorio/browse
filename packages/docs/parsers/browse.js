@@ -28,7 +28,7 @@ const cleanComment = (comment) =>
         .filter(Boolean)
         .join("")
         .trim()
-    : "";
+    : null;
 
 const parseComments = (ast) => {
   const commentBlocks = ast.comments.reduce((p, c) => {
@@ -194,14 +194,23 @@ module.exports = (code, fileName) => {
       rules: {},
     };
     const processedRules = rules.forEach((ruleNode) => {
-      rtn[scopeName].rules[ruleNode.args[0].value] = {
-        ...processRule(
-          ruleNode.leadingComments.map((comment) => ({
-            ...comment,
-            value: cleanComment(comment.value),
-          }))
-        ),
-      };
+      //Make sure at  least one of the comments starts with a *
+      ruleNode.leadingComments = ruleNode.leadingComments.filter((comment) =>
+        comment.value.startsWith("*")
+      );
+      if (ruleNode.leadingComments.length) {
+        rtn[scopeName].rules[ruleNode.args[0].value] = {
+          ...processRule(
+            ruleNode.leadingComments.map((comment) => {
+              const cleanText = cleanComment(comment.value);
+              return {
+                ...comment,
+                value: cleanText,
+              };
+            })
+          ),
+        };
+      }
     });
   }
   console.log(rtn);
