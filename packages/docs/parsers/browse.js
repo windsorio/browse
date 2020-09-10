@@ -225,7 +225,7 @@ module.exports = (code, fileName) => {
                   .map((rule) => rule.args.map((arg) => arg.value))
               )
               .forEach((arg) => {
-                params[arg] = { name: arg };
+                params[arg] = {};
               }));
 
         if (Object.keys(params).length)

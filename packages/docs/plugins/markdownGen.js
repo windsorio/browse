@@ -111,12 +111,15 @@ module.exports = async (docTree, file) => {
             (param) => (out.header += " " + param.trim())
           );
           out.params = bullet(
-            Object.keys(params).map(
-              (param) =>
-                `${shortcode(param)} ${
-                  params[param].type ? type(params[param].type) : ""
-                } ${subLinks(params[param].description || "", ruleMap)}`
-            ),
+            Object.keys(params)
+              .map(
+                (param) =>
+                  Object.keys(params[param]).length &&
+                  `${shortcode(param)} ${
+                    params[param].type ? type(params[param].type) : ""
+                  } ${subLinks(params[param].description || "", ruleMap)}`
+              )
+              .filter(Boolean),
             1
           );
         }

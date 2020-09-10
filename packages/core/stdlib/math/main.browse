@@ -45,7 +45,7 @@ rule abs { bind x; return (native:fn abs $x) }
 #*Returns the arccosine of x.
 rule acos { bind x; return (native:fn acos $x) }
 #*Returns the hyperbolic arccosine of x.
-rule acosh { bind x; bind y; return (native:fn acosh $x) }
+rule acosh { bind x; return (native:fn acosh $x) }
 #*Returns the arcsine of x.
 rule asin { bind x; return (native:fn asin $x) }
 #*Returns the hyperbolic arcsine of a number.

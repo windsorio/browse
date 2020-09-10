@@ -12,7 +12,7 @@
   - [`SQRT1_2`](#SQRT1_2)
   - [`SQRT2`](#SQRT2)
   - [`acos x`](#acos-x)
-  - [`acosh x y`](#acosh-x-y)
+  - [`acosh x`](#acosh-x)
   - [`asin x`](#asin-x)
   - [`asinh x`](#asinh-x)
   - [`atan x`](#atan-x)
@@ -85,144 +85,93 @@ Square root of 2; approximately 1.414.
 
 ### `acos x`
 
-- `x`
-
 Returns the arccosine of x.
 
-### `acosh x y`
-
-- `x`
-- `y`
+### `acosh x`
 
 Returns the hyperbolic arccosine of x.
 
 ### `asin x`
 
-- `x`
-
 Returns the arcsine of x.
 
 ### `asinh x`
-
-- `x`
 
 Returns the hyperbolic arcsine of a number.
 
 ### `atan x`
 
-- `x`
-
 Returns the arctangent of x.
 
 ### `atanh x`
-
-- `x`
 
 Returns the hyperbolic arctangent of x.
 
 ### `atan2 y x`
 
-- `y`
-- `x`
-
 Returns the arctangent of the quotient of its arguments.
 
 ### `cbrt x`
-
-- `x`
 
 Returns the cube root of x.
 
 ### `ceil x`
 
-- `x`
-
 Returns the smallest integer greater than or equal to x.
 
 ### `clz32 x`
-
-- `x`
 
 Returns the number of leading zeroes of the 32-bit integer x.
 
 ### `cos x`
 
-- `x`
-
 Returns the cosine of x.
 
 ### `cosh x`
-
-- `x`
 
 Returns the hyperbolic cosine of x.
 
 ### `exp x`
 
-- `x`
-
 Returns E^x, where x is the argument, and E is Euler's constant (2.718…, the base of the natural logarithm).
 
 ### `expm1 x`
-
-- `x`
 
 Returns subtracting 1 from exp(x).
 
 ### `floor x`
 
-- `x`
-
 Returns the largest integer less than or equal to x.
 
 ### `fround x`
-
-- `x`
 
 Returns the nearest single precision float representation of x.
 
 ### `hypot x y`
 
-- `x`
-- `y`
-
 Returns the square root of the sum of squares of both arguments. TODO: support more than 2 arguments, like in the JS native version
 
 ### `imul x y`
-
-- `x`
-- `y`
 
 Returns the result of the 32-bit integer multiplication of x and y.
 
 ### `log x`
 
-- `x`
-
 Returns the natural logarithm (㏒e; also, ㏑) of x.
 
 ### `log1p x`
-
-- `x`
 
 Returns the natural logarithm (㏒e; also ㏑) of 1 + x for the number x.
 
 ### `log10 x`
 
-- `x`
-
 Returns the base-10 logarithm of x.
 
 ### `log2 x`
 
-- `x`
-
 Returns the base-2 logarithm of x.
 
 ### `pow x y`
-
-- `x`
-- `y`
 
 Returns base x to the exponent power y (that is, xy).
 
@@ -232,48 +181,32 @@ Returns a pseudo-random number between 0 and 1.
 
 ### `round x`
 
-- `x`
-
 Returns the value of the number x rounded to the nearest integer.
 
 ### `sign x`
-
-- `x`
 
 Returns the sign of the x, indicating whether x is positive, negative, or zero.
 
 ### `sin x`
 
-- `x`
-
 Returns the sine of x.
 
 ### `sinh x`
-
-- `x`
 
 Returns the hyperbolic sine of x.
 
 ### `sqrt x`
 
-- `x`
-
 Returns the positive square root of x.
 
 ### `tan x`
-
-- `x`
 
 Returns the tangent of x.
 
 ### `tanh x`
 
-- `x`
-
 Returns the hyperbolic tangent of x.
 
 ### `trunc x`
-
-- `x`
 
 Returns the integer portion of x, removing any fractional digits.
