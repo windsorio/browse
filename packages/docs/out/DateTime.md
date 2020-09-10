@@ -3,6 +3,15 @@
 # Table of Contents
 
 - [Scope: DateTime](#scope-DateTime)
+  - [`SECONDS_PER_MINUTE`](#SECONDS_PER_MINUTE)
+  - [`MINUTES_PER_HOUR`](#MINUTES_PER_HOUR)
+  - [`HOURS_PER_DAY`](#HOURS_PER_DAY)
+  - [`DAYS_PER_WEEK`](#DAYS_PER_WEEK)
+  - [`SECOND`](#SECOND)
+  - [`MINUTE`](#MINUTE)
+  - [`HOUR`](#HOUR)
+  - [`DAY`](#DAY)
+  - [`WEEK`](#WEEK)
   - [`getDay date`](#getDay-date)
   - [`getFullYear date`](#getFullYear-date)
   - [`getHours date`](#getHours-date)
@@ -34,6 +43,44 @@
 ## Scope `DateTime`
 
 DateTime utilities
+
+## Variables
+
+### `SECONDS_PER_MINUTE`
+
+Number of seconds in a minute
+
+### `MINUTES_PER_HOUR`
+
+Number of minutes in an hour
+
+### `HOURS_PER_DAY`
+
+Number of hours in a day
+
+### `DAYS_PER_WEEK`
+
+Number of days in a week
+
+### `SECOND`
+
+Number of milliseconds in a second
+
+### `MINUTE`
+
+Number of milliseconds in a minute
+
+### `HOUR`
+
+Number of milliseconds in an hour
+
+### `DAY`
+
+Number of milliseconds in a day
+
+### `WEEK`
+
+Number of milliseconds in a week
 
 ## Rules
 
@@ -144,41 +191,3 @@ Returns the primitive value of a Date object
 ### `dayOfYear date`
 
 Get number of the day in the year @return Number of the day in year
-
-## Variables
-
-### `SECONDS_PER_MINUTE`
-
-Number of seconds in a minute
-
-### `MINUTES_PER_HOUR`
-
-Number of minutes in an hour
-
-### `HOURS_PER_DAY`
-
-Number of hours in a day
-
-### `DAYS_PER_WEEK`
-
-Number of days in a week
-
-### `SECOND`
-
-Number of milliseconds in a second
-
-### `MINUTE`
-
-Number of milliseconds in a minute
-
-### `HOUR`
-
-Number of milliseconds in an hour
-
-### `DAY`
-
-Number of milliseconds in a day
-
-### `WEEK`
-
-Number of milliseconds in a week

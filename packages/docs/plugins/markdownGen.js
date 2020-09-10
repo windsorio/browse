@@ -39,11 +39,12 @@ module.exports = async (docTree, file) => {
   // mapping of a rulename to a link slug
   const ruleMap = {};
 
+  const varMap = {};
+
   //Build Documentation Directory (Inspired by https://nodejs.org/api/fs.html)
   readmeLines.push(
     bullet(
       Object.keys(docTree).map((scope) => {
-        // TODO: Will break if multiple rules have the same name in different scopes
         const rules = Object.keys(docTree[scope].rules).map((rule) => {
           let text = rule.trim();
           let slug = rule.trim();
@@ -60,11 +61,14 @@ module.exports = async (docTree, file) => {
           return link(shortcode(text), `#${slug}`);
         });
 
+        const vars = Object.keys(docTree[scope].vars || {}).map((variable) => {
+          return link(shortcode(variable), `#${variable}`);
+        });
         const configVars = Object.keys(
           docTree[scope].config || {}
         ).map((configVar) => link(`Config: ${configVar}`, `#${configVar}`));
 
-        const entries = bullet([...configVars, ...rules], 1);
+        const entries = bullet([...vars, ...configVars, ...rules], 1);
         return `${link(
           `Scope: ${scope.trim()}`,
           `#scope-${scope.trim()}`
@@ -82,6 +86,16 @@ module.exports = async (docTree, file) => {
     readmeLines.push(line);
 
     const { vars, rules, config } = docTree[scope];
+    if (vars && Object.keys(vars).length) {
+      readmeLines.push(h2("Variables"));
+      const varLines = Object.keys(vars).map((variable) => {
+        const { help, desc, type } = vars[variable];
+        return `${h3(shortcode(variable))}${type ? "\n" + italics(type) : ""}${
+          desc ? "\n" + desc : help ? "\n" + help : ""
+        }`;
+      });
+      readmeLines.push(...varLines);
+    }
     if (rules && Object.keys(rules).length) {
       readmeLines.push(h2("Rules"));
       const ruleLines = Object.keys(rules).map((rule) => {
@@ -138,16 +152,6 @@ module.exports = async (docTree, file) => {
         }`;
       });
       readmeLines.push(bullet(configLines));
-    }
-    if (vars && Object.keys(vars).length) {
-      readmeLines.push(h2("Variables"));
-      const varLines = Object.keys(vars).map((variable) => {
-        const { help, desc, type } = vars[variable];
-        return `${h3(shortcode(variable))}${type ? "\n" + italics(type) : ""}${
-          desc ? "\n" + desc : help ? "\n" + help : ""
-        }`;
-      });
-      readmeLines.push(...varLines);
     }
   });
 

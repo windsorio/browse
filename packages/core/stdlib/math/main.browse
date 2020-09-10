@@ -1,7 +1,7 @@
-import "./native.js"
-
 #* @scope { Standard Math functions }
 #  @name { Math }
+#  TODO: This is a bit hacky. If the @name is called below the import it will be attributed to E rather than to the scope.
+import "./native.js"
 
 #*Euler's constant and the base of natural logarithms; approximately 2.718.
 set E 2.718281828459045
