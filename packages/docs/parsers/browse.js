@@ -23,6 +23,7 @@ const getChildren = (type) =>
 const cleanComment = (comment) =>
   comment.startsWith("*")
     ? comment
+        .slice(1)
         .split("\n")
         .map((line) => line.split("#")[1] || line.split("#")[0])
         .filter(Boolean)
@@ -131,7 +132,7 @@ const assignLeadingComment = (ast, comments) => {
       }
       //Since everything is sorted, the first node we find is the one the comment belongs to
       else {
-        if (node.comments) node.leadingComments.push(comment);
+        if (node.leadingComments) node.leadingComments.push(comment);
         else node.leadingComments = [comment];
         break;
       }
@@ -199,20 +200,42 @@ module.exports = (code, fileName) => {
         comment.value.startsWith("*")
       );
       if (ruleNode.leadingComments.length) {
-        rtn[scopeName].rules[ruleNode.args[0].value] = {
-          ...processRule(
-            ruleNode.leadingComments.map((comment) => {
-              const cleanText = cleanComment(comment.value);
-              return {
-                ...comment,
-                value: cleanText,
-              };
-            })
-          ),
+        //First we grab the tags from the comments
+        const tags = pullTags(ruleNode.leadingComments);
+        const ruleName = tags["@rule"] || ruleNode.args[0].value;
+
+        const processedRule = processRule(
+          ruleNode.leadingComments.map((comment) => {
+            const cleanText = cleanComment(comment.value);
+            return {
+              ...comment,
+              value: cleanText,
+            };
+          })
+        );
+
+        const params = {};
+        //If we can't find parameters, we try to autoparse the parameters
+        tags["@params"] ||
+          (ruleNode.args[1].rules &&
+            []
+              .concat(
+                ...ruleNode.args[1].rules
+                  .filter((rule) => rule.fn.name.name === "bind")
+                  .map((rule) => rule.args.map((arg) => arg.value))
+              )
+              .forEach((arg) => {
+                params[arg] = { name: arg };
+              }));
+
+        if (Object.keys(params).length)
+          processedRule["params"] = processedRule["params"] || params;
+        //In the absenes of an @rule tag, we use the name of the rule below
+        rtn[scopeName].rules[ruleName] = {
+          ...processedRule,
         };
       }
     });
   }
-  console.log(rtn);
   return rtn;
 };

@@ -113,10 +113,9 @@ module.exports = async (docTree, file) => {
           out.params = bullet(
             Object.keys(params).map(
               (param) =>
-                `${shortcode(param)} ${type(params[param].type)} ${subLinks(
-                  params[param].description || "",
-                  ruleMap
-                )}`
+                `${shortcode(param)} ${
+                  params[param].type ? type(params[param].type) : ""
+                } ${subLinks(params[param].description || "", ruleMap)}`
             ),
             1
           );

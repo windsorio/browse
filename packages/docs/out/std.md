@@ -370,45 +370,17 @@ Get the length of the string or number of elements in an array
 
 - Returns: \<**any**\> nil
 
-**Only used within a [rule](#rule-name-body) body**
-'bind' lets the rule accept arguments. Strings passed to bind are used to
-assign variables that track the incoming values
+'bind' lets the rule accept arguments. Strings passed to bind are used to assign variables that track the incoming values
 
 ```
-# take 2 arguments and return the sum
-rule add { bind x y; return $x + $y }
-
-# accept options
-rule add2 {
-  bind(print) x y
-  set z $x + $y
-  if $print then { print $z } else { return $z }
-}
-
+# take 2 arguments and return the sum    rule add { bind x y; return $x + $y }    # accept options    rule add2 {      bind(print) x y      set z $x + $y      if $print then { print $z } else { return $z }    }
 ```
 
 ### `return value`
 
 - `value` \<**T**\> The value to return
-
 - Returns: \<**T**\> The value passed in, unchanged
 
-**Only used within a [rule](#rule-name-body) body**
-'return' is often used to make the return value for a rule explicit. It's often
-unnecessary however since every rule uses the last evaluated value in its body
-as the return value anyway.
+'return' is often used to make the return value for a rule explicit. It's often unnecessary however since every rule uses the last evaluated value in its body as the return value anyway.
 
-> The return rule doesn't work like `return` in other languages. `return` is just an
-> alias for [id](#id-value) since the last value in a RuleSet is the implicit return value of the
-> RuleSet. For example
->
-> ```
-> rule f {
->  return foo
->  return bar
-> }
-> ```
->
-> In browse, this is valid and the return value is "bar". `return foo` is the same as `id foo`
-> Which basically does nothing (a.k.a it's a no-op). and the last rule in the body evaluates to
-> "bar"
+> The return rule doesn't work like `return` in other languages. `return` is just an alias for [id](#id-value) since the last value in a RuleSet is the implicit return value of the RuleSet. For example `rule f { return foo return bar }` In browse, this is valid and the return value is "bar". `return foo` is the same as `id foo` Which basically does nothing (a.k.a it's a no-op). and the last rule in the body evaluates to "bar"
