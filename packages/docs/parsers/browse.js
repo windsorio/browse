@@ -182,9 +182,12 @@ module.exports = (code, fileName) => {
         }
       }
 
-      if (node.type === "Rule") {
+      //All of the rule declarations
+      if (node.type === "Rule" && node.fn.name.name === "rule") {
         rules.push(node);
       }
+
+      //All of the variable declarations
     }
   });
 
