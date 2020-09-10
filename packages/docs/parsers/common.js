@@ -63,9 +63,59 @@ const parseRtn = (rtnString) => {
     description: description.trim(),
   };
 };
+/*
+ * Process a single annotated rule
+ */
+const processRule = (ruleComments) => {
+  const rtn = {};
+  const tags = pullAllTags(ruleComments);
+  /* Parse the help tag */
+
+  console.log("Tags", tags);
+  if (tags["@help"] === undefined && tags["@desc"] === undefined) {
+    //If the help and desc tags have no data we grab all of the text
+    //TODO: Return just the comments not within a tag
+    rtn.help = ruleComments.map((comment) => comment.value).join("\n");
+  } else {
+    //else we just extract data from @help tags
+    rtn.help = tags["@help"] || tags["@desc"];
+  }
+
+  /* Parse the desc tag */
+  if (tags["@desc"] === undefined && tags["@help"] === undefined) {
+    //If the help and desc tags have no data we grab all of the text
+    //TODO: Return just the comments not within a tag
+    rtn.help = ruleComments.map((comment) => comment.value).join("\n");
+  } else {
+    //else we just extract data from @help tags
+    rtn.help = tags["@desc"] || tags["@help"];
+  }
+
+  /* Parse the params tag */
+  if (tags["@params"] !== undefined) {
+    rtn.params = parseParams(tags["@params"]);
+  }
+
+  /* Parse the returns tag */
+  if (tags["@return"] !== undefined) {
+    rtn.rtn = parseRtn(tags["@return"]);
+  }
+
+  /* Parse the example tag */
+  if (tags["@example"] !== undefined) {
+    rtn.example = tags["@example"];
+  }
+
+  /* Parse the example tag */
+  if (tags["@notes"] !== undefined) {
+    rtn.notes = tags["@notes"];
+  }
+  return rtn;
+};
 
 module.exports = {
   pullTags: pullAllTags,
   parseRtn,
   parseParams,
+  processRule,
 };

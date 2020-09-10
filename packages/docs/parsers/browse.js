@@ -1,6 +1,6 @@
 const parser = require("@browselang/parser");
 const util = require("util");
-const { pullTags, parseRtn, parseParams } = require("./common");
+const { pullTags, parseRtn, parseParams, processRule } = require("./common");
 
 const show = (obj) =>
   console.log(util.inspect(obj, false, null, true /* enable colors */));
@@ -19,6 +19,14 @@ const getChildren = (type) =>
     Literal: [],
     Ident: [],
   }[type]);
+
+const cleanComment = (comment) =>
+  comment
+    .split("\n")
+    .map((line) => line.split("#")[1])
+    .filter(Boolean)
+    .join("")
+    .trim();
 
 const parseComments = (ast) => {
   const commentBlocks = ast.comments.reduce((p, c) => {
@@ -150,16 +158,41 @@ module.exports = (code, fileName) => {
   assignLeadingComment(ast, parseComments(ast));
 
   trimSource(ast);
-  dfsTraverse(ast, (node) => {
-    if (node.leadingComments) {
-      node.commentTags = pullTags(node.leadingComments);
+
+  let scope = null;
+
+  const rules = [];
+
+  bfsTraverse(ast, (node) => {
+    if (node.leadingComments !== undefined) {
+      const tags = pullTags(node.leadingComments);
+      if (tags["@scope"] !== undefined) {
+        scope = {};
+        //If we find the scope tag set the description
+        scope.desc = tags["@scope"];
+        if (tags["@name"] !== undefined) {
+          //If we find the name, set the name
+          scope.name = tags["@name"];
+        } else {
+          //Else set the name to be the file name
+          scope.name = fileName;
+        }
+      }
+
+      if (node.type === "Rule") {
+        rules.push(node);
+      }
     }
   });
-  dfsTraverse(
-    ast,
-    (node) =>
-      node.leadingComments &&
-      console.log("Found", node.leadingComments, node.source, node.commentTags)
+  console.log(
+    rules.map((ruleNode) =>
+      processRule(
+        ruleNode.leadingComments.map((comment) => ({
+          ...comment,
+          value: cleanComment(comment.value),
+        }))
+      )
+    )
   );
   return rtn;
 };

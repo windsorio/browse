@@ -1,7 +1,7 @@
 const traverse = require("@babel/traverse").default;
 const parser = require("@babel/parser");
 const assert = require("assert");
-const { pullTags, parseRtn, parseParams } = require("./common");
+const { pullTags, parseRtn, parseParams, processRule } = require("./common");
 
 const split = (arr, n) => {
   const rtn = [];
@@ -37,58 +37,6 @@ const parseConfig = (configString) => {
       );
     }
   });
-  return rtn;
-};
-
-/*
- * Process a single annotated rule
- */
-const processRule = (rule) => {
-  const rtn = {};
-  const tags = pullTags(rule.leadingComments);
-  /* Parse the help tag */
-  if (tags["@help"] === undefined && tags["@desc"] === undefined) {
-    //If the help and desc tags have no data we grab all of the text
-    //TODO: Return just the comments not within a tag
-    rtn.help = rule.leadingComments
-      .map((node) => cleanComment(node.value))
-      .join("\n");
-  } else {
-    //else we just extract data from @help tags
-    rtn.help = tags["@help"] || tags["@desc"];
-  }
-
-  /* Parse the desc tag */
-  if (tags["@desc"] === undefined && tags["@help"] === undefined) {
-    //If the help and desc tags have no data we grab all of the text
-    //TODO: Return just the comments not within a tag
-    rtn.help = rule.leadingComments
-      .map((node) => cleanComment(node.value))
-      .join("\n");
-  } else {
-    //else we just extract data from @help tags
-    rtn.help = tags["@desc"] || tags["@help"];
-  }
-
-  /* Parse the params tag */
-  if (tags["@params"] !== undefined) {
-    rtn.params = parseParams(tags["@params"]);
-  }
-
-  /* Parse the returns tag */
-  if (tags["@return"] !== undefined) {
-    rtn.rtn = parseRtn(tags["@return"]);
-  }
-
-  /* Parse the example tag */
-  if (tags["@example"] !== undefined) {
-    rtn.example = tags["@example"];
-  }
-
-  /* Parse the example tag */
-  if (tags["@notes"] !== undefined) {
-    rtn.notes = tags["@notes"];
-  }
   return rtn;
 };
 
@@ -285,7 +233,12 @@ module.exports = (code, fileName) => {
           //Rules
           if (!rtn[scopeName]["rules"]) rtn[scopeName]["rules"] = {};
 
-          rtn[scopeName]["rules"][tags["@rule"]] = processRule(path.node);
+          rtn[scopeName]["rules"][tags["@rule"]] = processRule(
+            path.node.leadingComments.map((comment) => ({
+              ...comment,
+              value: cleanComment(comment.value),
+            }))
+          );
         }
 
         // In the case of a config definition
