@@ -80,6 +80,52 @@ const getPlaintext = (comment) => {
 };
 
 /*
+ * Process a single annotated variable
+ */
+const processVar = (variableComments) => {
+  const rtn = {};
+
+  const tags = pullAllTags(variableComments);
+  /* Parse the help tag */
+
+  if (tags["@help"] === undefined && tags["@desc"] === undefined) {
+    //If the help and desc tags have no data we grab all of the text
+    rtn.help = variableComments
+      .map((comment) => getPlaintext(comment.value))
+      .join("\n");
+  } else {
+    //else we just extract data from @help tags
+    rtn.help = tags["@help"] || tags["@desc"];
+  }
+
+  /* Parse the desc tag */
+  if (tags["@desc"] === undefined && tags["@help"] === undefined) {
+    //If the help and desc tags have no data we grab all of the text
+    rtn.help = variableComments
+      .map((comment) => getPlaintext(comment.value))
+      .join("\n");
+  } else {
+    //else we just extract data from @help tags
+    rtn.help = tags["@desc"] || tags["@help"];
+  }
+
+  if (tags["@type"] !== undefined) {
+    rtn.type = tags["@type"];
+  }
+
+  /* Parse the example tag */
+  if (tags["@example"] !== undefined) {
+    rtn.example = tags["@example"];
+  }
+
+  /* Parse the example tag */
+  if (tags["@notes"] !== undefined) {
+    rtn.notes = tags["@notes"];
+  }
+  return rtn;
+};
+
+/*
  * Process a single annotated rule
  */
 const processRule = (ruleComments) => {
@@ -136,4 +182,5 @@ module.exports = {
   parseRtn,
   parseParams,
   processRule,
+  processVar,
 };

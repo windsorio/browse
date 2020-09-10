@@ -81,9 +81,9 @@ module.exports = async (docTree, file) => {
     readmeLines.push(subLinks(docTree[scope].description || "", ruleMap));
     readmeLines.push(line);
 
-    const { rules, config } = docTree[scope];
+    const { vars, rules, config } = docTree[scope];
     if (rules && Object.keys(rules).length) {
-      readmeLines.push(h3("Rules"));
+      readmeLines.push(h2("Rules"));
       const ruleLines = Object.keys(rules).map((rule) => {
         const { help, desc, params, rtn, example, notes } = rules[rule];
 
@@ -131,13 +131,23 @@ module.exports = async (docTree, file) => {
       readmeLines.push(...ruleLines);
     }
     if (config && Object.keys(config).length) {
-      readmeLines.push(h3("Config"));
+      readmeLines.push(h2("Config"));
       const configLines = Object.keys(config).map((configVar) => {
         return `${h4(configVar)}\n( ${italics(config[configVar].type)} ) ${
           config[configVar].description
         }`;
       });
       readmeLines.push(bullet(configLines));
+    }
+    if (vars && Object.keys(vars).length) {
+      readmeLines.push(h2("Variables"));
+      const varLines = Object.keys(vars).map((variable) => {
+        const { help, desc, type } = vars[variable];
+        return `${h3(shortcode(variable))}${type ? "\n" + italics(type) : ""}${
+          desc ? "\n" + desc : help ? "\n" + help : ""
+        }`;
+      });
+      readmeLines.push(...varLines);
     }
   });
 

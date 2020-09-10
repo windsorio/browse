@@ -1,6 +1,12 @@
 const parser = require("@browselang/parser");
 const util = require("util");
-const { pullTags, parseRtn, parseParams, processRule } = require("./common");
+const {
+  pullTags,
+  parseRtn,
+  parseParams,
+  processVar,
+  processRule,
+} = require("./common");
 
 const show = (obj) =>
   console.log(util.inspect(obj, false, null, true /* enable colors */));
@@ -165,6 +171,7 @@ module.exports = (code, fileName) => {
   let scope = null;
 
   const rules = [];
+  const vars = [];
 
   bfsTraverse(ast, (node) => {
     if (node.leadingComments !== undefined) {
@@ -187,6 +194,10 @@ module.exports = (code, fileName) => {
         rules.push(node);
       }
 
+      if (node.type === "Rule" && node.fn.name.name === "set") {
+        vars.push(node);
+      }
+
       //All of the variable declarations
     }
   });
@@ -196,7 +207,30 @@ module.exports = (code, fileName) => {
     rtn[scopeName] = {
       description: scope ? scope.desc : "",
       rules: {},
+      vars: {},
     };
+
+    const processedVars = vars.forEach((varNode) => {
+      varNode.leadingComments = varNode.leadingComments.filter((comment) =>
+        comment.value.startsWith("*")
+      );
+      if (varNode.leadingComments.length) {
+        //Grab the tags
+        const tags = pullTags(varNode.leadingComments);
+        const varName = tags["@name"] || varNode.args[0].value;
+
+        const processedVar = processVar(
+          varNode.leadingComments.map((comment) => ({
+            ...comment,
+            value: cleanComment(comment.value),
+          }))
+        );
+        rtn[scopeName].vars[varName] = {
+          ...processedVar,
+        };
+      }
+    });
+
     const processedRules = rules.forEach((ruleNode) => {
       //Make sure at  least one of the comments starts with a *
       ruleNode.leadingComments = ruleNode.leadingComments.filter((comment) =>
@@ -218,7 +252,7 @@ module.exports = (code, fileName) => {
         );
 
         const params = {};
-        //If we can't find parameters, we try to autoparse the parameters
+        //If we can't find a parameters tag, we try to autoparse the parameters
         tags["@params"] ||
           (ruleNode.args[1].rules &&
             []

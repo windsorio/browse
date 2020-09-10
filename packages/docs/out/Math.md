@@ -40,7 +40,7 @@
 
 Standard Math functions
 
-### Rules
+## Rules
 
 ### `acos x`
 
@@ -169,3 +169,38 @@ Returns the hyperbolic tangent of x.
 ### `trunc x`
 
 Returns the integer portion of x, removing any fractional digits.
+
+## Variables
+
+### `Math`
+
+, ,
+Euler's constant and the base of natural logarithms; approximately 2.718.
+
+### `LN10`
+
+Natural logarithm of 2; approximately 0.693.
+
+### `LN2`
+
+Natural logarithm of 10; approximately 2.303.
+
+### `LOG10E`
+
+Base-2 logarithm of E; approximately 1.443.
+
+### `LOG2E`
+
+Base-10 logarithm of E; approximately 0.434.
+
+### `PI`
+
+Ratio of the a circle's circumference to its diameter; approximately 3.14159.
+
+### `SQRT1_2`
+
+Square root of ½ (or equivalently, 1/√2); approximately 0.707.
+
+### `SQRT2`
+
+Square root of 2; approximately 1.414.

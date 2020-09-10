@@ -36,7 +36,7 @@
 
 This scope is available to every program and consists of all the core rules to write useful browse programs
 
-### Rules
+## Rules
 
 ### `help`
 
@@ -364,7 +364,7 @@ Get the length of the string or number of elements in an array
 
 ## Scope `rule`
 
-### Rules
+## Rules
 
 ### `bind`
 

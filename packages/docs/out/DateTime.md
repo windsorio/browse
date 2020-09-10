@@ -35,7 +35,7 @@
 
 DateTime utilities
 
-### Rules
+## Rules
 
 ### `getDay date`
 
@@ -119,7 +119,7 @@ Returns a string with a locality sensitive representation of the date portion of
 
 ### `toLocaleString date tz`
 
-Returns a string with a locality-sensitive representation of this date. Overrides the Object.prototype.toLocaleString() method.
+Returns a string with a locality-sensitive representation of this date
 
 ### `toLocaleTimeString date tz`
 
@@ -127,7 +127,7 @@ Returns a string with a locality-sensitive representation of the time portion of
 
 ### `toString date`
 
-Returns a string representing the specified Date object. Overrides the Object.prototype.toString() method.
+Returns a string representing the specified Date object
 
 ### `toTimeString date`
 
@@ -139,8 +139,46 @@ Converts a date to a string using the UTC timezone.
 
 ### `valueOf date`
 
-Returns the primitive value of a Date object. Overrides the Object.prototype.valueOf() method.
+Returns the primitive value of a Date object
 
 ### `dayOfYear date`
 
 Get number of the day in the year @return Number of the day in year
+
+## Variables
+
+### `SECONDS_PER_MINUTE`
+
+Number of seconds in a minute
+
+### `MINUTES_PER_HOUR`
+
+Number of minutes in an hour
+
+### `HOURS_PER_DAY`
+
+Number of hours in a day
+
+### `DAYS_PER_WEEK`
+
+Number of days in a week
+
+### `SECOND`
+
+Number of milliseconds in a second
+
+### `MINUTE`
+
+Number of milliseconds in a minute
+
+### `HOUR`
+
+Number of milliseconds in an hour
+
+### `DAY`
+
+Number of milliseconds in a day
+
+### `WEEK`
+
+Number of milliseconds in a week
