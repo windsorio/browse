@@ -14,12 +14,14 @@ const split = (arr, n) => {
 
 //Removes a bunch of extra stuff from block comments such as the newlines and the *'s
 const cleanComment = (comment) =>
-  comment
-    .split("\n")
-    .map((line) => line.split("*")[1])
-    .filter(Boolean)
-    .join("")
-    .trim();
+  comment.startsWith("*")
+    ? comment
+        .split("\n")
+        .map((line) => line.split("*")[1])
+        .filter(Boolean)
+        .join("")
+        .trim()
+    : "";
 
 const parseConfig = (configString) => {
   const rtn = {};

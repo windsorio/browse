@@ -15,21 +15,19 @@ const pullTags = (comment) => {
   const annotationMatch = /(@\w+) {(((?:\\})|[^}])*)}/g;
   let matches;
 
-  if (comment.startsWith("*")) {
-    while ((matches = annotationMatch.exec(comment)) !== null) {
-      const tag = matches[1];
+  while ((matches = annotationMatch.exec(comment)) !== null) {
+    const tag = matches[1];
 
-      let val = matches[2].replace(/^\s*\*/gm, "");
-      val = val.replace(/\\}/g, "}");
+    let val = matches[2].replace(/^\s*\*/gm, "");
+    val = val.replace(/\\}/g, "}");
 
-      const [leadingWhitespace] = /^\s*/.exec(val);
-      val = val.replace(
-        new RegExp(`^[ \\t]{${leadingWhitespace.length}}`, "gm"),
-        ""
-      );
-      if (val.endsWith("\n")) val = val.slice(0, -1);
-      rtn[tag] = val;
-    }
+    const [leadingWhitespace] = /^\s*/.exec(val);
+    val = val.replace(
+      new RegExp(`^[ \\t]{${leadingWhitespace.length}}`, "gm"),
+      ""
+    );
+    if (val.endsWith("\n")) val = val.slice(0, -1);
+    rtn[tag] = val;
   }
   return rtn;
 };
@@ -40,7 +38,7 @@ const pullAllTags = (comments) =>
 
 const parseParams = (paramString) => {
   const rtn = {};
-  const paramMatch = /\[(?:(\w*)(?::\s(.+))?)\]\s*([^\[]*)/g;
+  const paramMatch = /\[(?:(\w*)(?::\s(.+))?)\]\s*:?\s*([^\[]*)/g;
   let matches;
   while ((matches = paramMatch.exec(paramString)) !== null) {
     const name = matches[1];
@@ -55,7 +53,7 @@ const parseParams = (paramString) => {
 };
 
 const parseRtn = (rtnString) => {
-  const matches = /(\[(.*)\])?\s*(.+)/g.exec(rtnString);
+  const matches = /(\[(.*)\])?\s*:?\s*(.+)/g.exec(rtnString);
   const type = matches[2] || "any";
   const description = matches[3];
   return {
@@ -68,10 +66,10 @@ const parseRtn = (rtnString) => {
  */
 const processRule = (ruleComments) => {
   const rtn = {};
+
   const tags = pullAllTags(ruleComments);
   /* Parse the help tag */
 
-  console.log("Tags", tags);
   if (tags["@help"] === undefined && tags["@desc"] === undefined) {
     //If the help and desc tags have no data we grab all of the text
     //TODO: Return just the comments not within a tag

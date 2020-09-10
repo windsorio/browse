@@ -21,12 +21,14 @@ const getChildren = (type) =>
   }[type]);
 
 const cleanComment = (comment) =>
-  comment
-    .split("\n")
-    .map((line) => line.split("#")[1])
-    .filter(Boolean)
-    .join("")
-    .trim();
+  comment.startsWith("*")
+    ? comment
+        .split("\n")
+        .map((line) => line.split("#")[1] || line.split("#")[0])
+        .filter(Boolean)
+        .join("")
+        .trim()
+    : "";
 
 const parseComments = (ast) => {
   const commentBlocks = ast.comments.reduce((p, c) => {
@@ -172,7 +174,7 @@ module.exports = (code, fileName) => {
         scope.desc = tags["@scope"];
         if (tags["@name"] !== undefined) {
           //If we find the name, set the name
-          scope.name = tags["@name"];
+          scope.name = tags["@name"].trim();
         } else {
           //Else set the name to be the file name
           scope.name = fileName;
@@ -184,15 +186,24 @@ module.exports = (code, fileName) => {
       }
     }
   });
-  console.log(
-    rules.map((ruleNode) =>
-      processRule(
-        ruleNode.leadingComments.map((comment) => ({
-          ...comment,
-          value: cleanComment(comment.value),
-        }))
-      )
-    )
-  );
+
+  if (scope) {
+    const scopeName = scope ? scope.name : fileName;
+    rtn[scopeName] = {
+      description: scope ? scope.desc : "",
+      rules: {},
+    };
+    const processedRules = rules.forEach((ruleNode) => {
+      rtn[scopeName].rules[ruleNode.args[0].value] = {
+        ...processRule(
+          ruleNode.leadingComments.map((comment) => ({
+            ...comment,
+            value: cleanComment(comment.value),
+          }))
+        ),
+      };
+    });
+  }
+  console.log(rtn);
   return rtn;
 };
