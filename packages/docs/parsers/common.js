@@ -61,6 +61,24 @@ const parseRtn = (rtnString) => {
     description: description.trim(),
   };
 };
+
+/*
+ * Grabs the text that's not part of the autodoc format
+ */
+const getPlaintext = (comment) => {
+  const annotationMatch = /(@\w+) {(((?:\\})|[^}])*)}/g;
+
+  let lastMatchedIndex = 0;
+  const nonMatched = [];
+  while ((matches = annotationMatch.exec(comment)) !== null) {
+    nonMatched.push(comment.slice(lastMatchedIndex, matches.index));
+    lastMatchedIndex = matches.index + matches[0].length;
+  }
+  nonMatched.push(comment.slice(lastMatchedIndex));
+
+  return nonMatched;
+};
+
 /*
  * Process a single annotated rule
  */
@@ -72,8 +90,9 @@ const processRule = (ruleComments) => {
 
   if (tags["@help"] === undefined && tags["@desc"] === undefined) {
     //If the help and desc tags have no data we grab all of the text
-    //TODO: Return just the comments not within a tag
-    rtn.help = ruleComments.map((comment) => comment.value).join("\n");
+    rtn.help = ruleComments
+      .map((comment) => getPlaintext(comment.value))
+      .join("\n");
   } else {
     //else we just extract data from @help tags
     rtn.help = tags["@help"] || tags["@desc"];
@@ -82,8 +101,9 @@ const processRule = (ruleComments) => {
   /* Parse the desc tag */
   if (tags["@desc"] === undefined && tags["@help"] === undefined) {
     //If the help and desc tags have no data we grab all of the text
-    //TODO: Return just the comments not within a tag
-    rtn.help = ruleComments.map((comment) => comment.value).join("\n");
+    rtn.help = ruleComments
+      .map((comment) => getPlaintext(comment.value))
+      .join("\n");
   } else {
     //else we just extract data from @help tags
     rtn.help = tags["@desc"] || tags["@help"];

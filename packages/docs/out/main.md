@@ -52,7 +52,7 @@ Standard Math functions
 
 ### `E`
 
-@scope { Standard Math functions } @name { Math }
+, ,
 Euler's constant and the base of natural logarithms; approximately 2.718.
 
 ### `LN10`
