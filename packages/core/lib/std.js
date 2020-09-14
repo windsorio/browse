@@ -14,7 +14,7 @@ const IMMUTABLE_RULES = ["rule", "import", "id", "return", "eval"]; // if and fo
 /**
  * @scope { This scope is available to every program and consists of all the core rules to write useful browse programs }
  */
-module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
+module.exports = ({ evalRule, evalRuleSet, evalExpr, getNewScope }) => ({
   parent: null, // This is the root
   vars: {},
   internal: {},
@@ -637,7 +637,7 @@ module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
      *  \}
      * }
      */
-    match: (scope) => (_) => (/** @type Map */ val, rs) => {
+    match: (scope) => (_) => async (/** @type Map */ val, rs) => {
       const type = val.get("__type__");
       if (!type) {
         throw new Error("The value does not have a type constructor");
@@ -646,19 +646,24 @@ module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
       if (!matchedRule) {
         throw new Error(`Unhandled type '${type}'`);
       }
-      const boundVars = {};
-      const bindings = matchedRule.args.slice(0, -1);
+      // Resolve the args
+      const resolvedArgs = [];
+      for (const arg of matchedRule.args) {
+        resolvedArgs.push(await evalExpr(arg, scope));
+      }
 
-      bindings.forEach((binding, i) => {
-        if (binding.type !== "Literal") {
+      // Bind parameters
+      const boundVars = {};
+      resolvedArgs.slice(0, -1).forEach((binding, i) => {
+        if (typeof binding !== "string") {
           throw new Error(
-            `An argument for the match case '${type}' wasn't a string literal`
+            `An argument for the match case '${type}' wasn't a string`
           );
         }
-        boundVars[binding.value] = val.get("" + i) || null;
+        boundVars[binding] = val.get("" + i) || null;
       });
 
-      const matchedRuleSet = matchedRule.args[matchedRule.args.length - 1];
+      const matchedRuleSet = resolvedArgs[resolvedArgs.length - 1];
       return evalRuleSet(matchedRuleSet, { vars: boundVars });
     },
   },

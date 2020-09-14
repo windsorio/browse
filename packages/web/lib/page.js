@@ -219,15 +219,15 @@ const getPageScope = (parent) => {
       }
       return str;
     },
-    wait: (_) => (_) => async (value) => {
+    wait: (_) => ({ visible, timeout }) => async (value) => {
       const page = pageScope.internal.page;
       if (!page) {
         return false;
       }
       if (typeof value === "number") {
-        await page.waitFor(value);
+        await page.waitFor(value, { visible, timeout });
       } else if (typeof value === "string") {
-        await page.waitForSelector(value);
+        await page.waitForSelector(value, { visible, timeout });
       } else {
         return false;
       }
