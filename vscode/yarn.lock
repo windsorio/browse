@@ -23,7 +23,7 @@
     chalk "^2.0.0"
     js-tokens "^4.0.0"
 
-"@browselang/format@0.0.21-2":
+"@browselang/format@^0.0.21-2":
   version "0.0.21-2"
   resolved "https://registry.yarnpkg.com/@browselang/format/-/format-0.0.21-2.tgz#96f12d665502bf06c7fab7ca0c663d28ad82cfec"
   integrity sha512-Hi0Ougmc44v7i7FOMcy97X1awbUh4gdDOZU7GyWJWOQ3/k/eoovxrqN58MlAYjD9dyrSH/4izwgkTZth12f9EQ==

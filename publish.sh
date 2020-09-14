@@ -31,10 +31,11 @@ done
 
 # Update "format" lib in vscode and publish
 cd vscode
-yarn add @browselang/format
 if [ "$1" == "prerelease" ]; then
+  yarn add @browselang/format@pre
   vsce publish patch
 else
+  yarn add @browselang/format@latest
   vsce publish $1
 fi
 cd ..

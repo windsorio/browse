@@ -61,6 +61,6 @@
     ]
   },
   "dependencies": {
-    "@browselang/format": "0.0.21-2"
+    "@browselang/format": "^0.0.21-2"
   }
 }
