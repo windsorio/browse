@@ -15,7 +15,7 @@ const moduleCache = new Map();
 
 const getNewScope = (parent) => {
   if (!parent) {
-    parent = getSTD({ evalRule, evalRuleSet, getNewScope });
+    parent = getSTD({ evalRule, evalRuleSet, evalExpr, getNewScope });
   }
   return {
     parent,
