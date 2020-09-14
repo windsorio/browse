@@ -4,11 +4,16 @@
 
 PKG_DIRS=$(ls packages)
 
+if [ -z $1 ]; then
+  echo "Usage: ./publish.sh <major|minor|patch|prerelease>"
+  exit 1
+fi
+
 # Bump all versions
 for pkg in $PKG_DIRS; do
   rm -rf .yarn/versions
   cd "packages/$pkg"
-  yarn version $@
+  yarn version $1
   cd ../../
 done
 rm -rf .yarn/versions
@@ -16,12 +21,21 @@ rm -rf .yarn/versions
 # Publish each one
 for pkg in $PKG_DIRS; do
   cd "packages/$pkg"
-  yarn npm publish --access public
+  if [ "$1" == "prerelease" ]; then
+    yarn npm publish --access public --tag pre
+  else
+    yarn npm publish --access public
+  fi
   cd ../../
 done
 
 # Update "format" lib in vscode and publish
 cd vscode
-yarn add @browselang/format
-vsce publish $@
+if [ "$1" == "prerelease" ]; then
+  yarn add @browselang/format@pre
+  vsce publish patch
+else
+  yarn add @browselang/format@latest
+  vsce publish $1
+fi
 cd ..

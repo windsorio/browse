@@ -163,7 +163,7 @@ const getBrowserScope = (parent) => {
           // TODO: Make this determinisitic
           for (const key in defs) {
             const { matcher, ruleSets, scrape } = defs[key];
-            const matchObj = matcher.match(href.split("?")[0]);
+            const matchObj = matcher.match(href.split("#")[0].split("?")[0]);
             if (matchObj) {
               const urlObj = url.parse(href);
               match = {

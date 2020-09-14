@@ -79,6 +79,7 @@ function genericPrint(path, options, print) {
       return concat([
         ...(n.module ? [path.call(print, "module"), ":"] : []),
         path.call(print, "name"),
+        n.optional ? "?" : "",
         n.options.length
           ? group(
               concat([
