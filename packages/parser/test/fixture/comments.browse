@@ -10,17 +10,15 @@
 # hello # world
 
 # Strings can have # between them
-print "hello # world" 
+print "hello # world"
 
 # and after them too
 print 'hello # world' # some # comment
-
 # implicit strings
-print hell# w#rld  # some # comment
-
+print hell# w#rld # some # comment
 # and without #
 print hello world # some # comment
 
 # trailing comments
 #
-# 
+#
