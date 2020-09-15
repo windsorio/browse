@@ -22,7 +22,7 @@ rm -rf .yarn/versions
 for pkg in $PKG_DIRS; do
   cd "packages/$pkg"
   if [ "$1" == "prerelease" ]; then
-    yarn npm publish --access public --tag pre
+    yarn npm publish --access public --tag next
   else
     yarn npm publish --access public
   fi
@@ -32,7 +32,7 @@ done
 # Update "format" lib in vscode and publish
 cd vscode
 if [ "$1" == "prerelease" ]; then
-  yarn add @browselang/format@pre
+  yarn add @browselang/format@next
   vsce publish patch
 else
   yarn add @browselang/format@latest
