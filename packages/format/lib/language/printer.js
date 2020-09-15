@@ -125,7 +125,9 @@ function genericPrint(path, options, print) {
       return "opt";
     }
     case "Literal": {
-      if (typeof n.value === "string") {
+      if (n.value === null) {
+        return "nil";
+      } else if (typeof n.value === "string") {
         return concat([n.quoteType, n.value, n.quoteType]);
       } else {
         return String(n.value);

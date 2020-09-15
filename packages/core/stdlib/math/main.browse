@@ -57,7 +57,7 @@ rule atanh { bind x; return (native:fn atanh $x) }
 #*Returns the arctangent of the quotient of its arguments.
 rule atan2 { bind y x; return (native:fn atan2 $y $x) }
 #*Returns the cube root of x.
-rule cbrt { bind x; return (native:fn cbrt $x) }a
+rule cbrt { bind x; return (native:fn cbrt $x) }
 #*Returns the smallest integer greater than or equal to x.
 rule ceil { bind x; return (native:fn ceil $x) }
 #*Returns the number of leading zeroes of the 32-bit integer x.
