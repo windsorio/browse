@@ -1,0 +1,19 @@
+rule test { throw error }
+
+# Adding a ? after a rule name wraps the return value in a "Result" type This
+# means that if the rule succeeds, the return value is a dictionary that
+# contains the success values and if it fails, the dictionary contains the Error
+set a (test?)
+
+# to unwrap the dictionary and get the value, we can use the pattern matching
+# rule "match"
+match $a {
+  # The Rule names are just matched against the __type__ value in the
+  # dictionary, and if a match is found,
+  #  * all arguments to the rule (excpet the last) are used to bind variables
+  #    from the dictionary; and
+  #  * the last argument is a RuleSet which is evaluated (with those bound
+  #    variables)
+  Err e { print "Error:" $e }
+  Ok v { print "Ok:" $v }
+}

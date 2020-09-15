@@ -3,6 +3,7 @@ const {
   resolveRuleScope,
   resolveVar,
   resolveVarScope,
+  resolveInternal,
 } = require("./scope");
 const { isNullish, help, stringify } = require("./utils");
 const { BrowseError } = require("./error");
@@ -13,7 +14,7 @@ const IMMUTABLE_RULES = ["rule", "import", "id", "return", "eval"]; // if and fo
 /**
  * @scope { This scope is available to every program and consists of all the core rules to write useful browse programs }
  */
-module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
+module.exports = ({ evalRule, evalRuleSet, evalExpr, getNewScope }) => ({
   parent: null, // This is the root
   vars: {},
   internal: {},
@@ -608,6 +609,63 @@ module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
      * @returns { [number] length of the string or the number of elements in an array }
      */
     len: (_) => (_) => (v) => v.length,
+    /**
+     * @desc { Throw an error }
+     * @params {
+     *  [value: any] Any value to throw as an error
+     * }
+     * @throws { The value passed in }
+     */
+    throw: (_) => (_) => (v) => {
+      throw new Error(v);
+    },
+    /**
+     * @desc { Pattern match the value using the potential options in the
+     * RuleSet }
+     * @params {
+     *  [value: dict<string, any>] A value constructed using the `type` rule, or the return value of a rule used with the `?` modifier
+     *  [matchers: RuleSet] A ruleset where each rule name is tested against the value's type to find a rule that matches. The arguments to each rule should be the variable names to bind the type's value in case of a match, and the last argument is the RuleSet to evaluate (with the bound variables)
+     * }
+     * @throws { If an invalid value is passed, or the value has a type that isn't handled by the matchers RuleSet }
+     * @returns { [any] The return value from the matched RuleSet }
+     * @example {
+     *  rule test { throw error \}
+     *
+     *  match (test? x) {
+     *    Err e { print "Error:" $e \}
+     *    Ok v { print "Ok:" $v \}
+     *  \}
+     * }
+     */
+    match: (scope) => (_) => async (/** @type Map */ val, rs) => {
+      const type = val.get("__type__");
+      if (!type) {
+        throw new Error("The value does not have a type constructor");
+      }
+      const matchedRule = rs.rules.find((rule) => rule.fn.name.name === type);
+      if (!matchedRule) {
+        throw new Error(`Unhandled type '${type}'`);
+      }
+      // Resolve the args
+      const resolvedArgs = [];
+      for (const arg of matchedRule.args) {
+        resolvedArgs.push(await evalExpr(arg, scope));
+      }
+
+      // Bind parameters
+      const boundVars = {};
+      resolvedArgs.slice(0, -1).forEach((binding, i) => {
+        if (typeof binding !== "string") {
+          throw new Error(
+            `An argument for the match case '${type}' wasn't a string`
+          );
+        }
+        boundVars[binding] = val.get("" + i) || null;
+      });
+
+      const matchedRuleSet = resolvedArgs[resolvedArgs.length - 1];
+      return evalRuleSet(matchedRuleSet, { vars: boundVars });
+    },
   },
 });
 

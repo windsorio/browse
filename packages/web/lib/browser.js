@@ -20,11 +20,10 @@ const { BrowseError } = require("@browselang/core/lib/error");
 
 const getPageScope = require("./page");
 
-const newBrowser = async (headless) => {
+const newBrowser = async (opts = {}) => {
   return puppeteer.launch({
     ...(isDocker()
       ? {
-          headless,
           args: [
             // Required for Docker version of Puppeteer
             "--no-sandbox",
@@ -33,9 +32,10 @@ const newBrowser = async (headless) => {
             // /dev/shm, because Docker’s default for /dev/shm is 64MB
             "--disable-dev-shm-usage",
           ],
+          ...opts,
         }
       : {
-          headless,
+          ...opts,
         }),
   });
 };
@@ -82,6 +82,7 @@ const getBrowserScope = (parent) => {
       browser: null,
       // Page definitions
       pageDefs: {},
+      config: {},
     },
   };
 
@@ -162,7 +163,7 @@ const getBrowserScope = (parent) => {
           // TODO: Make this determinisitic
           for (const key in defs) {
             const { matcher, ruleSets, scrape } = defs[key];
-            const matchObj = matcher.match(href.split("?")[0]);
+            const matchObj = matcher.match(href.split("#")[0].split("?")[0]);
             if (matchObj) {
               const urlObj = url.parse(href);
               match = {
@@ -178,12 +179,11 @@ const getBrowserScope = (parent) => {
         });
       } catch (e) {}
 
-      const isHeadless = resolveVar("headless", scope);
-
       // Setup a browser if there isn't one
       let browser = browserScope.internal.browser;
       if (!browser) {
-        browser = browserScope.internal.browser = await newBrowser(isHeadless);
+        const config = browserScope.internal.config;
+        browser = browserScope.internal.browser = await newBrowser(config);
       }
 
       if (match) {
@@ -261,6 +261,22 @@ const getBrowserScope = (parent) => {
         nearestPageScope.page = await preparePage(browser, href);
       }
       return href;
+    },
+    /**
+     * @rule { BrowserConfig }
+     * @scope { Browser }
+     * @desc { Set configuration options on the puppeteer browser }
+     */
+    browserConfig: (_) => (_) => async (ruleSet) => {
+      // Evaluate the ruleSet
+      await evalRuleSet(ruleSet, {
+        rules: {
+          set: (_) => (_) => (name, value) => {
+            browserScope.internal.config[name] = value;
+          },
+        },
+      });
+      return new Map(Object.entries(browserScope.internal.config));
     },
   };
 

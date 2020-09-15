@@ -38,6 +38,24 @@ semantics.addAttribute("errors", {
     ];
   },
 
+  InvalidBinExpr_and(_l, o, _, _r) {
+    return [
+      {
+        message: "Bitwise AND '&' is not supported. For Logical AND, use &&",
+        source: o.source,
+      },
+    ];
+  },
+  InvalidBinExpr_xor(_l, o, _, _r) {
+    return [
+      {
+        message:
+          "Bitwise XOR '^' is not supported. For Logical XOR, combine Logical AND '&&' and Logical OR '||'",
+        source: o.source,
+      },
+    ];
+  },
+
   // Base Cases
   _iter(children) {
     const errors = children.map((c) => c.errors);
@@ -102,6 +120,7 @@ semantics.addAttribute('asLisp', {
   OrExpr_or:      function(l, _op, _, r)        { return ["||", l.asLisp, r.asLisp]; },
 
   ruleName:       function (m, _, n)       { return (m.asLisp ? m.asLisp + ":" : "") + n.asLisp; },
+  errorRule_optional: function(r, _)       { return r.asLisp + "?" },
 
   Rule:           function(w, es)     { return [w.asLisp, es.asLisp] },
   Rules:          function (_nl, first, _rs, rest, _s) 
@@ -323,21 +342,23 @@ semantics.addAttribute("asAST", {
   },
 
   InitRule_withOpts(w, _l, opts, _r) {
-    const { module, name } = w.asAST;
+    const { module, name, optional } = w.asAST;
     return {
       type: "InitRule",
       module,
       name,
+      optional,
       options: opts.asAST,
       source: this.source,
     };
   },
   InitRule_vanilla(w) {
-    const { module, name } = w.asAST;
+    const { module, name, optional } = w.asAST;
     return {
       type: "InitRule",
       module,
       name,
+      optional,
       options: [],
       source: this.source,
     };
@@ -395,7 +416,12 @@ semantics.addAttribute("asAST", {
   },
 
   ruleName: function (m, _, n) {
-    return { module: m.asAST[0], name: n.asAST }; // This is not an AST node
+    // Used upstream to create an AST node
+    return { module: m.asAST[0], name: n.asAST, optional: false };
+  },
+  errorRule_optional: function (r, _) {
+    // Used upstream to create an AST node
+    return { ...r.asAST, optional: true };
   },
   word: function (_) {
     return {

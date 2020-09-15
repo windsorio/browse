@@ -1,0 +1,28 @@
+version = 1
+
+exclude_patterns = [
+  ".pnp.js",
+  ".yarn/**/*",
+  ".vscode/**/*",
+  "**/test/snapshots",
+]
+
+[[analyzers]]
+enabled = true
+name = "docker"
+
+[[analyzers]]
+enabled = true
+name = "javascript"
+
+[analyzers.meta]
+environment = [
+  "nodejs",
+  "browser",
+]
+module_system = "commonjs"
+plugins = ["react"]
+
+[[transformers]]
+enabled = true
+name = "prettier"

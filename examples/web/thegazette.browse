@@ -14,7 +14,7 @@ page https://www.thegazette.co.uk/all-notices/notice {
 
 page https://www.thegazette.co.uk/notice/:issue {
   print $url
-  config { set output "./notices/" + $issue + ".json" }
+  pageConfig { set output "./notices/" + $issue + ".json" }
 
   wait `.wrapperContent`
   @string title `h1.title`

@@ -59,15 +59,16 @@ const getPageScope = (parent) => {
       if (value === null || value === undefined) {
         value = null; // We don't want undefined in the `finally` clause
         throw new Error(
-          `Element given to @${type} call had no content of the correct type. If this value is optional, try using @${type}?. This will set the value to null if a match isn't found`
+          `Element given to @${type} call had no content of the correct type`
         );
       }
       if (trim && typeof value === "string") {
         value = value.trim();
       }
     } catch (e) {
-      if (!optional) throw e;
+      throw e;
     } finally {
+      // Always explicitly set it to null
       pageScope.vars[key] = value;
     }
     return value;
@@ -82,22 +83,16 @@ const getPageScope = (parent) => {
         scope: helpScope,
         key,
         functions: {
-          config:
+          pageConfig:
             "Takes in a ruleSet and overrides the set rule so that any sets within the ruleSet set config variables",
           click:
             "Takes in a selector and clicks the argument indicated by the selector",
           "@string":
             "<key> <selector>: Sets a key on the data object in nearest page scope to a string value specified by selector",
-          "@string?":
-            "<key> <selector>: Sets a key on the data object in nearest page scope to a string value specified by selector or null if there is no string value",
           "@number":
             "<key> <selector>: Sets a key on the data object in nearest page scope to a numeric value specified by selector",
-          "@number?":
-            "<key> <selector>: Sets a key on the data object in nearest page scope to a numeric value specified by selector or null if there is no numeric value",
           "@url":
             "<key> <selector>: Sets a key on the data object in nearest page scope to the href value at the selector",
-          "@url?":
-            "<key> <selector>: Sets a key on the data object in nearest page scope to the href value at the selector or to null if there is no href value",
           page:
             "Defines a page definition which matches on the regex passed in as the first argument, and which executes the rule set passed in as the second argument on every matching page",
           press: "Presses the given key",
@@ -110,7 +105,7 @@ const getPageScope = (parent) => {
       });
       return null;
     },
-    config: (_) => (_) => async (ruleSet) => {
+    pageConfig: (_) => (_) => async (ruleSet) => {
       // Evaluate the ruleSet
       await evalRuleSet(ruleSet, {
         rules: {
@@ -126,14 +121,11 @@ const getPageScope = (parent) => {
           },
         },
       });
-      return pageScope.internal.config;
+      return new Map(Object.entries(pageScope.internal.config));
     },
     "@string": dataExtractionRule(getString, "string"),
-    "@string?": dataExtractionRule(getString, "string", true),
     "@number": dataExtractionRule(getNumber, "number"),
-    "@number?": dataExtractionRule(getNumber, "number", true),
     "@url": dataExtractionRule(getUrl, "url"),
-    "@url?": dataExtractionRule(getUrl, "url", true),
     "@arr": (_) => ({ string = false, trim = true }) => async (
       key,
       selector
@@ -227,15 +219,15 @@ const getPageScope = (parent) => {
       }
       return str;
     },
-    wait: (_) => (_) => async (value) => {
+    wait: (_) => ({ visible, timeout }) => async (value) => {
       const page = pageScope.internal.page;
       if (!page) {
         return false;
       }
       if (typeof value === "number") {
-        await page.waitFor(value);
+        await page.waitFor(value, { visible, timeout });
       } else if (typeof value === "string") {
-        await page.waitForSelector(value);
+        await page.waitForSelector(value, { visible, timeout });
       } else {
         return false;
       }

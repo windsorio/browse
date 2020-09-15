@@ -112,11 +112,8 @@ rule valueOf { bind date; return (native:date_fn $date valueOf) }
 rule dayOfYear {
   bind date
   set yearStart (Date (getFullYear $date) 0 0)
-  set diff (getTime $date) -
-    (getTime $yearStart) +
-    ((getTimezoneOffset $yearStart) - (getTimezoneOffset $date)) *
-      60 *
-      1000
+  set diff (getTime $date) - (getTime $yearStart) +
+    ((getTimezoneOffset $yearStart) - (getTimezoneOffset $date)) * 60 * 1000
 
   # return Math.floor($diff / $DAY);
   return (math:floor $diff / $DAY)
