@@ -1,0 +1,3 @@
+import "./native.js"
+
+rule argv { bind n; native:argv $n }

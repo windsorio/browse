@@ -1,0 +1,10 @@
+import "." as sys
+
+print (sys:argv 0) # Node binary
+print (sys:argv 1) # @browselang/cli path
+print (sys:argv 2) # path to .browse script
+print (sys:argv 3) # first arg
+print (sys:argv 4) # second arg
+print (sys:argv 5) # ...
+print (sys:argv 6) # ...
+print (sys:argv 7) # ...
