@@ -1,10 +1,17 @@
 import "." as sys
 
-print (sys:argv 0) # Node binary
-print (sys:argv 1) # @browselang/cli path
-print (sys:argv 2) # path to .browse script
-print (sys:argv 3) # first arg
-print (sys:argv 4) # second arg
-print (sys:argv 5) # ...
-print (sys:argv 6) # ...
-print (sys:argv 7) # ...
+print sys:env PATH (sys:env PATH)
+print
+print sys:argv 0 (sys:argv 0) # Node binary
+print sys:argv 1 (sys:argv 1) # @browselang/cli path
+print sys:argv 2 (sys:argv 2) # path to .browse script
+print sys:argv 3 (sys:argv 3) # first arg
+print sys:argv 4 (sys:argv 4) # second arg
+print sys:argv 5 (sys:argv 5) # ...
+print sys:argv 6 (sys:argv 6) # ...
+print sys:argv 7 (sys:argv 7) # ...
+print
+print exiting with code 42
+sys:exit 1 # exit with code 1
+print This should not print, and
+throw 'This should not happen'

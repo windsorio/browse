@@ -1,3 +1,5 @@
 import "./native.js"
 
 rule argv { bind n; native:argv $n }
+rule env { bind key; native:env $key }
+rule exit { bind code; native:exit $code }
