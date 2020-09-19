@@ -223,19 +223,40 @@ module.exports = (code, fileName) => {
         //In the case of a rule definition which has been tagged with a scope
         else if (tags["@scope"] !== undefined && tags["@rule"] !== undefined) {
           const scopeName = (tags["@scope"] || scope || fileName).trim();
-
-          if (!rtn[scopeName]) {
-            console.warn(
-              `WARNING:: Scope ${scopeName} does not exist. Creating new scope definition.`
-            );
-            rtn[scopeName] = {};
+          let scopeObj = rtn;
+          //In the case that this scope doesn't exist, we check for an @parent tag. If that doesn't exist we create a new scope
+          if (!scopeObj[scopeName]) {
+            //TODO: inference parent
+            if (tags["@parent"]) {
+              //TODO: Support arbitrarily nested scopes (currently supports one level of nesting)
+              //If the parent exists We create a child scope
+              if (!scopeObj[tags["@parent"]]) {
+                console.warn(
+                  `WARNING:: Parent Scope '${
+                    scopeObj[tags["@parent"]]
+                  }' for scope ${scopeName} does not exist. Creating new scope definition.`
+                );
+                scopeObj[tags["@parent"]] = {};
+              }
+              if (!scopeObj[tags["@parent"]]["children"]) {
+                scopeObj[tags["@parent"]]["children"] = {};
+              }
+              scopeObj = scopeObj[tags["@parent"]]["children"];
+              //Since this is a child scope, we don't need to print a warning
+              if (!scopeObj[scopeName]) scopeObj[scopeName] = {};
+            } else {
+              console.warn(
+                `WARNING:: Scope '${scopeName}' does not exist. Creating new scope definition.`
+              );
+              scopeObj[scopeName] = {};
+            }
           }
 
           /* Deal with the Rule annotations */
           //Rules
-          if (!rtn[scopeName]["rules"]) rtn[scopeName]["rules"] = {};
+          if (!scopeObj[scopeName]["rules"]) scopeObj[scopeName]["rules"] = {};
 
-          rtn[scopeName]["rules"][tags["@rule"]] = processRule(
+          scopeObj[scopeName]["rules"][tags["@rule"]] = processRule(
             path.node.leadingComments.map((comment) => ({
               ...comment,
               value: cleanComment(comment.value),

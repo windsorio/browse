@@ -1,30 +1,29 @@
 #* @scope { Standard Math functions }
 #  @name { Math }
-#  TODO: This is a bit hacky. If the @name is called below the import it will be attributed to E rather than to the scope.
 import "./native.js"
 
-#*Euler's constant and the base of natural logarithms; approximately 2.718.
+#* Euler's constant and the base of natural logarithms; approximately 2.718.
 set E 2.718281828459045
 
-#*Natural logarithm of 2; approximately 0.693.
+#* Natural logarithm of 2; approximately 0.693.
 set LN10 2.302585092994046
 
-#*Natural logarithm of 10; approximately 2.303.
+#* Natural logarithm of 10; approximately 2.303.
 set LN2 0.6931471805599453
 
-#*Base-2 logarithm of E; approximately 1.443.
+#* Base-2 logarithm of E; approximately 1.443.
 set LOG10E 0.4342944819032518
 
-#*Base-10 logarithm of E; approximately 0.434.
+#* Base-10 logarithm of E; approximately 0.434.
 set LOG2E 1.4426950408889634
 
-#*Ratio of the a circle's circumference to its diameter; approximately 3.14159.
+#* Ratio of the a circle's circumference to its diameter; approximately 3.14159.
 set PI 3.141592653589793
 
-#*Square root of ½ (or equivalently, 1/√2); approximately 0.707.
+#* Square root of ½ (or equivalently, 1/√2); approximately 0.707.
 set SQRT1_2 0.7071067811865476
 
-#*Square root of 2; approximately 1.414.
+#* Square root of 2; approximately 1.414.
 set SQRT2 1.4142135623730951
 
 # built in number functions
@@ -40,76 +39,76 @@ rule toPrecision {
 }
 
 # Math.* fns
-#*Returns the absolute value of x.
+#* Returns the absolute value of x.
 rule abs { bind x; return (native:fn abs $x) }
-#*Returns the arccosine of x.
+#* Returns the arccosine of x.
 rule acos { bind x; return (native:fn acos $x) }
-#*Returns the hyperbolic arccosine of x.
+#* Returns the hyperbolic arccosine of x.
 rule acosh { bind x; return (native:fn acosh $x) }
-#*Returns the arcsine of x.
+#* Returns the arcsine of x.
 rule asin { bind x; return (native:fn asin $x) }
-#*Returns the hyperbolic arcsine of a number.
+#* Returns the hyperbolic arcsine of a number.
 rule asinh { bind x; return (native:fn asinh $x) }
-#*Returns the arctangent of x.
+#* Returns the arctangent of x.
 rule atan { bind x; return (native:fn atan $x) }
-#*Returns the hyperbolic arctangent of x.
+#* Returns the hyperbolic arctangent of x.
 rule atanh { bind x; return (native:fn atanh $x) }
-#*Returns the arctangent of the quotient of its arguments.
+#* Returns the arctangent of the quotient of its arguments.
 rule atan2 { bind y x; return (native:fn atan2 $y $x) }
-#*Returns the cube root of x.
+#* Returns the cube root of x.
 rule cbrt { bind x; return (native:fn cbrt $x) }a
-#*Returns the smallest integer greater than or equal to x.
+#* Returns the smallest integer greater than or equal to x.
 rule ceil { bind x; return (native:fn ceil $x) }
-#*Returns the number of leading zeroes of the 32-bit integer x.
+#* Returns the number of leading zeroes of the 32-bit integer x.
 rule clz32 { bind x; return (native:fn clz32 $x) }
-#*Returns the cosine of x.
+#* Returns the cosine of x.
 rule cos { bind x; return (native:fn cos $x) }
-#*Returns the hyperbolic cosine of x.
+#* Returns the hyperbolic cosine of x.
 rule cosh { bind x; return (native:fn cosh $x) }
-#*Returns E^x, where x is the argument, and E is Euler's constant (2.718…, the base of the natural logarithm).
+#* Returns E^x, where x is the argument, and E is Euler's constant (2.718…, the base of the natural logarithm).
 rule exp { bind x; return (native:fn exp $x) }
-#*Returns subtracting 1 from exp(x).
+#* Returns subtracting 1 from exp(x).
 rule expm1 { bind x; return (native:fn expm1 $x) }
-#*Returns the largest integer less than or equal to x.
+#* Returns the largest integer less than or equal to x.
 rule floor { bind x; return (native:fn floor $x) }
-#*Returns the nearest single precision float representation of x.
+#* Returns the nearest single precision float representation of x.
 rule fround { bind x; return (native:fn fround $x) }
-#*Returns the square root of the sum of squares of both arguments.
+#* Returns the square root of the sum of squares of both arguments.
 # TODO: support more than 2 arguments, like in the JS native version
 rule hypot { bind x y; return (native:fn hypot $x $y) }
-#*Returns the result of the 32-bit integer multiplication of x and y.
+#* Returns the result of the 32-bit integer multiplication of x and y.
 rule imul { bind x y; return (native:fn imul $x $y) }
-#*Returns the natural logarithm (㏒e; also, ㏑) of x.
+#* Returns the natural logarithm (㏒e; also, ㏑) of x.
 rule log { bind x; return (native:fn log $x) }
-#*Returns the natural logarithm (㏒e; also ㏑) of 1 + x for the number x.
+#* Returns the natural logarithm (㏒e; also ㏑) of 1 + x for the number x.
 rule log1p { bind x; return (native:fn log1p $x) }
-#*Returns the base-10 logarithm of x.
+#* Returns the base-10 logarithm of x.
 rule log10 { bind x; return (native:fn log10 $x) }
-#*Returns the base-2 logarithm of x.
+#* Returns the base-2 logarithm of x.
 rule log2 { bind x; return (native:fn log2 $x) }
 # TODO: support more than 2 arguments, like in the JS native version
-#*Returns the largest of x and y numbers.
+#* Returns the largest of x and y numbers.
 rule max { bind x y; return (native:fn max $x $y) }
 # TODO: support more than 2 arguments, like in the JS native version
-#*Returns the smallest of x and y.
+#* Returns the smallest of x and y.
 rule min { bind x y; return (native:fn min $x $y) }
-#*Returns base x to the exponent power y (that is, xy).
+#* Returns base x to the exponent power y (that is, xy).
 rule pow { bind x y; return (native:fn pow $x $y) }
-#*Returns a pseudo-random number between 0 and 1.
+#* Returns a pseudo-random number between 0 and 1.
 rule random { return (native:fn random) }
-#*Returns the value of the number x rounded to the nearest integer.
+#* Returns the value of the number x rounded to the nearest integer.
 rule round { bind x; return (native:fn round $x) }
-#*Returns the sign of the x, indicating whether x is positive, negative, or zero.
+#* Returns the sign of the x, indicating whether x is positive, negative, or zero.
 rule sign { bind x; return (native:fn sign $x) }
-#*Returns the sine of x.
+#* Returns the sine of x.
 rule sin { bind x; return (native:fn sin $x) }
-#*Returns the hyperbolic sine of x.
+#* Returns the hyperbolic sine of x.
 rule sinh { bind x; return (native:fn sinh $x) }
-#*Returns the positive square root of x.
+#* Returns the positive square root of x.
 rule sqrt { bind x; return (native:fn sqrt $x) }
-#*Returns the tangent of x.
+#* Returns the tangent of x.
 rule tan { bind x; return (native:fn tan $x) }
-#*Returns the hyperbolic tangent of x.
+#* Returns the hyperbolic tangent of x.
 rule tanh { bind x; return (native:fn tanh $x) }
-#*Returns the integer portion of x, removing any fractional digits.
+#* Returns the integer portion of x, removing any fractional digits.
 rule trunc { bind x; return (native:fn trunc $x) }

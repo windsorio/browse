@@ -27,7 +27,7 @@ const pullTags = (comment) => {
       ""
     );
     if (val.endsWith("\n")) val = val.slice(0, -1);
-    rtn[tag] = val;
+    rtn[tag] = val.trim();
   }
   return rtn;
 };

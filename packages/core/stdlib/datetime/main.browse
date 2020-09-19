@@ -1,27 +1,27 @@
-#*  @name { DateTime }
+#* @name { DateTime }
 # @scope { DateTime utilities }
 import math
 
 import "./native.js"
 
-#*Number of seconds in a minute
+#* Number of seconds in a minute
 set SECONDS_PER_MINUTE 60
-#*Number of minutes in an hour
+#* Number of minutes in an hour
 set MINUTES_PER_HOUR 60
-#*Number of hours in a day
+#* Number of hours in a day
 set HOURS_PER_DAY 24
-#*Number of days in a week
+#* Number of days in a week
 set DAYS_PER_WEEK 7
 
-#*Number of milliseconds in a second
+#* Number of milliseconds in a second
 set SECOND 1000
-#*Number of milliseconds in a minute
+#* Number of milliseconds in a minute
 set MINUTE $SECOND * $SECONDS_PER_MINUTE
-#*Number of milliseconds in an hour
+#* Number of milliseconds in an hour
 set HOUR $MINUTE * $MINUTES_PER_HOUR
-#*Number of milliseconds in a day
+#* Number of milliseconds in a day
 set DAY $HOUR * $HOURS_PER_DAY
-#*Number of milliseconds in a week
+#* Number of milliseconds in a week
 set WEEK $DAY * $DAYS_PER_WEEK
 
 # A date looks like this:
@@ -36,71 +36,71 @@ rule Date { bind a b c d e f g; return (native:Date $a $b $c $d $e $f $g) }
 ####################################
 ### The Native JS Date functions ###
 ####################################
-#*Returns the day of the month (1–31) for the specified date according to local time.
+#* Returns the day of the month (1–31) for the specified date according to local time.
 rule getDate { bind date; return (native:date_fn $date getDate) }
-#*Returns the day of the week (0–6) for the specified date according to local time.
+#* Returns the day of the week (0–6) for the specified date according to local time.
 rule getDay { bind date; return (native:date_fn $date getDay) }
-#*Returns the day of the week (0–6) for the specified date according to local time.
+#* Returns the day of the week (0–6) for the specified date according to local time.
 rule getFullYear { bind date; return (native:date_fn $date getFullYear) }
-#*Returns the hour (0–23) in the specified date according to local time.
+#* Returns the hour (0–23) in the specified date according to local time.
 rule getHours { bind date; return (native:date_fn $date getHours) }
-#*Returns the milliseconds (0–999) in the specified date according to local time.
+#* Returns the milliseconds (0–999) in the specified date according to local time.
 rule getMilliseconds {
   bind date; return (native:date_fn $date getMilliseconds)
 }
-#*Returns the minutes (0–59) in the specified date according to local time.
+#* Returns the minutes (0–59) in the specified date according to local time.
 rule getMinutes { bind date; return (native:date_fn $date getMinutes) }
-#*Returns the month (0–11) in the specified date according to local time.
+#* Returns the month (0–11) in the specified date according to local time.
 rule getMonth { bind date; return (native:date_fn $date getMonth) }
-#*Returns the seconds (0–59) in the specified date according to local time.
+#* Returns the seconds (0–59) in the specified date according to local time.
 rule getSeconds { bind date; return (native:date_fn $date getSeconds) }
-#*Returns the numeric value of the specified date as the number of milliseconds since January 1, 1970, 00:00:00 UTC. (Negative values are returned for prior times.)
+#* Returns the numeric value of the specified date as the number of milliseconds since January 1, 1970, 00:00:00 UTC. (Negative values are returned for prior times.)
 rule getTime { bind date; return (native:date_fn $date getTime) }
-#*Returns the time-zone offset in minutes for the current locale.
+#* Returns the time-zone offset in minutes for the current locale.
 rule getTimezoneOffset {
   bind date; return (native:date_fn $date getTimezoneOffset)
 }
-#*Returns the day (date) of the month (1–31) in the specified date according to universal time.
+#* Returns the day (date) of the month (1–31) in the specified date according to universal time.
 rule getUTCDate { bind date; return (native:date_fn $date getUTCDate) }
-#*Returns the day of the week (0–6) in the specified date according to universal time.
+#* Returns the day of the week (0–6) in the specified date according to universal time.
 rule getUTCDay { bind date; return (native:date_fn $date getUTCDay) }
-#*Returns the year (4 digits for 4-digit years) in the specified date according to universal time.
+#* Returns the year (4 digits for 4-digit years) in the specified date according to universal time.
 rule getUTCFullYear { bind date; return (native:date_fn $date getUTCFullYear) }
-#*Returns the hours (0–23) in the specified date according to universal time.
+#* Returns the hours (0–23) in the specified date according to universal time.
 rule getUTCHours { bind date; return (native:date_fn $date getUTCHours) }
-#*Returns the milliseconds (0–999) in the specified date according to universal time.
+#* Returns the milliseconds (0–999) in the specified date according to universal time.
 rule getUTCMilliseconds {
   bind date; return (native:date_fn $date getUTCMilliseconds)
 }
-#*Returns the minutes (0–59) in the specified date according to universal time.
+#* Returns the minutes (0–59) in the specified date according to universal time.
 rule getUTCMinutes { bind date; return (native:date_fn $date getUTCMinutes) }
-#*Returns the month (0–11) in the specified date according to universal time.
+#* Returns the month (0–11) in the specified date according to universal time.
 rule getUTCMonth { bind date; return (native:date_fn $date getUTCMonth) }
-#*Returns the seconds (0–59) in the specified date according to universal time.
+#* Returns the seconds (0–59) in the specified date according to universal time.
 rule getUTCSeconds { bind date; return (native:date_fn $date getUTCSeconds) }
-#*Returns the "date" portion of the Date as a human-readable string like 'Thu Apr 12 2018'.
+#* Returns the "date" portion of the Date as a human-readable string like 'Thu Apr 12 2018'.
 rule toDateString { bind date; return (native:date_fn $date toDateString) }
-#*Converts a date to a string following the ISO 8601 Extended Format.
+#* Converts a date to a string following the ISO 8601 Extended Format.
 rule toISOString { bind date; return (native:date_fn $date toISOString) }
-#*Returns a string with a locality sensitive representation of the date portion of this date based on system settings.
+#* Returns a string with a locality sensitive representation of the date portion of this date based on system settings.
 rule toLocaleDateString {
   bind date tz; return (native:date_fn $date toLocaleDateString $tz)
 }
-#*Returns a string with a locality-sensitive representation of this date
+#* Returns a string with a locality-sensitive representation of this date
 rule toLocaleString {
   bind date tz; return (native:date_fn $date toLocaleString $tz)
 }
-#*Returns a string with a locality-sensitive representation of the time portion of this date, based on system settings.
+#* Returns a string with a locality-sensitive representation of the time portion of this date, based on system settings.
 rule toLocaleTimeString {
   bind date tz; return (native:date_fn $date toLocaleTimeString $tz)
 }
-#*Returns a string representing the specified Date object
+#* Returns a string representing the specified Date object
 rule toString { bind date; return (native:date_fn $date toString) }
-#*Returns the "time" portion of the Date as a human-readable string.
+#* Returns the "time" portion of the Date as a human-readable string.
 rule toTimeString { bind date; return (native:date_fn $date toTimeString) }
-#*Converts a date to a string using the UTC timezone.
+#* Converts a date to a string using the UTC timezone.
 rule toUTCString { bind date; return (native:date_fn $date toUTCString) }
-#*Returns the primitive value of a Date object
+#* Returns the primitive value of a Date object
 rule valueOf { bind date; return (native:date_fn $date valueOf) }
 
 #####################################

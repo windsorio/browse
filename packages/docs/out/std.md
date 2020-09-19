@@ -49,7 +49,6 @@ Internal: this dumps the current JS scope to stdout for debugging
 ### `id value`
 
 - `value` \<**T**\> Any value
-
 - Returns: \<**T**\> The value passed in, unchanged
 
 Returns whatever value is passed in. This is the _identity_ rule
@@ -57,7 +56,6 @@ Returns whatever value is passed in. This is the _identity_ rule
 ### `get key`
 
 - `key` \<**string**\> An identifer
-
 - Returns: \<**any**\> The value of `key`
 
 Resolves to the value of the variable `key`
@@ -71,7 +69,6 @@ Resolves to the value of the variable `key`
 - `index` \<**number**\> A valid 0-indexed position in the `array`
 
 - `array` \<**arr\<T\>**\> The array to lookup
-
 - Returns: \<**T**\> The element at `index` in the `array`
 
 Get the element at `index` in the `array`
@@ -81,7 +78,6 @@ Get the element at `index` in the `array`
 - `key` \<**K**\> A valid key in the dictionary
 
 - `dict` \<**dict\<K, V\>**\> The dictionary to lookup
-
 - Returns: \<**V**\> The value of `key` in the `dict` dictionary
 
 Get the value of `key` in the `dict` dictionary
@@ -91,7 +87,6 @@ Get the value of `key` in the `dict` dictionary
 - `key` \<**string**\> An identifer (a.k.a variable name)
 
 - `value` \<**T**\> The value to set the variable to
-
 - Returns: \<**T**\> value
 
 sets to the value of the variable `key` to `value`
@@ -99,7 +94,7 @@ sets to the value of the variable `key` to `value`
 > 'set' always creates/updates the variable in the immediate/local scope.
 > If a variable with the same name exists in a higher scope, it will be
 > 'shadowed', not updated. To update a variable instead of creating a
-> new one, use the [update](#update-key-value) rule.
+> new one, use the [update](#update) rule.
 
 ### `arr_set index value array`
 
@@ -108,12 +103,11 @@ sets to the value of the variable `key` to `value`
 - `value` \<**T**\> The value to set in the array
 
 - `array` \<**arr\<T\>**\> The array to write to
-
 - Returns: \<**T**\> The value
 
 Set the element at `index` in the `array` to `value`
 
-> To increase the size of the array, see [push](#push-value-dest) or use the `array` library
+> To increase the size of the array, see [push](#push) or use the `array` library
 
 ### `dict_set key value dict`
 
@@ -122,7 +116,6 @@ Set the element at `index` in the `array` to `value`
 - `value` \<**V**\> The value to set `key` to in the dictionary
 
 - `dict` \<**dict\<K, V\>**\> The dictionary to write to
-
 - Returns: \<**V**\> The value
 
 Set the value of `key` in the `dict` dictionary
@@ -130,7 +123,6 @@ Set the value of `key` in the `dict` dictionary
 ### `unset key`
 
 - `key` \<**string**\> An identifer
-
 - Returns: \<**any**\> The value stored in the variable key
 
 Unset the variable 'key'
@@ -140,7 +132,6 @@ Unset the variable 'key'
 - `key` \<**K**\> A valid key in dict
 
 - `dict` \<**dict\<K, V\>**\> The dictionary to update
-
 - Returns: \<**V**\> The value from the deleted pair
 
 Delete the key-value record matching `key` from the dictionary `dict`
@@ -150,21 +141,19 @@ Delete the key-value record matching `key` from the dictionary `dict`
 - `key` \<**string**\> An identifer (a.k.a variable name)
 
 - `value` \<**V**\> The value to set the variable to
-
 - Returns: \<**V**\> value
 
 Updates the variable 'key' to the value 'value'
 
 > 'update' updates the value for the variable `key` in the closest ancestor scope.
 > If a variable with the name `key` already exists in the current scope, then
-> `update` throws an error. You should use [set](#set-key-value) instead for such cases.
+> `update` throws an error. You should use [set](#set) instead for such cases.
 
 ### `push value dest`
 
 - `value` \<**T**\> The value to push
 
 - `dest` \<**arr\<T\>**\> The array to push to
-
 - Returns: \<**number**\> The number of elements in the array after pushing to it
 
 Push an element to the back of an array
@@ -172,7 +161,6 @@ Push an element to the back of an array
 ### `pop dest`
 
 - `dest` \<**arr\<T\>**\> The array to remove an element from
-
 - Returns: \<**T**\> The value of the element removed
 
 Remove the element at the back of the array and return it
@@ -182,15 +170,13 @@ Remove the element at the back of the array and return it
 - `name` \<**string**\> An identifer to name the rule
 
 - `body` \<**RuleSet**\> The behavior that should be executed when rule is called with arguments
-
 - Returns: \<**Rule**\> TODO: This value cannot be used by browse and is only understood by the runtime. Provide a better value
 
-Define a new rule 'name'. The 'body' has access to two additional rules, [bind](#bind) and [return](#return-value) used to take arguments and return a value
+Define a new rule 'name'. The 'body' has access to two additional rules, [bind](#bind) and [return](#return) used to take arguments and return a value
 
 ### `sleep ms`
 
 - `ms` \<**number**\> The number of milliseconds to sleep for
-
 - Returns: \<**number**\> ms
 
 Sleep for 'ms' milliseconds
@@ -221,7 +207,6 @@ fact 4
 # 2! = 2
 # 3! = 6
 # 4! = 24
-
 ```
 
 ### `if condition then thenRuleSet else elseRuleSet`
@@ -235,7 +220,6 @@ fact 4
 - `else` \<**"else"**\> The string "else"
   ?
 - `elseRuleSet` \<**RuleSet**\> The ruleset that will be executed if condition evaluates to false
-
 - Returns: \<**any**\> The result of the RuleSet that was evaluated code. `nil` is no `else` claus is provided
 
 If 'condition' is truthy, evaluate the 'then' RuleSet, else evaluate the 'else' rule set
@@ -252,7 +236,6 @@ if ($grade > 60) then { print pass
 - `iterator` \<**RuleSet**\> The iteration criteria
 
 - `body` \<**RuleSet**\> The body of the loop
-
 - Returns: \<**nil**\> nil (TODO: Should return the value of the last evaluated statement, or the number of iterations?)
 
 Execute the `body` while the `test` expressions in the `interator` do not fail
@@ -277,7 +260,6 @@ for { set i 2; test $i < 5; set i $i + 1 } { print loop $i }
 - `ruleset` \<**RuleSet**\> The RuleSet to evaluate
   ?
 - `inject` \<**RuleSet**\> A RuleSet that is evaluated in the scope before the ruleset is evaluated
-
 - Returns: \<**any**\> The result of evaluating the ruleset
 
 Evaluate a RuleSet. Optionally, inject variables and additional rules into the evaluation context/scope
@@ -289,13 +271,11 @@ Evaluate a RuleSet. Optionally, inject variables and additional rules into the e
 
 ```
 # See https://github.com/windsorio/browse/blob/master/examples/advanced/custom_rules.browse
-
 ```
 
 ### `arr ruleset`
 
 - `ruleset` \<**RuleSet**\> The RuleSet used to instantiate the array
-
 - Returns: \<**arr\<any\>**\> The array
 
 Create an Array from a RuleSet
@@ -316,13 +296,11 @@ set a2 (arr {
     _ 1
   })
 })
-
 ```
 
 ### `dict ruleset`
 
 - `ruleset` \<**RuleSet**\> The RuleSet used to instantiate the dictionary
-
 - Returns: \<**dict\<K, V\>**\> The dictionary
 
 Create a Dictionary from a RuleSet
@@ -343,7 +321,6 @@ set o2 (dict {
     _ k2 v2
   })
 })
-
 ```
 
 ### `import`
@@ -383,4 +360,4 @@ Get the length of the string or number of elements in an array
 
 'return' is often used to make the return value for a rule explicit. It's often unnecessary however since every rule uses the last evaluated value in its body as the return value anyway.
 
-> The return rule doesn't work like `return` in other languages. `return` is just an alias for [id](#id-value) since the last value in a RuleSet is the implicit return value of the RuleSet. For example `rule f { return foo return bar }` In browse, this is valid and the return value is "bar". `return foo` is the same as `id foo` Which basically does nothing (a.k.a it's a no-op). and the last rule in the body evaluates to "bar"
+> The return rule doesn't work like `return` in other languages. `return` is just an alias for [id](#id) since the last value in a RuleSet is the implicit return value of the RuleSet. For example `rule f { return foo return bar }` In browse, this is valid and the return value is "bar". `return foo` is the same as `id foo` Which basically does nothing (a.k.a it's a no-op). and the last rule in the body evaluates to "bar"

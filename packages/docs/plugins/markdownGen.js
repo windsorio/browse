@@ -26,20 +26,20 @@ const subLinks = (str, map) =>
     link(rule.trim(), `#${map[rule.trim()] || rule.trim()}`)
   );
 
-module.exports = async (docTree, file) => {
-  const readmeLines = [
-    quote(
-      "This was generated using BrowseDoc which is still very much a work in progress"
-    ),
-    line,
-    h1("Table of Contents"),
-    line,
-  ];
+const startingLines = [
+  quote(
+    "This was generated using BrowseDoc which is still very much a work in progress"
+  ),
+  line,
+  h1("Table of Contents"),
+  line,
+];
+
+const getDirectory = (docTree) => {
+  const readmeLines = [];
 
   // mapping of a rulename to a link slug
   const ruleMap = {};
-
-  const varMap = {};
 
   //Build Documentation Directory (Inspired by https://nodejs.org/api/fs.html)
   readmeLines.push(
@@ -76,7 +76,20 @@ module.exports = async (docTree, file) => {
       })
     )
   );
+  const childrenLines = Object.keys(docTree)
+    .map((scope) => {
+      if (docTree[scope]["children"]) {
+        return getDirectory(docTree[scope]["children"]);
+      }
+    })
+    .filter(Boolean);
+  return [...readmeLines, ...childrenLines];
+};
 
+const getReadme = (docTree, file, directory = null) => {
+  const ruleMap = {};
+  const varMap = {};
+  const readmeLines = [];
   //Build actual documentation
   Object.keys(docTree).map((scope) => {
     readmeLines.push(line);
@@ -153,10 +166,25 @@ module.exports = async (docTree, file) => {
       });
       readmeLines.push(bullet(configLines));
     }
+
+    //Also write the children readme's below this one
+    //TODO: Could indent, or have some special rendering for parents
+    const childrenLines = docTree[scope]["children"]
+      ? getReadme(docTree[scope]["children"], file)
+      : [];
+    readmeLines.push(...childrenLines);
   });
 
+  return readmeLines;
+};
+
+module.exports = async (docTree, file) => {
+  const directory = getDirectory(docTree);
+  const readmeContents = getReadme(docTree, file);
   if (typeof file === "string") {
-    await fs.promises.writeFile(file, readmeLines.join("\n"));
+    await fs.promises.writeFile(
+      file,
+      [...startingLines, ...directory, ...readmeContents].join("\n")
+    );
   }
-  return readmeLines.join("\n");
 };
