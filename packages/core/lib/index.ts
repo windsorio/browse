@@ -34,7 +34,16 @@ const getNewScope = (parent?: any) : IScope => {
   };
 };
 
-const evalRuleSet = async (ruleSet, inject, options) => {
+const evalRuleSet = async (
+  ruleSet: any,
+  inject: {
+    parent?: any,
+    rules?: object,
+    vars?: object,
+    internal?: object
+  },
+  options: { reverse?: () => {} }
+  ) => {
   const rules = [...ruleSet.rules]; // Don't want to modify the original rules
 
   // reverse is just a hack for now. The rules stdlib will replace this
