@@ -36,7 +36,8 @@ const getNewScope = (parent?: any) : IScope => {
 const evalRuleSet = async (
   ruleSet: {
     rules: Array<any>,
-    scope: any
+    scope?: any,
+    type: string
   },
   inject: {
     parent?: any,
@@ -97,7 +98,7 @@ const injectProgramMeta = (node, meta) => {
   }
 };
 
-const evalProgram = async (program, { scope, document, basedir }) => {
+const evalProgram = async (program: { rules: any }, { scope, document, basedir }) => {
   if (document !== "repl") {
     moduleCache.set(document, scope);
   }
