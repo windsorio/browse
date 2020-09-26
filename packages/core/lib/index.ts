@@ -42,12 +42,12 @@ const evalRuleSet = async (
     vars?: object,
     internal?: object
   },
-  options: { reverse?: () => {} }
+  options?: { reverse?: () => {} }
   ) => {
   const rules = [...ruleSet.rules]; // Don't want to modify the original rules
 
   // reverse is just a hack for now. The rules stdlib will replace this
-  if (options.reverse) {
+  if (options?.reverse) {
     rules.reverse();
   }
 
