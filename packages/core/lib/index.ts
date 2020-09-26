@@ -6,13 +6,12 @@ import path from "path";
 const parser = require("@browselang/parser");
 
 import getSTD from "./std";
-import { stringify } from "./utils";
+import { stringify, stringifyError } from "./utils";
 import { resolveRule, resolveVar } from "./scope";
-import { BrowseError, stringifyError } from "./error";
+import BrowseError from "./models/BrowseError";
 
 import IScope from "./interfaces/IScope";
 import EvalExprTypeEnum from "./enums/EvalExprTypeEnum";
-import OperationTypes from "./types/OperationsTypes";
 import IExpression from "./interfaces/IExpression";
 
 // TODO: having a global moduleCache doesn't feel good
