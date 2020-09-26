@@ -11,7 +11,8 @@ import { resolveRule, resolveVar } from "./scope";
 import { BrowseError, stringifyError } from "./error";
 
 import IScope from "./interfaces/IScope";
-
+import EvalExprTypeEnum from "./enums/EvalExprTypeEnum";
+import OperationTypes from "./types/OperationsTypes";
 
 // TODO: having a global moduleCache doesn't feel good
 const moduleCache = new Map();
@@ -232,30 +233,28 @@ const evalRule = async (rule, scope) => {
 
 
 const evalExpr = async (expr, scope) => {
+
   switch (expr.type) {
-    case "Paren":
+
+    case EvalExprTypeEnum.Paren:
       return evalExpr(expr.expr, scope);
-    case "Literal":
+
+    case EvalExprTypeEnum.Literal:
       return expr.value;
-    case "Ident":
+
+    case EvalExprTypeEnum.Ident:
       return resolveVar(expr, scope);
-    case "RuleSet":
+
+    case EvalExprTypeEnum.RuleSet:
       return { ...expr, scope }; // tracks lexical scope
-    case "RuleExpr":
+
+    case EvalExprTypeEnum.RuleExpr:
       return evalRule(expr.expr, scope);
-    case "UnaryExpr":
-      switch (expr.op) {
-        case "!":
-          return !(await evalExpr(expr.expr, scope));
-        case "-":
-          return -(await evalExpr(expr.expr, scope));
-        default:
-          throw new BrowseError({
-            message: `Invalid unary operator '${expr.op}'`,
-            node: expr,
-          });
-      }
-    case "BinExpr":
+
+    case EvalExprTypeEnum.UnaryExpr:
+      return UnaryExprResolver(expr, scope);
+
+    case EvalExprTypeEnum.BinExpr:
       const l = await evalExpr(expr.left, scope);
       // Handle && and || before evaluating the right side
       switch (expr.op) {
@@ -314,3 +313,22 @@ const evalExpr = async (expr, scope) => {
       });
   }
 };
+
+const UnaryExprResolver = async (
+  expr: {
+    op: OperationTypes, expr: any
+  },
+  scope: any)
+  : Promise<any> => {
+    switch (expr.op) {
+      case "!":
+        return !(await evalExpr(expr.expr, scope));
+      case "-":
+        return -(await evalExpr(expr.expr, scope));
+    default:
+      throw new BrowseError({
+        message: `Invalid unary operator '${expr.op}'`,
+        node: expr,
+      });
+  };
+}
