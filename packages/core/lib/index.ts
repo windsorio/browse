@@ -1,16 +1,16 @@
 "use strict";
 
-const fs = require("fs");
-const path = require("path");
+import fs from "fs";
+import path from "path";
 
 const parser = require("@browselang/parser");
 
-const getSTD = require("./std");
-const { stringify } = require("./utils");
-const { resolveRule, resolveVar } = require("./scope");
-const { BrowseError, stringifyError } = require("./error");
+import getSTD from "./std";
+import { stringify } from "./utils";
+import { resolveRule, resolveVar } from "./scope";
+import { BrowseError, stringifyError } from "./error";
 
-import IScope from "interfaces/IScope";
+import IScope from "./interfaces/IScope";
 
 
 // TODO: having a global moduleCache doesn't feel good
@@ -19,7 +19,6 @@ const moduleCache = new Map();
 
 const getNewScope = (parent?: any) : IScope => {
   if (!parent) {
-    // TODO: where the value of evalrule and evalRuleSetComes from?
     parent = getSTD({ evalRule, evalRuleSet, getNewScope });
   }
 
@@ -35,7 +34,10 @@ const getNewScope = (parent?: any) : IScope => {
 };
 
 const evalRuleSet = async (
-  ruleSet: any,
+  ruleSet: {
+    rules: Array<any>,
+    scope: any
+  },
   inject: {
     parent?: any,
     rules?: object,
