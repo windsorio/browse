@@ -13,6 +13,7 @@ import { BrowseError, stringifyError } from "./error";
 import IScope from "./interfaces/IScope";
 import EvalExprTypeEnum from "./enums/EvalExprTypeEnum";
 import OperationTypes from "./types/OperationsTypes";
+import IExpression from "./interfaces/IExpression";
 
 // TODO: having a global moduleCache doesn't feel good
 const moduleCache = new Map();
@@ -255,7 +256,38 @@ const evalExpr = async (expr, scope) => {
       return UnaryExprResolver(expr, scope);
 
     case EvalExprTypeEnum.BinExpr:
-      const l = await evalExpr(expr.left, scope);
+      return BinExprResolver(expr, scope);
+    default:
+      throw new BrowseError({
+        message: `Invalid Expression Type'${expr.type}'`,
+        node: expr,
+      });
+  }
+};
+
+const UnaryExprResolver = async (
+  expr: IExpression,
+  scope: any)
+  : Promise<any> => {
+    switch (expr.op) {
+      case "!":
+        return !(await evalExpr(expr.expr, scope));
+      case "-":
+        return -(await evalExpr(expr.expr, scope));
+    default:
+      throw new BrowseError({
+        message: `Invalid unary operator '${expr.op}'`,
+        node: expr,
+      });
+  };
+}
+
+const BinExprResolver = async (
+  expr: IExpression,
+  scope: any
+  ) : Promise<any> => {
+
+  const l = await evalExpr(expr.left, scope);
       // Handle && and || before evaluating the right side
       switch (expr.op) {
         case "&&": {
@@ -306,29 +338,4 @@ const evalExpr = async (expr, scope) => {
             node: expr,
           });
       }
-    default:
-      throw new BrowseError({
-        message: `Invalid Expression Type'${expr.type}'`,
-        node: expr,
-      });
-  }
-};
-
-const UnaryExprResolver = async (
-  expr: {
-    op: OperationTypes, expr: any
-  },
-  scope: any)
-  : Promise<any> => {
-    switch (expr.op) {
-      case "!":
-        return !(await evalExpr(expr.expr, scope));
-      case "-":
-        return -(await evalExpr(expr.expr, scope));
-    default:
-      throw new BrowseError({
-        message: `Invalid unary operator '${expr.op}'`,
-        node: expr,
-      });
-  };
 }
