@@ -1,8 +1,8 @@
 export default interface IScope {
   parent: any;
-  rules: object;
-  vars: object;
-  internal: object;
-  modules: object;
+  rules: any;
+  vars: any;
+  internal: any;
+  modules: any;
   close: () => Promise<any>;
 }
