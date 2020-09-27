@@ -1,4 +1,5 @@
 const { getLineAndColumn } = require("ohm-js/src/util");
+
 import BrowseError from "./models/BrowseError";
 
 const B_RED = "\u001b[31;1m";
@@ -188,4 +189,4 @@ function stringifyError(
   return msg;
 }
 
-module.exports = { isNullish, stringify, help, throws, stringifyError };
+export { isNullish, stringify, help, throws, stringifyError };
