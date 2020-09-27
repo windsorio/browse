@@ -287,54 +287,63 @@ const BinExprResolver = async (
   ) : Promise<any> => {
 
   const l = await evalExpr(expr.left, scope);
-      // Handle && and || before evaluating the right side
-      switch (expr.op) {
-        case "&&": {
-          return l && (await evalExpr(expr.right, scope));
-        }
-        case "||": {
-          return l || (await evalExpr(expr.right, scope));
-        }
+    // Handle && and || before evaluating the right side
+    switch (expr.op) {
+      case "&&": {
+        return l && (await evalExpr(expr.right, scope));
       }
+      case "||": {
+        return l || (await evalExpr(expr.right, scope));
+      }
+    }
       // Now evaluate the right side
-      const r = await evalExpr(expr.right, scope);
-      switch (expr.op) {
-        case "*":
-          return l * r;
-        case "/":
-          return l / r;
-        case "%":
-          return l % r;
-        case "+":
-          return l + r;
-        case "-":
-          return l - r;
-        case ">=":
-          return l >= r;
-        case "<=":
-          return l <= r;
-        case ">":
-          return l > r;
-        case "<":
-          return l < r;
-        case "!=":
-          return l !== r;
-        case "==":
-          return l === r;
-        case "!==":
-          throw new BrowseError({
-            message: `'!==' is not supported. Use '!=' instead`,
-            node: expr,
-          });
-        case "===":
-          throw new BrowseError({
-            message: `'===' is not supported. Use '==' instead`,
-            node: expr,
-          });
-        default:
-          throw new BrowseError({
-            message: `Invalid unary operator '${expr.op}'`,
-            node: expr,
-          });
-      }
+  const r = await evalExpr(expr.right, scope);
+    switch (expr.op) {
+      case "*":
+        return l * r;
+      case "/":
+        return l / r;
+      case "%":
+        return l % r;
+      case "+":
+        return l + r;
+      case "-":
+        return l - r;
+      case ">=":
+        return l >= r;
+      case "<=":
+        return l <= r;
+      case ">":
+        return l > r;
+      case "<":
+        return l < r;
+      case "!=":
+        return l !== r;
+      case "==":
+        return l === r;
+      case "!==":
+        throw new BrowseError({
+          message: `'!==' is not supported. Use '!=' instead`,
+          node: expr,
+        });
+      case "===":
+        throw new BrowseError({
+          message: `'===' is not supported. Use '==' instead`,
+          node: expr,
+        });
+      default:
+        throw new BrowseError({
+          message: `Invalid unary operator '${expr.op}'`,
+          node: expr,
+        });
+    }
 }
+
+export {
+  getNewScope,
+  evalRule,
+  evalRuleSet,
+  evalProgram,
+  stringify,
+  stringifyError,
+};
