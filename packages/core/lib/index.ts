@@ -42,9 +42,9 @@ const evalRuleSet = async (
   },
   inject: {
     parent?: any,
-    rules?: object,
-    vars?: object,
-    internal?: object
+    rules?: { [index: string]: any; },
+    vars?: { [index: string]: any; },
+    internal?: { [index: string]: any; }
   },
   options?: { reverse: boolean }
   ) => {
@@ -178,7 +178,7 @@ const loadModule = async (req, { library }) => {
 const evalRule = async (rule, scope) => {
   const { fn, args } = rule;
 
-  const resolvedOpts = {};
+  const resolvedOpts: { [index: string]: any; } = {};
   for (const opt of fn.options) {
     if (resolvedOpts[opt.key.name] !== undefined) {
       throw new BrowseError({
