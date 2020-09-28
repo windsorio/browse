@@ -46,7 +46,7 @@ const evalRuleSet = async (
     vars?: object,
     internal?: object
   },
-  options?: { reverse?: () => {} }
+  options?: { reverse: boolean }
   ) => {
   const rules = [...ruleSet.rules]; // Don't want to modify the original rules
 
