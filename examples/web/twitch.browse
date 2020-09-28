@@ -1,7 +1,7 @@
 # Pass `--web` to browse when running this example
 # $ browse --web ./examples/twitch.browse
 
-set headless false
+browserConfig { set headless false }
 
 page https://www.twitch.tv {
   set logIn '#root > div > div.tw-flex.tw-flex-column.tw-flex-nowrap.tw-full-height > nav > div > div.tw-align-items-center.tw-flex.tw-flex-grow-1.tw-flex-shrink-1.tw-full-width.tw-justify-content-end > div.tw-flex.tw-full-height.tw-mg-r-1.tw-pd-y-1 > div > div.anon-user.tw-flex.tw-flex-nowrap > div:nth-child(2) > button'

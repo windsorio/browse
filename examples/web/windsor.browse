@@ -1,14 +1,15 @@
 # Pass `--web` to browse when running this example
 # $ browse --web ./examples/windsor.browse
 
-set headless false
+browserConfig { set headless false }
 
 page https://windsor.io {
-  click input # TODO: catch and ignore any errors from this
+  click? input
   wait 2000
   click input
   type test@windsor.io
   click `.signup-button`
+  wait 5000
 }
 
 visit https://windsor.io

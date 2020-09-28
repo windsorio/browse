@@ -6,7 +6,7 @@
   "license": "MIT",
   "scripts": {
     "format:prettier": "pretty-quick",
-    "format:browse": "find examples -name '*.browse' -print0 | xargs -0 -n 1 -P 12 -t yarn browse format -w",
+    "format:browse": "find . -path './packages/parser/test/fixture' -prune -false -o -name '*.browse' -print0 | xargs -0 -n 1 -P 12 -t yarn browse format -w",
     "format": "yarn format:prettier",
     "browse": "yarn node packages/cli/bin/index.js"
   },
