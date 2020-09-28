@@ -1,6 +1,7 @@
 const traverse = require("@babel/traverse").default;
 const parser = require("@babel/parser");
 const assert = require("assert");
+const { pullTags, parseRtn, parseParams, processRule } = require("./common");
 
 const split = (arr, n) => {
   const rtn = [];
@@ -11,72 +12,16 @@ const split = (arr, n) => {
   return rtn;
 };
 
-const safeMergeObjs = (o1, o2) => {
-  const rtn = { ...o2 };
-  Object.keys(o1).forEach((key) => {
-    if (rtn[key] !== undefined) {
-      const throwStr = `Cannot define key ${key} multiple times on the same structure`;
-      throw new Error(throwStr);
-    }
-    rtn[key] = o1[key];
-  });
-  return rtn;
-};
-
 //Removes a bunch of extra stuff from block comments such as the newlines and the *'s
 const cleanComment = (comment) =>
-  comment
-    .split("\n")
-    .map((line) => line.split("*")[1])
-    .filter(Boolean)
-    .join("")
-    .trim();
-
-const pullTags = (comment) => {
-  const rtn = {};
-  const annotationMatch = /(@\w+) {(((?:\\})|[^}])*)}/g;
-  let matches;
-
-  if (comment.startsWith("*")) {
-    while ((matches = annotationMatch.exec(comment)) !== null) {
-      const tag = matches[1];
-
-      let val = matches[2].replace(/^\s*\*/gm, "");
-      val = val.replace(/\\}/g, "}");
-
-      const [leadingWhitespace] = /^\s*/.exec(val);
-      val = val.replace(
-        new RegExp(`^[ \\t]{${leadingWhitespace.length}}`, "gm"),
-        ""
-      );
-      if (val.endsWith("\n")) val = val.slice(0, -1);
-      rtn[tag] = val;
-    }
-  }
-  return rtn;
-};
-
-/*
- * TODO: Only pull from comments that start with *
- */
-const pullAllTags = (comments) =>
-  comments.map((comment) => pullTags(comment.value)).reduce(safeMergeObjs, {});
-
-const parseParams = (paramString) => {
-  const rtn = {};
-  const paramMatch = /\[(?:(\w*)(?::\s(.+))?)\]\s*([^\[]*)/g;
-  let matches;
-  while ((matches = paramMatch.exec(paramString)) !== null) {
-    const name = matches[1];
-    const type = matches[2];
-    const description = matches[3];
-    rtn[name] = {
-      type,
-      description,
-    };
-  }
-  return rtn;
-};
+  comment.startsWith("*")
+    ? comment
+        .split("\n")
+        .map((line) => line.split("*")[1])
+        .filter(Boolean)
+        .join("")
+        .trim()
+    : "";
 
 const parseConfig = (configString) => {
   const rtn = {};
@@ -94,68 +39,6 @@ const parseConfig = (configString) => {
       );
     }
   });
-  return rtn;
-};
-
-const parseRtn = (rtnString) => {
-  const matches = /(\[(.*)\])?\s*(.+)/g.exec(rtnString);
-  const type = matches[2] || "any";
-  const description = matches[3];
-  return {
-    type: type.trim(),
-    description: description.trim(),
-  };
-};
-
-/*
- * Process a single annotated rule
- */
-const processRule = (rule) => {
-  const rtn = {};
-  const tags = pullAllTags(rule.leadingComments);
-  /* Parse the help tag */
-  if (tags["@help"] === undefined && tags["@desc"] === undefined) {
-    //If the help and desc tags have no data we grab all of the text
-    //TODO: Return just the comments not within a tag
-    rtn.help = rule.leadingComments
-      .map((node) => cleanComment(node.value))
-      .join("\n");
-  } else {
-    //else we just extract data from @help tags
-    rtn.help = tags["@help"] || tags["@desc"];
-  }
-
-  /* Parse the desc tag */
-  if (tags["@desc"] === undefined && tags["@help"] === undefined) {
-    //If the help and desc tags have no data we grab all of the text
-    //TODO: Return just the comments not within a tag
-    rtn.help = rule.leadingComments
-      .map((node) => cleanComment(node.value))
-      .join("\n");
-  } else {
-    //else we just extract data from @help tags
-    rtn.help = tags["@desc"] || tags["@help"];
-  }
-
-  /* Parse the params tag */
-  if (tags["@params"] !== undefined) {
-    rtn.params = parseParams(tags["@params"]);
-  }
-
-  /* Parse the returns tag */
-  if (tags["@return"] !== undefined) {
-    rtn.rtn = parseRtn(tags["@return"]);
-  }
-
-  /* Parse the example tag */
-  if (tags["@example"] !== undefined) {
-    rtn.example = tags["@example"];
-  }
-
-  /* Parse the example tag */
-  if (tags["@notes"] !== undefined) {
-    rtn.notes = tags["@notes"];
-  }
   return rtn;
 };
 
@@ -188,7 +71,7 @@ const processRules = (rules) => {
   commentedRules.forEach((rule) => {
     const ruleName = rule.key.name || rule.key.value;
     rtn[ruleName] = {};
-    const tags = pullAllTags(rule.leadingComments);
+    const tags = pullTags(rule.leadingComments);
     /* Parse the help tag */
     if (tags["@help"] === undefined && tags["@desc"] === undefined) {
       //If the help and desc tags have no data we grab all of the text
@@ -247,7 +130,7 @@ const processConfig = (config) => {
       //TODO: We should try to grab the name, type, and init value
       const propertyName = property.key.name;
 
-      const tags = pullAllTags(property.leadingComments || []);
+      const tags = pullTags(property.leadingComments || []);
 
       if (tags["@config"] === undefined) {
         rtn[propertyName] = (property.leadingComments || [])
@@ -319,7 +202,7 @@ module.exports = (code, fileName) => {
        */
       if (path.node.leadingComments !== undefined) {
         //Find the scope tag
-        const tags = pullAllTags(path.node.leadingComments);
+        const tags = pullTags(path.node.leadingComments);
 
         // In the case of just a scope declaration.
         if (tags["@scope"] && tags["@rule"] === undefined) {
@@ -340,19 +223,45 @@ module.exports = (code, fileName) => {
         //In the case of a rule definition which has been tagged with a scope
         else if (tags["@scope"] !== undefined && tags["@rule"] !== undefined) {
           const scopeName = (tags["@scope"] || scope || fileName).trim();
-
-          if (!rtn[scopeName]) {
-            console.warn(
-              `WARNING:: Scope ${scopeName} does not exist. Creating new scope definition.`
-            );
-            rtn[scopeName] = {};
+          let scopeObj = rtn;
+          //In the case that this scope doesn't exist, we check for an @parent tag. If that doesn't exist we create a new scope
+          if (!scopeObj[scopeName]) {
+            //TODO: inference parent
+            if (tags["@parent"]) {
+              //TODO: Support arbitrarily nested scopes (currently supports one level of nesting)
+              //If the parent exists We create a child scope
+              if (!scopeObj[tags["@parent"]]) {
+                console.warn(
+                  `WARNING:: Parent Scope '${
+                    scopeObj[tags["@parent"]]
+                  }' for scope ${scopeName} does not exist. Creating new scope definition.`
+                );
+                scopeObj[tags["@parent"]] = {};
+              }
+              if (!scopeObj[tags["@parent"]]["children"]) {
+                scopeObj[tags["@parent"]]["children"] = {};
+              }
+              scopeObj = scopeObj[tags["@parent"]]["children"];
+              //Since this is a child scope, we don't need to print a warning
+              if (!scopeObj[scopeName]) scopeObj[scopeName] = {};
+            } else {
+              console.warn(
+                `WARNING:: Scope '${scopeName}' does not exist. Creating new scope definition.`
+              );
+              scopeObj[scopeName] = {};
+            }
           }
 
           /* Deal with the Rule annotations */
           //Rules
-          if (!rtn[scopeName]["rules"]) rtn[scopeName]["rules"] = {};
+          if (!scopeObj[scopeName]["rules"]) scopeObj[scopeName]["rules"] = {};
 
-          rtn[scopeName]["rules"][tags["@rule"]] = processRule(path.node);
+          scopeObj[scopeName]["rules"][tags["@rule"]] = processRule(
+            path.node.leadingComments.map((comment) => ({
+              ...comment,
+              value: cleanComment(comment.value),
+            }))
+          );
         }
 
         // In the case of a config definition

@@ -680,6 +680,7 @@ const defRule = (evalRuleSet) => (scope) => (_opts) => (name, body) => {
         /**
          * @rule { bind }
          * @scope { rule }
+         * @parent { std }
          * @desc {
          *    **Only used within a {@link rule\} body**
          *    'bind' lets the rule accept arguments. Strings passed to bind are used to
@@ -725,6 +726,7 @@ const defRule = (evalRuleSet) => (scope) => (_opts) => (name, body) => {
         /**
          * @rule { return }
          * @scope { rule }
+         * @parent { std }
          * @desc {
          *    **Only used within a {@link rule\} body**
          *    'return' is often used to make the return value for a rule explicit. It's often

@@ -44,6 +44,7 @@ const main = async () => {
                 ),
               ];
             } else if (ext === ".browse") {
+              console.log(`Parsing ${directory}/${file}`);
               const stem = path.basename(file, ".browse");
               return [
                 stem,
@@ -65,7 +66,9 @@ const main = async () => {
 
   const outputs = await Promise.all(
     pages.map(([stem, doc]) =>
-      markdownPlugin(doc, path.join(outPath, stem + ".md"))
+      Object.keys(doc).map((scope) =>
+        markdownPlugin(doc, path.join(outPath, scope + ".md"))
+      )
     )
   );
 

@@ -26,15 +26,17 @@ const subLinks = (str, map) =>
     link(rule.trim(), `#${map[rule.trim()] || rule.trim()}`)
   );
 
-module.exports = async (docTree, file) => {
-  const readmeLines = [
-    quote(
-      "This was generated using BrowseDoc which is still very much a work in progress"
-    ),
-    line,
-    h1("Table of Contents"),
-    line,
-  ];
+const startingLines = [
+  quote(
+    "This was generated using BrowseDoc which is still very much a work in progress"
+  ),
+  line,
+  h1("Table of Contents"),
+  line,
+];
+
+const getDirectory = (docTree) => {
+  const readmeLines = [];
 
   // mapping of a rulename to a link slug
   const ruleMap = {};
@@ -43,7 +45,6 @@ module.exports = async (docTree, file) => {
   readmeLines.push(
     bullet(
       Object.keys(docTree).map((scope) => {
-        // TODO: Will break if multiple rules have the same name in different scopes
         const rules = Object.keys(docTree[scope].rules).map((rule) => {
           let text = rule.trim();
           let slug = rule.trim();
@@ -60,11 +61,14 @@ module.exports = async (docTree, file) => {
           return link(shortcode(text), `#${slug}`);
         });
 
+        const vars = Object.keys(docTree[scope].vars || {}).map((variable) => {
+          return link(shortcode(variable), `#${variable}`);
+        });
         const configVars = Object.keys(
           docTree[scope].config || {}
         ).map((configVar) => link(`Config: ${configVar}`, `#${configVar}`));
 
-        const entries = bullet([...configVars, ...rules], 1);
+        const entries = bullet([...vars, ...configVars, ...rules], 1);
         return `${link(
           `Scope: ${scope.trim()}`,
           `#scope-${scope.trim()}`
@@ -72,7 +76,20 @@ module.exports = async (docTree, file) => {
       })
     )
   );
+  const childrenLines = Object.keys(docTree)
+    .map((scope) => {
+      if (docTree[scope]["children"]) {
+        return getDirectory(docTree[scope]["children"]);
+      }
+    })
+    .filter(Boolean);
+  return [...readmeLines, ...childrenLines];
+};
 
+const getReadme = (docTree, file, directory = null) => {
+  const ruleMap = {};
+  const varMap = {};
+  const readmeLines = [];
   //Build actual documentation
   Object.keys(docTree).map((scope) => {
     readmeLines.push(line);
@@ -81,9 +98,19 @@ module.exports = async (docTree, file) => {
     readmeLines.push(subLinks(docTree[scope].description || "", ruleMap));
     readmeLines.push(line);
 
-    const { rules, config } = docTree[scope];
+    const { vars, rules, config } = docTree[scope];
+    if (vars && Object.keys(vars).length) {
+      readmeLines.push(h2("Variables"));
+      const varLines = Object.keys(vars).map((variable) => {
+        const { help, desc, type } = vars[variable];
+        return `${h3(shortcode(variable))}${type ? "\n" + italics(type) : ""}${
+          desc ? "\n" + desc : help ? "\n" + help : ""
+        }`;
+      });
+      readmeLines.push(...varLines);
+    }
     if (rules && Object.keys(rules).length) {
-      readmeLines.push(h3("Rules"));
+      readmeLines.push(h2("Rules"));
       const ruleLines = Object.keys(rules).map((rule) => {
         const { help, desc, params, rtn, example, notes } = rules[rule];
 
@@ -111,13 +138,15 @@ module.exports = async (docTree, file) => {
             (param) => (out.header += " " + param.trim())
           );
           out.params = bullet(
-            Object.keys(params).map(
-              (param) =>
-                `${shortcode(param)} ${type(params[param].type)} ${subLinks(
-                  params[param].description || "",
-                  ruleMap
-                )}`
-            ),
+            Object.keys(params)
+              .map(
+                (param) =>
+                  Object.keys(params[param]).length &&
+                  `${shortcode(param)} ${
+                    params[param].type ? type(params[param].type) : ""
+                  } ${subLinks(params[param].description || "", ruleMap)}`
+              )
+              .filter(Boolean),
             1
           );
         }
@@ -129,7 +158,7 @@ module.exports = async (docTree, file) => {
       readmeLines.push(...ruleLines);
     }
     if (config && Object.keys(config).length) {
-      readmeLines.push(h3("Config"));
+      readmeLines.push(h2("Config"));
       const configLines = Object.keys(config).map((configVar) => {
         return `${h4(configVar)}\n( ${italics(config[configVar].type)} ) ${
           config[configVar].description
@@ -137,10 +166,25 @@ module.exports = async (docTree, file) => {
       });
       readmeLines.push(bullet(configLines));
     }
+
+    //Also write the children readme's below this one
+    //TODO: Could indent, or have some special rendering for parents
+    const childrenLines = docTree[scope]["children"]
+      ? getReadme(docTree[scope]["children"], file)
+      : [];
+    readmeLines.push(...childrenLines);
   });
 
+  return readmeLines;
+};
+
+module.exports = async (docTree, file) => {
+  const directory = getDirectory(docTree);
+  const readmeContents = getReadme(docTree, file);
   if (typeof file === "string") {
-    await fs.promises.writeFile(file, readmeLines.join("\n"));
+    await fs.promises.writeFile(
+      file,
+      [...startingLines, ...directory, ...readmeContents].join("\n")
+    );
   }
-  return readmeLines.join("\n");
 };
