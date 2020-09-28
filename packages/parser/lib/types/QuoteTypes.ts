@@ -1,3 +1,3 @@
-type QuoteTypes = '"' | "'" | '`' | '|';
+type QuoteTypes = '"' | "'" | '`' | '|' | "";
 
 export default QuoteTypes;
