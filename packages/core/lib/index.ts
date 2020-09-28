@@ -11,7 +11,7 @@ import { resolveRule, resolveVar } from "./scope";
 import BrowseError from "./models/BrowseError";
 
 import IScope from "./interfaces/IScope";
-import EvalExprTypeEnum from "./enums/EvalExprTypeEnum";
+import ASTTypeEnum from "./enums/ASTTypeEnum";
 import IExpression from "./interfaces/IExpression";
 
 // TODO: having a global moduleCache doesn't feel good
@@ -236,25 +236,25 @@ const evalExpr = async (expr, scope) => {
 
   switch (expr.type) {
 
-    case EvalExprTypeEnum.Paren:
+    case ASTTypeEnum.Paren:
       return evalExpr(expr.expr, scope);
 
-    case EvalExprTypeEnum.Literal:
+    case ASTTypeEnum.Literal:
       return expr.value;
 
-    case EvalExprTypeEnum.Ident:
+    case ASTTypeEnum.Ident:
       return resolveVar(expr, scope);
 
-    case EvalExprTypeEnum.RuleSet:
+    case ASTTypeEnum.RuleSet:
       return { ...expr, scope }; // tracks lexical scope
 
-    case EvalExprTypeEnum.RuleExpr:
+    case ASTTypeEnum.RuleExpr:
       return evalRule(expr.expr, scope);
 
-    case EvalExprTypeEnum.UnaryExpr:
+    case ASTTypeEnum.UnaryExpr:
       return UnaryExprResolver(expr, scope);
 
-    case EvalExprTypeEnum.BinExpr:
+    case ASTTypeEnum.BinExpr:
       return BinExprResolver(expr, scope);
     default:
       throw new BrowseError({

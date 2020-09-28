@@ -1,4 +1,4 @@
-enum EvalExprTypeEnum {
+enum ASTTypeEnum {
   Paren = "Paren",
   Literal = "Literal",
   Ident = "Ident",
@@ -8,4 +8,4 @@ enum EvalExprTypeEnum {
   BinExpr = "BinExpr"
 }
 
-export default EvalExprTypeEnum;
+export default ASTTypeEnum;

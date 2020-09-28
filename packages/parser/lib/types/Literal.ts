@@ -1,9 +1,9 @@
 import QuoteTypes from "./QuoteTypes";
-import EvalExprTypeEnum from "../../../core/lib/enums/EvalExprTypeEnum";
+import ASTTypeEnum from "../../../core/lib/enums/ASTTypeEnum";
 
 type Literal = {
 
-  type: EvalExprTypeEnum.Literal,
+  type: ASTTypeEnum.Literal,
   value: string | number | null,
   source: any,
   quoteType?: QuoteTypes

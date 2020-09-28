@@ -1,6 +1,6 @@
-import EvalExprTypeEnum from "../../../core/lib/enums/EvalExprTypeEnum";
+import ASTTypeEnum from "../../../core/lib/enums/ASTTypeEnum";
 
 export default interface IASTNode {
-  type: EvalExprTypeEnum,
+  type: ASTTypeEnum,
   source: any
 }

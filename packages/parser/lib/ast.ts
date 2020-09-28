@@ -2,12 +2,12 @@
  * Utility functions to create AST nodes
  */
 import Literal from "./types/Literal";
-import EvalExprTypeEnum from "../../core/lib/enums/EvalExprTypeEnum";
+import ASTTypeEnum from "../../core/lib/enums/ASTTypeEnum";
 import ILiteralCreator from "./interfaces/ILiteralCreator";
 
 export function literal(params: ILiteralCreator): Literal {
   return {
-    type: EvalExprTypeEnum.Literal,
+    type: ASTTypeEnum.Literal,
     value: params.value,
     source: params.source,
     quoteType: params.quoteType
