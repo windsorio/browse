@@ -2198,6 +2198,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@browselang/core", "workspace:packages/core"],
             ["@browselang/parser", "workspace:packages/parser"],
             ["@browselang/shared", "workspace:packages/shared"],
+            ["@types/node", "npm:13.13.15"],
             ["ava", "npm:3.11.1"],
             ["ohm-js", "npm:15.0.1"]
           ],
@@ -2254,6 +2255,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [
             ["@browselang/parser", "workspace:packages/parser"],
             ["@browselang/shared", "workspace:packages/shared"],
+            ["@types/node", "npm:13.13.15"],
             ["ava", "npm:3.11.1"],
             ["ohm-js", "npm:15.0.1"]
           ],
@@ -2265,6 +2267,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./packages/shared/",
           "packageDependencies": [
             ["@browselang/shared", "workspace:packages/shared"],
+            ["@types/node", "npm:13.13.15"],
             ["ava", "npm:3.11.1"]
           ],
           "linkType": "SOFT",

@@ -33,6 +33,7 @@
     "url": "https://github.com/windsorio/browse/issues"
   },
   "devDependencies": {
+    "@types/node": "^13.7.0",
     "ava": "3.11.1"
   }
 }
