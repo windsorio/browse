@@ -300,7 +300,7 @@ module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
      *    # 4! = 24
      * }
      */
-    print: (_) => (_) => (...args) => {
+    print: (_) => (_) => (...args: any[]) => {
       console.log(args.map(stringify).join(" "));
       return args.slice(-1)[0];
     },
