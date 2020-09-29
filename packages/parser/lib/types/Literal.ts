@@ -1,5 +1,5 @@
 import QuoteTypes from "./QuoteTypes";
-import ASTTypeEnum from "../../../core/lib/enums/ASTTypeEnum";
+import ASTTypeEnum from "@browselang/shared";
 
 type Literal = {
 
