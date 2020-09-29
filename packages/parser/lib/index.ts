@@ -3,10 +3,9 @@ import path from "path";
 
 import ohm from "ohm-js";
 const { getLineAndColumn } = require("ohm-js/src/util");
-
 import { literal } from "./ast";
-
 import parseComments from "./comments";
+import EqExprErrorType from "./types/EqExprErrorType";
 
 const genUnknownParseError = () =>
   new Error(
@@ -20,7 +19,7 @@ const g = ohm.grammars(contents.toString('utf8')).Browse;
 const semantics = g.createSemantics();
 
 semantics.addAttribute("errors", {
-  EqExpr_neError(_l, o, _, _r) {
+  EqExpr_neError(_l: ohm.Node, o: ohm.Node, _: ohm.Node, _r: ohm.Node) : EqExprErrorType[] {
     return [
       {
         message: "!== is not supported, use != instead",
@@ -28,7 +27,7 @@ semantics.addAttribute("errors", {
       },
     ];
   },
-  EqExpr_eqError(_l, o, _, _r) {
+  EqExpr_eqError(_l: ohm.Node, o: ohm.Node, _: ohm.Node, _r: ohm.Node) : EqExprErrorType[] {
     return [
       {
         message: "=== is not supported, use == instead",
@@ -37,6 +36,7 @@ semantics.addAttribute("errors", {
     ];
   },
 
+  // TODO: this is a ohm.Node array with a custom property errors?
   // Base Cases
   _iter(children) {
     const errors = children.map((c) => c.errors);
@@ -57,6 +57,7 @@ function getRange(_l, c, _r) {
   const { sourceString, _contents, ...range } = this.source;
   return /#/.test(this.sourceString) ? range : [];
 }
+
 semantics.addAttribute("forbiddenComments", {
   stringLiteral_doubleQuote: getRange,
   stringLiteral_singleQuote: getRange,
