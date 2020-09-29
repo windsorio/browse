@@ -11,7 +11,7 @@ import { resolveRule, resolveVar } from "./scope";
 import BrowseError from "./models/BrowseError";
 
 import IScope from "./interfaces/IScope";
-import ASTTypeEnum from "./enums/ASTTypeEnum";
+import ASTTypeEnum from "@browselang/shared";
 import IExpression from "./interfaces/IExpression";
 
 // TODO: having a global moduleCache doesn't feel good
