@@ -1,5 +1,4 @@
-import ASTTypeEnum from "../../../core/lib/enums/ASTTypeEnum";
-
+import ASTTypeEnum from "@browselang/shared";
 import { Interval } from "ohm-js";
 
 export default interface IASTNode {
