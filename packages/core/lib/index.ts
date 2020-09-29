@@ -3,7 +3,7 @@
 import fs from "fs";
 import path from "path";
 
-const parser = require("@browselang/parser");
+import parser from "@browselang/parser";
 
 import getSTD from "./std";
 import { stringify, stringifyError } from "./utils";
@@ -17,8 +17,7 @@ import IExpression from "./interfaces/IExpression";
 // TODO: having a global moduleCache doesn't feel good
 const moduleCache = new Map();
 
-
-const getNewScope = (parent?: any) : IScope => {
+const getNewScope = (parent?: any): IScope => {
   if (!parent) {
     parent = getSTD({ evalRule, evalRuleSet, getNewScope });
   }
@@ -36,18 +35,18 @@ const getNewScope = (parent?: any) : IScope => {
 
 const evalRuleSet = async (
   ruleSet: {
-    rules: Array<any>,
-    scope?: any,
-    type: string
+    rules: Array<any>;
+    scope?: any;
+    type: string;
   },
   inject: {
-    parent?: any,
-    rules?: { [index: string]: any; },
-    vars?: { [index: string]: any; },
-    internal?: { [index: string]: any; }
+    parent?: any;
+    rules?: { [index: string]: any };
+    vars?: { [index: string]: any };
+    internal?: { [index: string]: any };
   },
   options?: { reverse: boolean }
-  ) => {
+) => {
   const rules = [...ruleSet.rules]; // Don't want to modify the original rules
 
   // reverse is just a hack for now. The rules stdlib will replace this
@@ -99,7 +98,10 @@ const injectProgramMeta = (node, meta) => {
   }
 };
 
-const evalProgram = async (program: { rules: any }, { scope, document, basedir }) => {
+const evalProgram = async (
+  program: { rules: any },
+  { scope, document, basedir }
+) => {
   if (document !== "repl") {
     moduleCache.set(document, scope);
   }
@@ -178,7 +180,7 @@ const loadModule = async (req, { library }) => {
 const evalRule = async (rule, scope) => {
   const { fn, args } = rule;
 
-  const resolvedOpts: { [index: string]: any; } = {};
+  const resolvedOpts: { [index: string]: any } = {};
   for (const opt of fn.options) {
     if (resolvedOpts[opt.key.name] !== undefined) {
       throw new BrowseError({
@@ -231,11 +233,8 @@ const evalRule = async (rule, scope) => {
   }
 };
 
-
 const evalExpr = async (expr, scope) => {
-
   switch (expr.type) {
-
     case ASTTypeEnum.Paren:
       return evalExpr(expr.expr, scope);
 
@@ -266,78 +265,74 @@ const evalExpr = async (expr, scope) => {
 
 const UnaryExprResolver = async (
   expr: IExpression,
-  scope: any)
-  : Promise<any> => {
-    switch (expr.op) {
-      case "!":
-        return !(await evalExpr(expr.expr, scope));
-      case "-":
-        return -(await evalExpr(expr.expr, scope));
+  scope: any
+): Promise<any> => {
+  switch (expr.op) {
+    case "!":
+      return !(await evalExpr(expr.expr, scope));
+    case "-":
+      return -(await evalExpr(expr.expr, scope));
     default:
       throw new BrowseError({
         message: `Invalid unary operator '${expr.op}'`,
         node: expr,
       });
-  };
-}
+  }
+};
 
-const BinExprResolver = async (
-  expr: IExpression,
-  scope: any
-  ) : Promise<any> => {
-
+const BinExprResolver = async (expr: IExpression, scope: any): Promise<any> => {
   const l = await evalExpr(expr.left, scope);
-    // Handle && and || before evaluating the right side
-    switch (expr.op) {
-      case "&&": {
-        return l && (await evalExpr(expr.right, scope));
-      }
-      case "||": {
-        return l || (await evalExpr(expr.right, scope));
-      }
+  // Handle && and || before evaluating the right side
+  switch (expr.op) {
+    case "&&": {
+      return l && (await evalExpr(expr.right, scope));
     }
-      // Now evaluate the right side
+    case "||": {
+      return l || (await evalExpr(expr.right, scope));
+    }
+  }
+  // Now evaluate the right side
   const r = await evalExpr(expr.right, scope);
-    switch (expr.op) {
-      case "*":
-        return l * r;
-      case "/":
-        return l / r;
-      case "%":
-        return l % r;
-      case "+":
-        return l + r;
-      case "-":
-        return l - r;
-      case ">=":
-        return l >= r;
-      case "<=":
-        return l <= r;
-      case ">":
-        return l > r;
-      case "<":
-        return l < r;
-      case "!=":
-        return l !== r;
-      case "==":
-        return l === r;
-      case "!==":
-        throw new BrowseError({
-          message: `'!==' is not supported. Use '!=' instead`,
-          node: expr,
-        });
-      case "===":
-        throw new BrowseError({
-          message: `'===' is not supported. Use '==' instead`,
-          node: expr,
-        });
-      default:
-        throw new BrowseError({
-          message: `Invalid unary operator '${expr.op}'`,
-          node: expr,
-        });
-    }
-}
+  switch (expr.op) {
+    case "*":
+      return l * r;
+    case "/":
+      return l / r;
+    case "%":
+      return l % r;
+    case "+":
+      return l + r;
+    case "-":
+      return l - r;
+    case ">=":
+      return l >= r;
+    case "<=":
+      return l <= r;
+    case ">":
+      return l > r;
+    case "<":
+      return l < r;
+    case "!=":
+      return l !== r;
+    case "==":
+      return l === r;
+    case "!==":
+      throw new BrowseError({
+        message: `'!==' is not supported. Use '!=' instead`,
+        node: expr,
+      });
+    case "===":
+      throw new BrowseError({
+        message: `'===' is not supported. Use '==' instead`,
+        node: expr,
+      });
+    default:
+      throw new BrowseError({
+        message: `Invalid unary operator '${expr.op}'`,
+        node: expr,
+      });
+  }
+};
 
 export {
   getNewScope,
