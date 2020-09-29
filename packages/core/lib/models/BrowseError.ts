@@ -14,7 +14,7 @@ export default class BrowseError extends Error {
   node: any
   astStack: Array<any>
 
-  constructor(params: { node?: { source: any, [index: string]: any }, message: string }) {
+  constructor(params: { node?: { source?: any, [index: string]: any }, message: string }) {
 
     super("BrowseError");
     this.name = "BrowseError";
