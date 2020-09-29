@@ -16,7 +16,7 @@ const notUndefined = (v) => v !== undefined;
 
 // Instantiate the grammar.
 const contents = fs.readFileSync(path.join(__dirname, "browse.ohm"));
-const g = ohm.grammars(contents).Browse;
+const g = ohm.grammars(contents.toString('utf8')).Browse;
 const semantics = g.createSemantics();
 
 semantics.addAttribute("errors", {
