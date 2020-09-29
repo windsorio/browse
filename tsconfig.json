@@ -14,5 +14,8 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "downlevelIteration": true
-  }
+  },
+  "references": [
+    { "path": "./packages/shared" }
+  ]
 }
