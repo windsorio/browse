@@ -1,16 +1,11 @@
+import IScope from "../../lib/interfaces/IScope";
+
 const isNullish = (v) => v === undefined || v === null;
 // TODO: isNullish is also declared on the utils file, what are the difference between them and why the are named the same
 
-exports.browse = (parent) => {
-  const dateScope = {
-    parent,
-    vars: {},
-    internal: {},
-    modules: {},
-    rules: {}
-  };
+exports.browse = (parent) : IScope => {
 
-  dateScope.rules = {
+  const rules = {
     Date: (_) => (_) => ($1, $2, ...rest) => {
       let date;
 
@@ -37,6 +32,15 @@ exports.browse = (parent) => {
         return (date as { [index: string] : any})[fn](...args);
       }
     },
+  };
+
+  const dateScope = {
+    parent,
+    vars: {},
+    internal: {},
+    modules: {},
+    rules,
+    close: async () => {}
   };
 
   return dateScope;

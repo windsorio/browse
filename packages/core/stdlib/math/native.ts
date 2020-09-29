@@ -1,14 +1,19 @@
-exports.browse = (parent) => {
+import IScope from "../../lib/interfaces/IScope";
+
+exports.browse = (parent) : IScope => {
+  
+  const rules = {
+    proto: (_) => (_) => (fn, num, ...args) => num[fn](...args),
+    fn: (_) => (_) => (fn, ...args) => Math[fn](...args),
+  };
+
   const mathScope = {
     parent,
     vars: {},
     internal: {},
     modules: {},
-  };
-
-  mathScope.rules = {
-    proto: (_) => (_) => (fn, num, ...args) => num[fn](...args),
-    fn: (_) => (_) => (fn, ...args) => Math[fn](...args),
+    rules,
+    close: async () => {},
   };
 
   return mathScope;
