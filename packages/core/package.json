@@ -38,7 +38,7 @@
   },
   "dependencies": {
     "@browselang/parser": "workspace:packages/parser",
-    "ohm-js": "15.0.1",
-    "@browselang/shared": "workspace:packages/shared"
+    "@browselang/shared": "workspace:packages/shared",
+    "ohm-js": "15.0.1"
   }
 }
