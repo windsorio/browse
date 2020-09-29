@@ -31,7 +31,8 @@
     "url": "https://github.com/windsorio/browse/issues"
   },
   "dependencies": {
-    "ohm-js": "15.0.1"
+    "ohm-js": "15.0.1",
+    "@browselang/shared": "workspace:packages/shared"
   },
   "devDependencies": {
     "ava": "3.11.1"
