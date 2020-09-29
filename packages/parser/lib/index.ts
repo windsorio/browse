@@ -15,11 +15,16 @@ const notUndefined = (v) => v !== undefined;
 
 // Instantiate the grammar.
 const contents = fs.readFileSync(path.join(__dirname, "browse.ohm"));
-const g = ohm.grammars(contents.toString('utf8')).Browse;
+const g = ohm.grammars(contents.toString("utf8")).Browse;
 const semantics = g.createSemantics();
 
 semantics.addAttribute("errors", {
-  EqExpr_neError(_l: ohm.Node, o: ohm.Node, _: ohm.Node, _r: ohm.Node) : EqExprErrorType[] {
+  EqExpr_neError(
+    _l: ohm.Node,
+    o: ohm.Node,
+    _: ohm.Node,
+    _r: ohm.Node
+  ): EqExprErrorType[] {
     return [
       {
         message: "!== is not supported, use != instead",
@@ -27,7 +32,12 @@ semantics.addAttribute("errors", {
       },
     ];
   },
-  EqExpr_eqError(_l: ohm.Node, o: ohm.Node, _: ohm.Node, _r: ohm.Node) : EqExprErrorType[] {
+  EqExpr_eqError(
+    _l: ohm.Node,
+    o: ohm.Node,
+    _: ohm.Node,
+    _r: ohm.Node
+  ): EqExprErrorType[] {
     return [
       {
         message: "=== is not supported, use == instead",
@@ -520,7 +530,7 @@ const parse = (text) => {
   return ast;
 };
 
-module.exports = {
+export default {
   grammar: g,
   semantics,
   parse,
