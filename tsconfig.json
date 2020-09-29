@@ -15,5 +15,15 @@
     "noFallthroughCasesInSwitch": true,
     "downlevelIteration": true
   },
-  "references": [{ "path": "./packages/shared" }]
+  "references": [
+    {
+      "path": "./packages/shared"
+    },
+    {
+      "path": "./packages/core"
+    },
+    {
+      "path": "./packages/parser"
+    }
+  ]
 }
