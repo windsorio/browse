@@ -1,0 +1,40 @@
+{
+  "name": "@browselang/shared",
+  "version": "0.0.21",
+  "description": "Shared are utilities that are common in the browse runtime",
+  "keywords": [
+    "browse",
+    "shared",
+    "utilities"
+  ],
+  "author": "Windsor Team <oss@windsor.io>",
+  "homepage": "https://github.com/windsorio/browse#readme",
+  "license": "MIT",
+  "main": "lib/index.ts",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "files": [
+    "lib",
+    "stdlib"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.yarnpkg.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/windsorio/browse.git"
+  },
+  "scripts": {
+    "test": "ava"
+  },
+  "bugs": {
+    "url": "https://github.com/windsorio/browse/issues"
+  },
+  "devDependencies": {
+    "ava": "3.11.1"
+  },
+  "dependencies": {
+  }
+}
