@@ -502,7 +502,7 @@ semantics.addOperation('interpret()', {
 });
 
 const parse = (text) => {
-  const r = g.match(text);
+  const r = grammar.match(text);
   if (!r.succeeded()) {
     let e;
     try {
@@ -531,7 +531,7 @@ const parse = (text) => {
 };
 
 export default {
-  grammar: g,
+  grammar: grammar,
   semantics,
   parse,
 };
