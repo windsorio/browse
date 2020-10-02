@@ -6,6 +6,7 @@ const { getLineAndColumn } = require("ohm-js/src/util");
 import { literal } from "./ast";
 import parseComments from "./comments";
 import EqExprErrorType from "./types/EqExprErrorType";
+import ErrorsNode from "./interfaces/ErrorsNode";
 
 const genUnknownParseError = () =>
   new Error(
@@ -46,15 +47,14 @@ semantics.addAttribute("errors", {
     ];
   },
 
-  // TODO: this is a ohm.Node array with a custom property errors?
   // Base Cases
-  _iter(children) {
-    const errors = children.map((c) => c.errors);
-    return [].concat(...errors);
+  _iter(...childrens: ohm.Node[]) : EqExprErrorType[] {
+    const errors = childrens.map((c) => c.errors as EqExprErrorType);
+    return ([] as EqExprErrorType[]).concat(...errors);
   },
-  _nonterminal(children) {
-    const errors = children.map((c) => c.errors);
-    return [].concat(...errors);
+  _nonterminal(...childrens: ohm.Node[]) {
+    const errors = childrens.map((c) => c.errors as EqExprErrorType);
+    return ([] as EqExprErrorType[]).concat(...errors);
   },
   _terminal() {
     return [];
