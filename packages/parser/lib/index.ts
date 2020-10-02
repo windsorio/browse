@@ -63,11 +63,9 @@ semantics.addAttribute("errors", {
 
 // get a list of all the nodes that include a `#` in their body so that the
 // comment parser can ignore them
-// TODO: this is not returning a node it's returning an internal, is that right?
-// Why this function has arguments if they're not used?
 function getRange(this: ohm.Node, _l?: ohm.Node, c?: ohm.Node, _r?: ohm.Node) {
-  const { ...range } = this.source;
-  return /#/.test(this.sourceString) ? range : [];
+  const { startIdx, endIdx } = this.source;
+  return /#/.test(this.sourceString) ? [{ startIdx, endIdx }] : [];
 }
 
 semantics.addAttribute("forbiddenComments", {
