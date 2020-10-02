@@ -63,8 +63,10 @@ semantics.addAttribute("errors", {
 
 // get a list of all the nodes that include a `#` in their body so that the
 // comment parser can ignore them
-function getRange(_l, c, _r) {
-  const { sourceString, _contents, ...range } = this.source;
+// TODO: this is not returning a node it's returning an internal, is that right?
+// Why this function has arguments if they're not used?
+function getRange(this: ohm.Node, _l?: ohm.Node, c?: ohm.Node, _r?: ohm.Node) {
+  const { ...range } = this.source;
   return /#/.test(this.sourceString) ? range : [];
 }
 
@@ -73,9 +75,7 @@ semantics.addAttribute("forbiddenComments", {
   stringLiteral_singleQuote: getRange,
   stringLiteral_cssSelector: getRange,
   stringLiteral_javascript: getRange,
-  stringLiteral_implicit(_c, _r) {
-    return getRange.call(this);
-  },
+  stringLiteral_implicit: getRange,
   _iter(children) {
     const forbiddenComments = children.map((c) => c.forbiddenComments);
     return [].concat(...forbiddenComments);
