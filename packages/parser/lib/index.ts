@@ -73,7 +73,9 @@ semantics.addAttribute("forbiddenComments", {
   stringLiteral_singleQuote: getRange,
   stringLiteral_cssSelector: getRange,
   stringLiteral_javascript: getRange,
-  stringLiteral_implicit: getRange,
+  stringLiteral_implicit(this: ohm.Node, _c: ohm.Node, _r: ohm.Node) {
+    return getRange.call(this, _c, _r);
+  },
   _iter(children) {
     const forbiddenComments = children.map((c) => c.forbiddenComments);
     return [].concat(...forbiddenComments);
