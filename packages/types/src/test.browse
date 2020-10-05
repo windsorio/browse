@@ -1,16 +1,26 @@
-rule fact {
-  bind x
-  if $x <= 1 then { return $x } else {
-    return $x * (fact $x - 1)
-  }
+#rule fact {
+#  bind x
+#  if $x <= 1 then { return $x } else {
+#    return $x * (fact $x - 1)
+#  }
+#}
+#
+rule dist {
+  bind x y
+  return $x * $x + $y * $y
 }
 
-set x 4
+set x (dist 4)
 #fact $x
 
 set x 1
-set y (x + 1)
-sleep(y)
-set z (y + 1)
+set y ($x + 1)
+
+#TODO: I accidentally used this syntax and it's technically correct
+#  Can fix this in the type checker by adding opts as an argument to all rules
+#  One can then use the type checker to type the opts
+#  sleep(y)
+sleep $y
+set z ($y + 1)
 print $x + $y + $z
 

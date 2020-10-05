@@ -58,9 +58,15 @@ const ifDef = multiArgRuleType([
 
 const leDef = multiArgRuleType([numberT, numberT, boolT]);
 
-const mulDef = multiArgRuleType([numberT, numberT, numberT]);
+const numericBin = multiArgRuleType([numberT, numberT, numberT]);
 
 const rtnDef = multiArgRuleType([varT("b"), varT("b")]);
+
+const sleepDef = multiArgRuleType([numberT, numberT]);
+
+//TODO: Need to add array types for this to work
+//TODO: Also need to add union types
+const printDef = multiArgRuleType([varT("c"), varT("d")]);
 
 const basicScheme = (type: any, boundVars: string[] = []) => ({
   _type: <"scheme">"scheme",
@@ -72,10 +78,13 @@ console.log(
   "Type Inferencing",
   typeInferencer(
     {
-      if: basicScheme(ifDef),
+      if: basicScheme(ifDef, ["a"]),
       "<=": basicScheme(leDef),
-      return: basicScheme(rtnDef),
-      "*": basicScheme(mulDef),
+      return: basicScheme(rtnDef, ["b"]),
+      "*": basicScheme(numericBin),
+      "+": basicScheme(numericBin),
+      sleep: basicScheme(sleepDef),
+      print: basicScheme(printDef),
     },
     astTransformer(tree),
     freshVariableGenerator()
