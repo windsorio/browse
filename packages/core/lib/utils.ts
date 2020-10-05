@@ -30,7 +30,7 @@ const stringify = (jsValue: any, depth = 0) => {
   const indent = new Array(depth + 1).join("  "); // indent
   // Arrays
   if (Array.isArray(jsValue)) {
-    // TODO: if it's and array this should be lenght instead of size?
+
     if (jsValue.length === 0) {
       return "arr { }";
     }
