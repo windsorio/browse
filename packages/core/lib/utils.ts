@@ -31,7 +31,7 @@ const stringify = (jsValue: any, depth = 0) => {
   // Arrays
   if (Array.isArray(jsValue)) {
     // TODO: if it's and array this should be lenght instead of size?
-    if (jsValue.size === 0) {
+    if (jsValue.length === 0) {
       return "arr { }";
     }
     if (depth > 2) {
