@@ -1,7 +1,6 @@
 import IScope from "../../lib/interfaces/IScope";
+import { isNullish } from "../../lib/utils";
 
-const isNullish = (v) => v === undefined || v === null;
-// TODO: isNullish is also declared on the utils file, what are the difference between them and why the are named the same
 
 exports.browse = (parent) : IScope => {
 
