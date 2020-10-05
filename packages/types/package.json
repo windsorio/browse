@@ -1,0 +1,17 @@
+{
+  "name": "types",
+  "description": "Browse Type System",
+  "license": "MIT",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/windsorio/browse.git"
+  },
+  "dependencies": {
+    "@browselang/parser": "workspace:packages/parser",
+    "fs": "0.0.1-security"
+  },
+  "devDependencies": {
+    "@types/node": "^14.11.2"
+  }
+}

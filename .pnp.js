@@ -43,6 +43,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         "reference": "workspace:packages/parser"
       },
       {
+        "name": "types",
+        "reference": "workspace:packages/types"
+      },
+      {
         "name": "@browselang/web",
         "reference": "workspace:packages/web"
       }
@@ -56,7 +60,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       ["@browselang/parser", ["workspace:packages/parser"]],
       ["@browselang/web", ["workspace:packages/web"]],
       ["browse", ["workspace:."]],
-      ["docs", ["workspace:packages/docs"]]
+      ["docs", ["workspace:packages/docs"]],
+      ["types", ["workspace:packages/types"]]
     ],
     "fallbackPool": [
       [
@@ -850,6 +855,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       [
         "form-data",
         "npm:2.3.3"
+      ],
+      [
+        "fs",
+        "npm:0.0.1-security"
       ],
       [
         "fs-constants",
@@ -1878,6 +1887,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       [
         "typedarray-to-buffer",
         "npm:3.1.5"
+      ],
+      [
+        "types",
+        "workspace:packages/types"
       ],
       [
         "typescript",
@@ -4374,6 +4387,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["asynckit", "npm:0.4.0"],
             ["combined-stream", "npm:1.0.8"],
             ["mime-types", "npm:2.1.27"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["fs", [
+        ["npm:0.0.1-security", {
+          "packageLocation": "./.yarn/cache/fs-npm-0.0.1-security-5060b47e87-d23d3c0dd4.zip/node_modules/fs/",
+          "packageDependencies": [
+            ["fs", "npm:0.0.1-security"]
           ],
           "linkType": "HARD",
         }]
@@ -7378,6 +7400,17 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["is-typedarray", "npm:1.0.0"]
           ],
           "linkType": "HARD",
+        }]
+      ]],
+      ["types", [
+        ["workspace:packages/types", {
+          "packageLocation": "./packages/types/",
+          "packageDependencies": [
+            ["types", "workspace:packages/types"],
+            ["@browselang/parser", "workspace:packages/parser"],
+            ["fs", "npm:0.0.1-security"]
+          ],
+          "linkType": "SOFT",
         }]
       ]],
       ["typescript", [

@@ -1,0 +1,16 @@
+rule fact {
+  bind x
+  if $x <= 1 then { return $x } else {
+    return $x * (fact $x - 1)
+  }
+}
+
+set x 4
+fact $x
+
+set x 1
+set y (x + 1)
+sleep(y)
+set z (y + 1)
+print $x + $y + $z
+

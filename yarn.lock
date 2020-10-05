@@ -2141,6 +2141,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fs@npm:0.0.1-security":
+  version: 0.0.1-security
+  resolution: "fs@npm:0.0.1-security"
+  checksum: d23d3c0dd42fd11508e5f8d265375c676816adf398f61bfc3e2635e6e8ca323fd1f530d5dd5f87e4fca54296efb5ddf8a382b99f1ac243ac0a8b4b1cae8f5fac
+  languageName: node
+  linkType: hard
+
 "fsevents@patch:fsevents@~2.1.2#builtin<compat/fsevents>":
   version: 2.1.3
   resolution: "fsevents@patch:fsevents@npm%3A2.1.3#builtin<compat/fsevents>::version=2.1.3&hash=495457"
@@ -4785,6 +4792,15 @@ resolve@^1.10.0:
   checksum: e6e0e6812acc3496612d81abe026bb6c71bfc0f3daa00716a3236fe37c46a81508de8306df8a29ae81e2a2c4293b6b8067c77b65003e0022134d544902b9acec
   languageName: node
   linkType: hard
+
+"types@workspace:packages/types":
+  version: 0.0.0-use.local
+  resolution: "types@workspace:packages/types"
+  dependencies:
+    "@browselang/parser": "workspace:packages/parser"
+    fs: 0.0.1-security
+  languageName: unknown
+  linkType: soft
 
 typescript@3.9.7:
   version: 3.9.7
