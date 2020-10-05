@@ -193,6 +193,7 @@ const typeInferencer = (
   expression: any,
   varGen: (prefix: string) => varT
 ): { sub: substitution; type: tiType } => {
+  console.log("Env", env);
   switch (expression.type) {
     case "App": {
       const typeVariable = varGen("a");
@@ -204,11 +205,20 @@ const typeInferencer = (
         expression.e2,
         varGen
       );
-      //Now we unify the types of (The argument to the function) and (The argument passed in)
-      const unificationSub = unify(
-        applySubstitution(rightInference.sub, leftInference.type),
-        { _type: "rule", left: rightInference.type, right: typeVariable }
-      );
+      let unificationSub;
+      //TODO: Implement maybe monad to propogate errors. Use a context object which includes varGen
+      try {
+        //Now we unify the types of (The argument to the function) and (The argument passed in)
+        unificationSub = unify(
+          applySubstitution(rightInference.sub, leftInference.type),
+          { _type: "rule", left: rightInference.type, right: typeVariable }
+        );
+      } catch (e) {
+        console.log("Left Inference", leftInference);
+        console.log("Right Inference", rightInference);
+        console.log(`Failed on App Expression`, expression);
+        throw e;
+      }
       return {
         sub: { ...leftInference.sub, ...rightInference.sub, ...unificationSub },
         type: applySubstitution(unificationSub, typeVariable),

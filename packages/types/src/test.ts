@@ -42,15 +42,25 @@ const plainStringT = {
   _type: "plainString",
 };
 
-const varT = {
+const varT = (name: string) => ({
   _type: "var",
-  name: "a",
-};
+  name,
+});
 
 //We would like to quantify over the variable 'a' here but I don't think HM allows it
-const ifDef = multiArgRuleType([boolT, plainStringT, varT, plainStringT, varT]);
+const ifDef = multiArgRuleType([
+  boolT,
+  plainStringT,
+  varT("a"),
+  plainStringT,
+  varT("a"),
+]);
 
-const leDef = multiArgRuleType([numberT, numberT]);
+const leDef = multiArgRuleType([numberT, numberT, boolT]);
+
+const mulDef = multiArgRuleType([numberT, numberT, numberT]);
+
+const rtnDef = multiArgRuleType([varT("b"), varT("b")]);
 
 const basicScheme = (type: any, boundVars: string[] = []) => ({
   _type: <"scheme">"scheme",
@@ -61,7 +71,12 @@ const basicScheme = (type: any, boundVars: string[] = []) => ({
 console.log(
   "Type Inferencing",
   typeInferencer(
-    { if: basicScheme(ifDef), "<=": basicScheme(leDef) },
+    {
+      if: basicScheme(ifDef),
+      "<=": basicScheme(leDef),
+      return: basicScheme(rtnDef),
+      "*": basicScheme(mulDef),
+    },
     astTransformer(tree),
     freshVariableGenerator()
   )
