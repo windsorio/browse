@@ -76,7 +76,6 @@ const schemeApplySubstitution = (s: substitution, t: schemeT): schemeT => {
   };
 };
 
-//@ts-ignore
 const typeEnvApplySubstitution = (s: substitution, env: typeEnv) => {
   const rtn: { [key: string]: schemeT } = {};
   Object.keys(env).forEach(
@@ -90,7 +89,6 @@ const typeEnvApplySubstitution = (s: substitution, env: typeEnv) => {
  *
  * MIght want to optimize later but this reduces complexity for now
  */
-//@ts-ignore
 const removeFromTypeEnv = (env: typeEnv, v: string) => {
   const newEnv = { ...env };
   delete newEnv[v];
@@ -100,7 +98,6 @@ const removeFromTypeEnv = (env: typeEnv, v: string) => {
 /*
  * Generalize a type over all of the variables that are free in the type but not free in the type env
  */
-//@ts-ignore
 const generalizeType = (env: typeEnv, t: tiType): schemeT => {
   return {
     _type: "scheme",
@@ -114,8 +111,7 @@ const generalizeType = (env: typeEnv, t: tiType): schemeT => {
 /*
  * We need fresh type variables for a variety of purposes. This encapsulates that behavior
  */
-//@ts-ignore
-const freshVariableGenerator: () => (prefix: string) => varT = () => {
+export const freshVariableGenerator: () => (prefix: string) => varT = () => {
   const nameMap: { [key: string]: number } = {};
   return (prefix: string): varT => {
     if (!nameMap[prefix]) {
@@ -128,7 +124,6 @@ const freshVariableGenerator: () => (prefix: string) => varT = () => {
 /*
  * instantiates a scheme with fresh type variables.
  */
-//@ts-ignore
 const instantiateScheme = (
   scheme: schemeT,
   varGen: (prefix: string) => varT
@@ -184,74 +179,105 @@ const unify = (t1: tiType, t2: tiType): substitution => {
     );
 };
 
+//TODO: make util functions for wrapping types. e.g plainStringT = { _type: plainStringT }
+//TODO: use bool everywhere or use boolean everywhere
 /*
  * This is the main type inference function which takes in an AST and returns the type tree
  */
-//@ts-ignore
+//TODO: Type the expressions
+//TODO: change the prefixes for new type variables so we can better track what's going on
+//TODO: Check that object spreading meets the H-M spec for composition of substitutions
+//TODO: Comment this function below
 const typeInferencer = (
   env: typeEnv,
-  node: any
+  expression: any,
+  varGen: (prefix: string) => varT
 ): { sub: substitution; type: tiType } => {
-  const inferLiteral = (
-    env: typeEnv,
-    lit: {
-      type: "Literal";
-      value: number | string | null;
-      quoteType: undefined | '"' | "'" | "`" | "|";
-    }
-  ): { sub: substitution; type: tiType } => {
-    switch (typeof lit.value) {
-      case "number":
-        return { type: { _type: "number" }, sub: {} };
-      case "string":
-        switch (lit.quoteType) {
-          case undefined:
-          case '"':
-          case "'":
-            return { type: { _type: "plainString" }, sub: {} };
-          case "`":
-            return { type: { _type: "cssString" }, sub: {} };
-          case "|":
-            return { type: { _type: "jsString" }, sub: {} };
-        }
-      case "object":
-        if (lit === null) return { type: { _type: "nil" }, sub: {} };
-      default:
-        throw new Error(
-          `Could not find type for literal ${JSON.stringify(lit)}`
-        );
-    }
-  };
-  switch (node.type) {
-    case "Program":
-    //If we encounter a variable
-
-    //the rule Rule is an Abs Expression
-    //the set rule is  a Let Expression
-    //Other rules are function application
-    case "Rule":
-    //A ruleset is interpreted as a series of function applications
-    case "RuleSet":
-    //The paren rule is just a noop
-    case "Paren":
-    //The unary expression lets us know that the expression is an int or a boolean
-    case "UnaryExpr":
-    //The binary expression allows us to type based on the type of underlying function
-    case "BinExpr":
-    //Not sure what the point of Rule Expr is TODO:
-    case "RuleExpr":
-    //Not sure what initRule is for TODO
-    case "InitRule":
-    //We should never recurse to the level of Word
-    case "Word":
-      throw new Error(
-        `Recursion went to far, Word node hit ${JSON.stringify(node)}`
+  switch (expression.type) {
+    case "App": {
+      const typeVariable = varGen("a");
+      //First we infer the type of the first expression
+      const leftInference = typeInferencer(env, expression.e1, varGen);
+      //Then we infer the type of the second expresion, using the context from the first
+      const rightInference = typeInferencer(
+        typeEnvApplySubstitution(leftInference.sub, env),
+        expression.e2,
+        varGen
       );
-    //Literal is the same as in lambda calculus. no transform needed
-    case "Literal":
-      return inferLiteral(env, node);
-    //Ident is a variable node
-    case "Ident":
+      //Now we unify the types of (The argument to the function) and (The argument passed in)
+      const unificationSub = unify(
+        applySubstitution(rightInference.sub, leftInference.type),
+        { _type: "rule", left: rightInference.type, right: typeVariable }
+      );
+      return {
+        sub: { ...leftInference.sub, ...rightInference.sub, ...unificationSub },
+        type: applySubstitution(unificationSub, typeVariable),
+      };
+    }
+    case "Abs":
+      const typeVariable = varGen("a");
+      const newEnv = {
+        ...removeFromTypeEnv(env, expression.arg),
+        [expression.arg]: {
+          _type: "scheme",
+          type: typeVariable,
+          boundVars: [],
+        },
+      };
+      const inference = typeInferencer(newEnv, expression.e, varGen);
+      return {
+        sub: inference.sub,
+        type: {
+          _type: "rule",
+          left: applySubstitution(inference.sub, typeVariable),
+          right: inference.type,
+        },
+      };
+    case "Var":
+      if (env[expression.name]) {
+        return {
+          sub: {},
+          type: instantiateScheme(env[expression.name], varGen),
+        };
+      }
+      throw new Error(`Unbound variable ${expression.name}`);
+    case "Let": {
+      const leftInference = typeInferencer(env, expression.e1, varGen);
+      const generalType = generalizeType(
+        typeEnvApplySubstitution(leftInference.sub, env),
+        leftInference.type
+      );
+      const newEnv = {
+        ...removeFromTypeEnv(env, expression.name),
+        [expression.name]: generalType,
+      };
+      const rightInference = typeInferencer(
+        typeEnvApplySubstitution(leftInference.sub, newEnv),
+        expression.e2,
+        varGen
+      );
+      return {
+        sub: { ...leftInference.sub, ...rightInference.sub },
+        type: rightInference.type,
+      };
+    }
+    case "plainStringLit":
+      return { sub: {}, type: { _type: "plainString" } };
+    case "jsStringLit":
+      return { sub: {}, type: { _type: "jsString" } };
+    case "cssStringLit":
+      return { sub: {}, type: { _type: "cssString" } };
+    case "numberLit":
+      return { sub: {}, type: { _type: "number" } };
+    case "booleanLit":
+      return { sub: {}, type: { _type: "bool" } };
+    case "nilLit":
+      return { sub: {}, type: { _type: "nil" } };
+    default:
+      console.log("Untypable expression", expression);
+      throw new Error(
+        `Cannot type expression of type ${expression.type}. No case in the inferencer`
+      );
   }
 };
 

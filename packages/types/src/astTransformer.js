@@ -157,6 +157,8 @@ const getLiteralType = (lit) => {
         case "|":
           return "jsStringLit";
       }
+    case "boolean":
+      return "booleanLit";
     case "object":
       if (lit === null) return "nilLit";
     default:

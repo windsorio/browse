@@ -6,7 +6,7 @@ rule fact {
 }
 
 set x 4
-fact $x
+#fact $x
 
 set x 1
 set y (x + 1)
