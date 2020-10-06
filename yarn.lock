@@ -150,6 +150,8 @@ __metadata:
   resolution: "@browselang/core@workspace:packages/core"
   dependencies:
     "@browselang/parser": "workspace:packages/parser"
+    "@browselang/shared": "workspace:packages/shared"
+    "@types/node": ^13.7.0
     ava: 3.11.1
     ohm-js: 15.0.1
   languageName: unknown
@@ -201,8 +203,19 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@browselang/parser@workspace:packages/parser"
   dependencies:
+    "@browselang/shared": "workspace:packages/shared"
+    "@types/node": ^13.7.0
     ava: 3.11.1
     ohm-js: 15.0.1
+  languageName: unknown
+  linkType: soft
+
+"@browselang/shared@workspace:packages/shared":
+  version: 0.0.0-use.local
+  resolution: "@browselang/shared@workspace:packages/shared"
+  dependencies:
+    "@types/node": ^13.7.0
+    ava: 3.11.1
   languageName: unknown
   linkType: soft
 
@@ -1128,6 +1141,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "browse@workspace:."
   dependencies:
+    "@types/node": ^13.7.0
     "@yarnpkg/pnpify": ^2.0.0-rc.22
     husky: 4.2.5
     prettier: 2.0.5

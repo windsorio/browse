@@ -34,10 +34,12 @@
     "url": "https://github.com/windsorio/browse/issues"
   },
   "devDependencies": {
+    "@types/node": "^13.7.0",
     "ava": "3.11.1"
   },
   "dependencies": {
     "@browselang/parser": "workspace:packages/parser",
+    "@browselang/shared": "workspace:packages/shared",
     "ohm-js": "15.0.1"
   }
 }

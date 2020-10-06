@@ -43,6 +43,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         "reference": "workspace:packages/parser"
       },
       {
+        "name": "@browselang/shared",
+        "reference": "workspace:packages/shared"
+      },
+      {
         "name": "@browselang/web",
         "reference": "workspace:packages/web"
       }
@@ -54,6 +58,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       ["@browselang/core", ["workspace:packages/core"]],
       ["@browselang/format", ["workspace:packages/format"]],
       ["@browselang/parser", ["workspace:packages/parser"]],
+      ["@browselang/shared", ["workspace:packages/shared"]],
       ["@browselang/web", ["workspace:packages/web"]],
       ["browse", ["workspace:."]],
       ["docs", ["workspace:packages/docs"]]
@@ -122,6 +127,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       [
         "@browselang/parser",
         "workspace:packages/parser"
+      ],
+      [
+        "@browselang/shared",
+        "workspace:packages/shared"
       ],
       [
         "@browselang/web",
@@ -253,7 +262,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       ],
       [
         "@types/node",
-        "npm:14.0.27"
+        "npm:13.13.15"
       ],
       [
         "@types/normalize-package-data",
@@ -2019,6 +2028,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         [null, {
           "packageLocation": "./",
           "packageDependencies": [
+            ["@types/node", "npm:13.13.15"],
             ["@yarnpkg/pnpify", "virtual:ba367005dcc9e642f796e835097ee3914c50b5006fc81536b5959222ce2d330fa4f015850afa3048322d4f62f170d2e2a22164b26fa2fb88c9d85009081bd469#npm:2.1.0"],
             ["husky", "npm:4.2.5"],
             ["prettier", "npm:2.0.5"],
@@ -2187,6 +2197,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [
             ["@browselang/core", "workspace:packages/core"],
             ["@browselang/parser", "workspace:packages/parser"],
+            ["@browselang/shared", "workspace:packages/shared"],
+            ["@types/node", "npm:13.13.15"],
             ["ava", "npm:3.11.1"],
             ["ohm-js", "npm:15.0.1"]
           ],
@@ -2242,8 +2254,21 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./packages/parser/",
           "packageDependencies": [
             ["@browselang/parser", "workspace:packages/parser"],
+            ["@browselang/shared", "workspace:packages/shared"],
+            ["@types/node", "npm:13.13.15"],
             ["ava", "npm:3.11.1"],
             ["ohm-js", "npm:15.0.1"]
+          ],
+          "linkType": "SOFT",
+        }]
+      ]],
+      ["@browselang/shared", [
+        ["workspace:packages/shared", {
+          "packageLocation": "./packages/shared/",
+          "packageDependencies": [
+            ["@browselang/shared", "workspace:packages/shared"],
+            ["@types/node", "npm:13.13.15"],
+            ["ava", "npm:3.11.1"]
           ],
           "linkType": "SOFT",
         }]
@@ -3289,6 +3314,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./",
           "packageDependencies": [
             ["browse", "workspace:."],
+            ["@types/node", "npm:13.13.15"],
             ["@yarnpkg/pnpify", "virtual:ba367005dcc9e642f796e835097ee3914c50b5006fc81536b5959222ce2d330fa4f015850afa3048322d4f62f170d2e2a22164b26fa2fb88c9d85009081bd469#npm:2.1.0"],
             ["husky", "npm:4.2.5"],
             ["prettier", "npm:2.0.5"],

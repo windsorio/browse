@@ -28,7 +28,7 @@ const getForbiddenLookupTable = (text, forbidden) => {
   return rangeLookup;
 };
 
-module.exports = (text, forbiddenRanges) => {
+export default (text, forbiddenRanges) => {
   const lines = text.split("\n");
   const forbidden = getForbiddenLookupTable(text, forbiddenRanges);
   const comments = [];

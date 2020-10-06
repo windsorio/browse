@@ -9,7 +9,7 @@ import datetime as dt
 
 print floor: (math:floor 1.7)
 
-set d (dt:Date )
+set d (dt:Date)
 print toDateString: (dt:toDateString $d)
 
 ```

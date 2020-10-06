@@ -1,18 +1,21 @@
-const { BrowseError } = require("./error");
+import BrowseError from "./models/BrowseError";
+import IScope from "./interfaces/IScope";
 
 /**
  * Recursively find a rule matching the name by walking up the scope/environment inheritance chain
  * @param {string | Word} name The rule name or Word AST node
  * @param {Scope} scope The scope to use
  */
-const resolveModule = (name, scope) => {
+const resolveModule = (name: { name: string }, scope: IScope ) : any => {
   const moduleName = name.name;
+
   if (!scope) {
     throw new BrowseError({
       message: `Unknown module '${moduleName}'`,
       node: name,
     });
   }
+
   if (scope.modules[moduleName]) {
     return scope.modules[moduleName];
   }
@@ -25,14 +28,17 @@ const resolveModule = (name, scope) => {
  * @param {string | Word} name The rule name or Word AST node
  * @param {Scope} scope The scope to use
  */
-const resolveRule = (name, scope) => {
+const resolveRule = (name: any , scope: IScope) : any => {
+  // TODO:  name.name.name? dafuq, i need some explanation for this
   const varName = typeof name === "string" ? name : name.name.name;
+
   if (!scope) {
     throw new BrowseError({
       message: `Rule '${varName}' is not defined`,
       node: typeof name === "string" ? null : name.name,
     });
   }
+
   if (typeof name !== "string" && name.module) {
     const moduleScope = resolveModule(name.module, scope);
     // moduleScope is always a top level scope, so resolveRule will only recurse twice,
@@ -58,8 +64,9 @@ const resolveRule = (name, scope) => {
  * @param {string | Ident} name The variable name
  * @param {Scope} scope The scope to use
  */
-const resolveVar = (name, scope) => {
+const resolveVar = (name: { name: string }, scope: IScope) : any => {
   const varName = typeof name === "string" ? name : name.name;
+
   if (!scope) {
     throw new BrowseError({
       message: `Variable '${varName}' is not defined`,
@@ -80,19 +87,22 @@ const resolveVar = (name, scope) => {
  * @param {string | Word} name The rule name
  * @param {Scope} scope The scope to use
  */
-const resolveRuleScope = (name, scope) => {
+const resolveRuleScope = (name: any, scope: IScope) : any => {
   const varName = typeof name === "string" ? name : name.name.name;
+
   if (!scope) {
     throw new BrowseError({
       message: `Rule '${varName}' is not defined`,
       node: typeof name === "string" ? null : name.name,
     });
   }
+
   if (scope.rules.hasOwnProperty(varName)) {
     return scope;
   } else {
     return resolveRuleScope(name, scope.parent);
   }
+
 };
 
 /**
@@ -101,19 +111,22 @@ const resolveRuleScope = (name, scope) => {
  * @param {string | Ident} name The variable name
  * @param {Scope} scope The scope to use
  */
-const resolveVarScope = (name, scope) => {
+const resolveVarScope = (name: { name: string }, scope: IScope) : any => {
   const varName = typeof name === "string" ? name : name.name;
+
   if (!scope) {
     throw new BrowseError({
       message: `Variable '${varName}' is not defined`,
       node: typeof name === "string" ? null : name,
     });
   }
+
   if (scope.vars.hasOwnProperty(varName) && scope.vars[varName] !== undefined) {
     return scope;
   } else {
     return resolveVarScope(name, scope.parent);
   }
+
 };
 
 /**
@@ -122,7 +135,7 @@ const resolveVarScope = (name, scope) => {
  * @param {Scope} scope The scope to use
  * @param {any => boolean} predicate An optional predicate with which to test the resolved value
  */
-const resolveInternal = (name, scope, predicate = () => true) => {
+const resolveInternal = (name, scope: IScope, predicate = (param?: any) => true) : any => {
   if (!scope) {
     throw new Error(`Internal:: Internal Variable '${name}' is not defined`);
   }
@@ -139,7 +152,7 @@ const resolveInternal = (name, scope, predicate = () => true) => {
  * @param {string} name The variable name
  * @param {Scope} scope The scope to use
  */
-const resolveInternalScope = (name, scope) => {
+const resolveInternalScope = (name: string, scope: IScope) : any => {
   if (!scope) {
     throw new Error(`Internal:: Internal Variable '${name}' is not defined`);
   }
@@ -152,16 +165,16 @@ const resolveInternalScope = (name, scope) => {
 
 /**
  * Recursively check if our scope meets certain conditions (usually used with isBrowser, isPage, or isRepl)
- * @param {scope => boolean} f the function used to check if we're in a scope
+ * @param {scope => boolean} scopeCheck the function used to check if we're in a scope
  * @param {Scope} scope The scope to use
  */
-const validateScope = (f, scope) => {
+const validateScope = (scopeCheck: (scope: IScope) => boolean, scope: IScope) : any => {
   if (!scope) return false;
-  if (f(scope)) return true;
-  return validateScope(f, scope.parent);
+  if (scopeCheck(scope)) return true;
+  return validateScope(scopeCheck, scope.parent);
 };
 
-module.exports = {
+export {
   resolveRule,
   resolveVar,
   resolveRuleScope,

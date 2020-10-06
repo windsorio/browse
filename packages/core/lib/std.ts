@@ -1,11 +1,11 @@
-const {
+import {
   resolveRule,
   resolveRuleScope,
   resolveVar,
   resolveVarScope,
-} = require("./scope");
-const { isNullish, help, stringify } = require("./utils");
-const { BrowseError } = require("./error");
+} from "./scope";
+import { isNullish, help, stringify } from "./utils";
+import BrowseError from "./models/BrowseError";
 
 // Rules that are not allowed to be overriden:
 const IMMUTABLE_RULES = ["rule", "import", "id", "return", "eval"]; // if and for?
@@ -13,7 +13,7 @@ const IMMUTABLE_RULES = ["rule", "import", "id", "return", "eval"]; // if and fo
 /**
  * @scope { This scope is available to every program and consists of all the core rules to write useful browse programs }
  */
-module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
+export default ({ evalRule, evalRuleSet, getNewScope }) => ({
   parent: null, // This is the root
   vars: {},
   internal: {},
@@ -299,7 +299,7 @@ module.exports = ({ evalRule, evalRuleSet, getNewScope }) => ({
      *    # 4! = 24
      * }
      */
-    print: (_) => (_) => (...args) => {
+    print: (_) => (_) => (...args: any[]) => {
       console.log(args.map(stringify).join(" "));
       return args.slice(-1)[0];
     },

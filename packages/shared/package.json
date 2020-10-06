@@ -1,21 +1,23 @@
 {
-  "name": "@browselang/parser",
+  "name": "@browselang/shared",
   "version": "0.0.21",
-  "description": "Parser for Browse using the ohm parser generator",
+  "description": "Shared are utilities that are common in the browse runtime",
   "keywords": [
     "browse",
-    "parser"
+    "shared",
+    "utilities"
   ],
   "author": "Windsor Team <oss@windsor.io>",
   "homepage": "https://github.com/windsorio/browse#readme",
   "license": "MIT",
-  "main": "lib/index.js",
+  "main": "lib/index.ts",
   "directories": {
     "lib": "lib",
     "test": "test"
   },
   "files": [
-    "lib"
+    "lib",
+    "stdlib"
   ],
   "publishConfig": {
     "registry": "https://registry.yarnpkg.com"
@@ -29,10 +31,6 @@
   },
   "bugs": {
     "url": "https://github.com/windsorio/browse/issues"
-  },
-  "dependencies": {
-    "@browselang/shared": "workspace:packages/shared",
-    "ohm-js": "15.0.1"
   },
   "devDependencies": {
     "@types/node": "^13.7.0",

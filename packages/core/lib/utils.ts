@@ -1,11 +1,20 @@
-const isNullish = (v) => v === undefined || v === null;
+const { getLineAndColumn } = require("ohm-js/src/util");
+
+import BrowseError from "./models/BrowseError";
+
+const B_RED = "\u001b[31;1m";
+const WHITE = "\u001b[37m";
+const DIM = "\u001b[2m";
+const RESET = "\u001b[0m";
+
+const isNullish = (v: any) : boolean => v === undefined || v === null;
 
 /**
  * Convert a JS value to the corresponding browse value as a string. Used by the repl, or when printing a value
  * @param {any} jsValue Any JS Value
  * @returns browse string value
  */
-const stringify = (jsValue, depth = 0) => {
+const stringify = (jsValue: any, depth = 0) => {
   if (jsValue === undefined) {
     throw new Error(
       "The value was somehow 'undefined'. This should not be possible as browse doesn't have 'undefined'. There's an error with this browse implementation"
@@ -21,7 +30,8 @@ const stringify = (jsValue, depth = 0) => {
   const indent = new Array(depth + 1).join("  "); // indent
   // Arrays
   if (Array.isArray(jsValue)) {
-    if (jsValue.size === 0) {
+
+    if (jsValue.length === 0) {
       return "arr { }";
     }
     if (depth > 2) {
@@ -96,4 +106,87 @@ const throws = (fn) => (...args) => {
   }
 };
 
-module.exports = { isNullish, stringify, help, throws };
+function stringifyError(
+  err: any,
+  opts: {
+    snippet: any,
+    color: any,
+    short: boolean
+  }) {
+
+  let msg = "";
+
+  if (err instanceof BrowseError) {
+    if (opts.snippet && err.node) {
+      opts.color && (msg += WHITE);
+      if (err.node.source) {
+        msg += err.node.source
+          .getLineAndColumnMessage()
+          .split("\n")
+          .slice(1)
+          .join("\n");
+      }
+      msg += "\n";
+      opts.color && (msg += RESET);
+    }
+
+    opts.color && (msg += B_RED);
+    msg += err.message + "\n";
+    opts.color && (msg += RESET);
+
+    if (!opts.short) {
+      opts.color && (msg += DIM);
+      err.astStack.forEach(({ node, source }, i) => {
+        let nodeName = "<...>";
+        if (node) {
+          switch (node.type) {
+            case "Word":
+              nodeName = node.name;
+              break;
+            case "Ident":
+              nodeName = "$" + node.name;
+              break;
+            case "RuleSet":
+              nodeName = "{ ... }";
+              break;
+          }
+        }
+
+        if (source) {
+          const pos = getLineAndColumn(source.sourceString, source.startIdx);
+
+          msg += `\tat ${nodeName} (${source.document}:${pos.lineNum}:${pos.colNum})`;
+        } else {
+          if (i < err.astStack.length - 1) {
+            // This should never happen, but, if it does, it only needs to
+            // appear in between the stack trace it's useless if it's the last
+            // line. TODO: remove?
+            msg += `\tat ${nodeName} (unknown)`;
+          } else {
+            return;
+          }
+        }
+        msg += "\n";
+      });
+      opts.color && (msg += RESET);
+    }
+
+    if (process.env.BROWSE_DEBUG) {
+      msg += "\n[DEBUG]\n";
+      msg += err.stack;
+    }
+    return msg;
+  } else if (err instanceof Error) {
+    // TODO: JS error handling
+    opts.color && (msg += B_RED);
+    msg += err.message + "\n";
+    opts.color && (msg += RESET);
+  } else {
+    opts.color && (msg += B_RED);
+    msg += "Unknown Browse Error: " + String(err) + "\n";
+    opts.color && (msg += RESET);
+  }
+  return msg;
+}
+
+export { isNullish, stringify, help, throws, stringifyError };

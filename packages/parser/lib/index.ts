@@ -1,13 +1,12 @@
-"use strict";
+import fs from "fs";
+import path from "path";
 
-const fs = require("fs");
-const path = require("path");
-
-const ohm = require("ohm-js");
+import ohm from "ohm-js";
 const { getLineAndColumn } = require("ohm-js/src/util");
-
-const { literal } = require("./ast");
-const parseComments = require("./comments");
+import { literal } from "./ast";
+import parseComments from "./comments";
+import EqExprErrorType from "./types/EqExprErrorType";
+import ErrorsNode from "./interfaces/ErrorsNode";
 
 const genUnknownParseError = () =>
   new Error(
@@ -17,11 +16,16 @@ const notUndefined = (v) => v !== undefined;
 
 // Instantiate the grammar.
 const contents = fs.readFileSync(path.join(__dirname, "browse.ohm"));
-const g = ohm.grammars(contents).Browse;
-const semantics = g.createSemantics();
+const grammar = ohm.grammars(contents.toString("utf8")).Browse;
+const semantics = grammar.createSemantics();
 
 semantics.addAttribute("errors", {
-  EqExpr_neError(_l, o, _, _r) {
+  EqExpr_neError(
+    _l: ohm.Node,
+    o: ohm.Node,
+    _: ohm.Node,
+    _r: ohm.Node
+  ): EqExprErrorType[] {
     return [
       {
         message: "!== is not supported, use != instead",
@@ -29,7 +33,12 @@ semantics.addAttribute("errors", {
       },
     ];
   },
-  EqExpr_eqError(_l, o, _, _r) {
+  EqExpr_eqError(
+    _l: ohm.Node,
+    o: ohm.Node,
+    _: ohm.Node,
+    _r: ohm.Node
+  ): EqExprErrorType[] {
     return [
       {
         message: "=== is not supported, use == instead",
@@ -39,13 +48,13 @@ semantics.addAttribute("errors", {
   },
 
   // Base Cases
-  _iter(children) {
-    const errors = children.map((c) => c.errors);
-    return [].concat(...errors);
+  _iter(...childrens: ohm.Node[]) : EqExprErrorType[] {
+    const errors = childrens.map((c) => c.errors as EqExprErrorType);
+    return ([] as EqExprErrorType[]).concat(...errors);
   },
-  _nonterminal(children) {
-    const errors = children.map((c) => c.errors);
-    return [].concat(...errors);
+  _nonterminal(...childrens: ohm.Node[]) {
+    const errors = childrens.map((c) => c.errors as EqExprErrorType);
+    return ([] as EqExprErrorType[]).concat(...errors);
   },
   _terminal() {
     return [];
@@ -54,17 +63,18 @@ semantics.addAttribute("errors", {
 
 // get a list of all the nodes that include a `#` in their body so that the
 // comment parser can ignore them
-function getRange(_l, c, _r) {
-  const { sourceString, _contents, ...range } = this.source;
-  return /#/.test(this.sourceString) ? range : [];
+function getRange(this: ohm.Node, _l?: ohm.Node, c?: ohm.Node, _r?: ohm.Node) {
+  const { startIdx, endIdx } = this.source;
+  return /#/.test(this.sourceString) ? [{ startIdx, endIdx }] : [];
 }
+
 semantics.addAttribute("forbiddenComments", {
   stringLiteral_doubleQuote: getRange,
   stringLiteral_singleQuote: getRange,
   stringLiteral_cssSelector: getRange,
   stringLiteral_javascript: getRange,
-  stringLiteral_implicit(_c, _r) {
-    return getRange.call(this);
+  stringLiteral_implicit(this: ohm.Node, _c: ohm.Node, _r: ohm.Node) {
+    return getRange.call(this, _c, _r);
   },
   _iter(children) {
     const forbiddenComments = children.map((c) => c.forbiddenComments);
@@ -492,7 +502,7 @@ semantics.addOperation('interpret()', {
 });
 
 const parse = (text) => {
-  const r = g.match(text);
+  const r = grammar.match(text);
   if (!r.succeeded()) {
     let e;
     try {
@@ -520,8 +530,8 @@ const parse = (text) => {
   return ast;
 };
 
-module.exports = {
-  grammar: g,
+export default {
+  grammar: grammar,
   semantics,
   parse,
 };
