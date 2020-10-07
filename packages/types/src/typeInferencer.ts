@@ -4,13 +4,14 @@
  */
 
 import { tiType, schemeT, varT, substitution, typeEnv } from "./tiTypes";
-import * as util from "util";
+//import * as util from "util";
 
-const show = (...objs: any) =>
+/*
+ const show = (...objs: any) =>
   objs.map((obj: any) =>
-    console.log(util.inspect(obj, false, null, true /* enable colors */))
-  );
-
+    console.log(util.inspect(obj, false, null, true))
+  ); 
+*/
 const getFreeTypeVariables = (t: tiType): string[] => {
   switch (t._type) {
     case "var":
@@ -199,7 +200,7 @@ const typeInferencer = (
   expression: any,
   varGen: (prefix: string) => varT
 ): { sub: substitution; type: tiType } => {
-  show("Env", env);
+  //  show("Env", env);
   switch (expression.type) {
     case "App": {
       const typeVariable = varGen("a");

@@ -55,7 +55,6 @@ const parseSet = (rule) => ({ name: rule.args[0].value, exp: rule.args[1] });
  * TODO: Change the calculus to allow multi argument abstraction
  */
 const argsToAbs = (args, next) => {
-  console.log("Args and Next", args, next);
   if (!args.length) return next;
   return {
     type: "Abs",
@@ -92,7 +91,6 @@ const makeRuleListFunctional = (rules) => {
   //Convert all the rules to vfunction application except for the rule rule which is converted to abstraction and the set rule which is converted to let.
   const rule = rules[0];
 
-  console.log("Rule", rule);
   if (rule.fn.name.name === "rule") {
     const name = rule.args[0].value;
     const args = getArgsFromRules(rule.args[1].rules);
