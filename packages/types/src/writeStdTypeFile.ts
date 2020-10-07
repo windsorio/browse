@@ -30,7 +30,7 @@ const types = JSON.stringify({
   if: basicScheme(ifDef, ["a"]),
   return: basicScheme(rtnDef, ["b"]),
   sleep: basicScheme(sleepDef),
-  print: basicScheme(printDef),
+  print: basicScheme(printDef, ["c", "d"]),
 });
 
 fs.writeFileSync(

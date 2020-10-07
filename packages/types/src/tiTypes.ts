@@ -9,38 +9,49 @@
 /*
  * All of the _type inferencer _types
  */
-export type tiType = varT | numberT | boolT | ruleT | stringT | nilT;
 
-export interface nilT {
+//NOTE:
+//  Any time a type is added in this file, a corresponding case will need to be added
+//    In the type inferencer
+//      1.) unify
+//      2.) getFreeTypeVaribles
+//
+//    In the type utilities
+//      1.) prettyPrintType
+
+//NOte the TT as opposed to T. Types are what are being passed around in the inferencer and these are the types of those types
+export type tiType = varTT | numberTT | boolTT | ruleTT | stringTT | nilTT;
+
+export interface nilTT {
   _type: "nil";
 }
 /*
  * The _type of a cssString
  */
-export interface cssStringT {
+export interface cssStringTT {
   _type: "cssString";
 }
 /*
  * The _type of a jsString
  */
-export interface jsStringT {
+export interface jsStringTT {
   _type: "jsString";
 }
 /*
  * The _type of a string which is not a cssString or jsString
  */
-export interface plainStringT {
+export interface plainStringTT {
   _type: "plainString";
 }
 /*
  * The _type of any string in browse
  */
-export type stringT = cssStringT | jsStringT | plainStringT;
+export type stringTT = cssStringTT | jsStringTT | plainStringTT;
 
 /*
  * Type Variable _type
  */
-export interface varT {
+export interface varTT {
   _type: "var";
   name: string;
 }
@@ -48,7 +59,7 @@ export interface varT {
 /*
  * The _type of an integer
  */
-export interface numberT {
+export interface numberTT {
   _type: "number";
 }
 
@@ -56,14 +67,14 @@ export interface numberT {
  * The _type of a boolean
  */
 
-export interface boolT {
+export interface boolTT {
   _type: "bool";
 }
 
 /*
  * The _type of a rule (e.g int -> int -> int)
  */
-export interface ruleT {
+export interface ruleTT {
   _type: "rule";
   left: tiType;
   right: tiType;

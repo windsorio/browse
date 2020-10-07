@@ -9,7 +9,7 @@
   },
   "scripts": {
     "build": "tsc --build tsconfig.json",
-    "test": "yarn ts-node-script src/test.ts",
+    "test": "yarn genTypes && yarn type src/std.browse.types src/builtIn.browse.types src/test.browse",
     "genTypes": "yarn ts-node-script src/writeBuiltInOpTypeFile.ts && yarn ts-node-script src/writeStdTypeFile.ts",
     "type": "yarn ts-node-script src/index.ts"
   },

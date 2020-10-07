@@ -23,4 +23,4 @@ set y ($x + 1)
 sleep $y
 set z ($y + 1)
 print $x + $y + $z
-
+return 1

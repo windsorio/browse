@@ -3,15 +3,25 @@
  *
  */
 
-import { tiType, schemeT, varT, substitution, typeEnv } from "./tiTypes";
+import { tiType, schemeT, varTT, substitution, typeEnv } from "./tiTypes";
+import {
+  boolT,
+  numberT,
+  plainStringT,
+  cssStringT,
+  jsStringT,
+  nilT,
+} from "./typeUtilities";
+
 //import * as util from "util";
 
 /*
- const show = (...objs: any) =>
-  objs.map((obj: any) =>
-    console.log(util.inspect(obj, false, null, true))
-  ); 
+const show = (...objs: any) =>
+ objs.map((obj: any) =>
+   console.log(util.inspect(obj, false, null, true))
+ ); 
 */
+
 const getFreeTypeVariables = (t: tiType): string[] => {
   switch (t._type) {
     case "var":
@@ -51,7 +61,7 @@ const typeEnvGetFreeTypeVariables = (env: typeEnv): string[] => {
   return getAllFreeTypeVariables(Object.values(env));
 };
 
-const applySubstitution = (s: substitution, t: tiType): tiType => {
+export const applySubstitution = (s: substitution, t: tiType): tiType => {
   switch (t._type) {
     case "var":
       if (s[t.name]) {
@@ -118,9 +128,9 @@ const generalizeType = (env: typeEnv, t: tiType): schemeT => {
 /*
  * We need fresh type variables for a variety of purposes. This encapsulates that behavior
  */
-export const freshVariableGenerator: () => (prefix: string) => varT = () => {
+export const freshVariableGenerator: () => (prefix: string) => varTT = () => {
   const nameMap: { [key: string]: number } = {};
-  return (prefix: string): varT => {
+  return (prefix: string): varTT => {
     if (!nameMap[prefix]) {
       nameMap[prefix] = 0;
     }
@@ -133,7 +143,7 @@ export const freshVariableGenerator: () => (prefix: string) => varT = () => {
  */
 const instantiateScheme = (
   scheme: schemeT,
-  varGen: (prefix: string) => varT
+  varGen: (prefix: string) => varTT
 ) => {
   const freshVarSub: substitution = {};
   scheme.boundVars.forEach((v) => (freshVarSub[v] = varGen("a")));
@@ -198,9 +208,10 @@ const unify = (t1: tiType, t2: tiType): substitution => {
 const typeInferencer = (
   env: typeEnv,
   expression: any,
-  varGen: (prefix: string) => varT
+  varGen: (prefix: string) => varTT
 ): { sub: substitution; type: tiType } => {
   //  show("Env", env);
+  //  show("Tyep", expression.type);
   switch (expression.type) {
     case "App": {
       const typeVariable = varGen("a");
@@ -226,9 +237,11 @@ const typeInferencer = (
         console.log(`Failed on App Expression`, expression);
         throw e;
       }
+      const type = applySubstitution(unificationSub, typeVariable);
+      expression.node._type = type;
       return {
         sub: { ...leftInference.sub, ...rightInference.sub, ...unificationSub },
-        type: applySubstitution(unificationSub, typeVariable),
+        type,
       };
     }
     case "Abs":
@@ -242,19 +255,23 @@ const typeInferencer = (
         },
       };
       const inference = typeInferencer(newEnv, expression.e, varGen);
+      const type = {
+        _type: <"rule">"rule",
+        left: applySubstitution(inference.sub, typeVariable),
+        right: inference.type,
+      };
+      expression.node._type = type;
       return {
         sub: inference.sub,
-        type: {
-          _type: "rule",
-          left: applySubstitution(inference.sub, typeVariable),
-          right: inference.type,
-        },
+        type,
       };
     case "Var":
       if (env[expression.name]) {
+        const type = instantiateScheme(env[expression.name], varGen);
+        expression.node._type = type;
         return {
           sub: {},
-          type: instantiateScheme(env[expression.name], varGen),
+          type,
         };
       }
       throw new Error(`Unbound variable ${expression.name}`);
@@ -273,22 +290,30 @@ const typeInferencer = (
         expression.e2,
         varGen
       );
+      const type = rightInference.type;
+      expression.node._type = type;
       return {
         sub: { ...leftInference.sub, ...rightInference.sub },
-        type: rightInference.type,
+        type,
       };
     }
     case "plainStringLit":
+      expression.node._type = plainStringT;
       return { sub: {}, type: { _type: "plainString" } };
     case "jsStringLit":
+      expression.node._type = jsStringT;
       return { sub: {}, type: { _type: "jsString" } };
     case "cssStringLit":
+      expression.node._type = cssStringT;
       return { sub: {}, type: { _type: "cssString" } };
     case "numberLit":
+      expression.node._type = numberT;
       return { sub: {}, type: { _type: "number" } };
     case "booleanLit":
+      expression.node._type = boolT;
       return { sub: {}, type: { _type: "bool" } };
     case "nilLit":
+      expression.node._type = nilT;
       return { sub: {}, type: { _type: "nil" } };
     default:
       console.log("Untypable expression", expression);
