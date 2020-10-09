@@ -33,7 +33,4 @@ const types = JSON.stringify({
   print: basicScheme(printDef, ["c", "d"]),
 });
 
-fs.writeFileSync(
-  "/home/andrew/browse/packages/types/src/std.browse.types",
-  types
-);
+fs.writeFileSync("./std.browse.types", types);

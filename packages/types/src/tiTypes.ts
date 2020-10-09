@@ -18,9 +18,17 @@
 //
 //    In the type utilities
 //      1.) prettyPrintType
+//      2.) A function to build the type (see varT, nilT ....)
 
 //NOte the TT as opposed to T. Types are what are being passed around in the inferencer and these are the types of those types
-export type tiType = varTT | numberTT | boolTT | ruleTT | stringTT | nilTT;
+export type tiType =
+  | varTT
+  | numberTT
+  | boolTT
+  | ruleTT
+  | stringTT
+  | nilTT
+  | arrayTT;
 
 export interface nilTT {
   _type: "nil";
@@ -78,6 +86,15 @@ export interface ruleTT {
   _type: "rule";
   left: tiType;
   right: tiType;
+}
+
+/*
+ * The type of an array Array<int>
+ */
+
+export interface arrayTT {
+  _type: "array";
+  elemType: tiType;
 }
 
 /*

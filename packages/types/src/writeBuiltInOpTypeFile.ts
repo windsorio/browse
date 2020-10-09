@@ -18,6 +18,7 @@ const types = JSON.stringify({
 });
 
 fs.writeFileSync(
-  "/home/andrew/browse/packages/types/src/builtIn.browse.types",
+  //"/home/andrew/browse/packages/types/src/builtIn.browse.types",
+  "./builtIn.browse.types",
   types
 );

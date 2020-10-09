@@ -8,6 +8,7 @@ import {
   cssStringTT,
   jsStringTT,
   nilTT,
+  arrayTT,
 } from "./tiTypes";
 
 const multiArgRuleType = (typeList: tiType[]): ruleTT => {
@@ -56,6 +57,11 @@ const varT = (name: string): varTT => ({
   name,
 });
 
+const arrayT = (elemType: tiType): arrayTT => ({
+  _type: "array",
+  elemType,
+});
+
 const numericBin = multiArgRuleType([numberT, numberT, numberT]);
 
 const prettyPrintType = (t: tiType): string => {
@@ -64,6 +70,8 @@ const prettyPrintType = (t: tiType): string => {
       return "any";
     case "rule":
       return `(${prettyPrintType(t.left)}) -> (${prettyPrintType(t.right)})`;
+    case "array":
+      return `${t.elemType}[]`;
     default:
       return t._type;
   }
@@ -78,6 +86,7 @@ export {
   jsStringT,
   varT,
   nilT,
+  arrayT,
   numericBin,
   prettyPrintType,
 };

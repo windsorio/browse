@@ -33,6 +33,8 @@ const getFreeTypeVariables = (t: tiType): string[] => {
     case "plainString":
     case "nil":
       return [];
+    case "array":
+      return getFreeTypeVariables(t.elemType);
     case "rule":
       return [
         ...getFreeTypeVariables(t.left),
@@ -186,6 +188,8 @@ const unify = (t1: tiType, t2: tiType): substitution => {
   } else if (t1._type === "var") return bindVar(t1.name, t2);
   else if (t2._type === "var") return bindVar(t2.name, t1);
   else if (t1._type === "bool" && t2._type === "bool") return {};
+  else if (t1._type === "array" && t2._type === "array")
+    return unify(t1.elemType, t2.elemType);
   else if (t1._type === "number" && t2._type === "number") return {};
   else if (t1._type === "cssString" && t2._type === "cssString") return {};
   else if (t1._type === "jsString" && t2._type === "jsString") return {};

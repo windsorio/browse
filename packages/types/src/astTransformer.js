@@ -75,10 +75,13 @@ const makeRuleListFunctional = (rules) => {
       //The rule
       name,
       //Equal it's converted ruleset
-      e1: nestedAbs,
+      //TODO: move this rule into the 'Rule' case on makeFunctional.
+      e1: { ...nestedAbs, node: rule },
       //In the rest of the ruleset
       e2: makeRuleListFunctional(rules.slice(1)),
-      node: rule,
+
+      //This Let is a construct not relevant in browse. What we actually care about is the type of e1, the function itself which is added accordingly above.
+      node: {},
     };
   } else if (rule.fn.name.name === "set") {
     const { name, exp } = parseSet(rule);
@@ -110,7 +113,8 @@ const makeRuleListFunctional = (rules) => {
       name: `__${name}__${++varMap[name]}`,
       e1: makeFunctional(rule),
       e2: makeRuleListFunctional(rules.slice(1)),
-      node: rule,
+      //This let is a construct not relevant in browse (It's return type is actually the return type of the evaluation of the rest of the ruleset). What the node actually corresponds to is the type of e1.
+      node: {},
     };
   }
 };
@@ -189,10 +193,14 @@ const makeFunctional = (node) => {
             node,
           },
           e2: makeFunctional(node.left),
+          //We don't care about the type given by applying 1 arg to a binary function. This doesn't make sense in browse
           node: node.left,
         },
         e2: makeFunctional(node.right),
-        node: node.right,
+        //The type of this should be the type of the whole Expression after it is applied
+        //I'm not sure that this is relevent
+        //TODO: Revisit this
+        node: {},
       };
     case "RuleExpr":
     case "Paren":
