@@ -290,7 +290,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       ],
       [
         "@types/yargs",
-        "npm:15.0.5"
+        "npm:15.0.8"
       ],
       [
         "@types/yargs-parser",
@@ -1873,6 +1873,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         "npm:1.0.1"
       ],
       [
+        "ts-node",
+        "virtual:6779a80b4631f3840ff8b6fb0823f9e0ae3fc7e9a3fe79b0243dac2657c15a44c8a406d88ae5ca916a882f23892396d7523ba413ed99489f2fc1aafa1544e981#npm:9.0.0"
+      ],
+      [
         "tslib",
         "npm:2.0.1"
       ],
@@ -2026,7 +2030,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       ],
       [
         "yargs",
-        "npm:15.4.1"
+        "npm:16.0.3"
       ],
       [
         "yargs-parser",
@@ -2203,9 +2207,9 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@browselang/format", "workspace:packages/format"],
             ["@browselang/parser", "workspace:packages/parser"],
             ["@browselang/web", "workspace:packages/web"],
-            ["@types/yargs", "npm:15.0.5"],
+            ["@types/yargs", "npm:15.0.8"],
             ["ohm-js", "npm:15.0.1"],
-            ["yargs", "npm:15.4.1"]
+            ["yargs", "npm:16.0.3"]
           ],
           "linkType": "SOFT",
         }]
@@ -2707,18 +2711,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]
       ]],
       ["@types/yargs", [
-        ["npm:15.0.5", {
-          "packageLocation": "./.yarn/cache/@types-yargs-npm-15.0.5-18a2128a57-2133c8cb58.zip/node_modules/@types/yargs/",
+        ["npm:15.0.8", {
+          "packageLocation": "./.yarn/cache/@types-yargs-npm-15.0.8-2253153b4c-f3a946ef2f.zip/node_modules/@types/yargs/",
           "packageDependencies": [
-            ["@types/yargs", "npm:15.0.5"],
-            ["@types/yargs-parser", "npm:15.0.0"]
-          ],
-          "linkType": "HARD",
-        }],
-        ["npm:15.0.7", {
-          "packageLocation": "./.yarn/cache/@types-yargs-npm-15.0.7-090d53e1d2-df076111e3.zip/node_modules/@types/yargs/",
-          "packageDependencies": [
-            ["@types/yargs", "npm:15.0.7"],
+            ["@types/yargs", "npm:15.0.8"],
             ["@types/yargs-parser", "npm:15.0.0"]
           ],
           "linkType": "HARD",
@@ -4048,9 +4044,9 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@browselang/parser", "workspace:packages/parser"],
             ["@types/babel__traverse", "npm:7.0.13"],
             ["@types/mkdirp", "npm:1.0.1"],
-            ["@types/yargs", "npm:15.0.5"],
+            ["@types/yargs", "npm:15.0.8"],
             ["mkdirp", "npm:1.0.4"],
-            ["yargs", "npm:15.4.1"]
+            ["yargs", "npm:16.0.3"]
           ],
           "linkType": "SOFT",
         }]
@@ -7386,7 +7382,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["diff", "npm:4.0.2"],
             ["make-error", "npm:1.3.6"],
             ["source-map-support", "npm:0.5.19"],
-            ["typescript", "patch:typescript@npm%3A4.0.3#builtin<compat/typescript>::version=4.0.3&hash=5b02a2"],
+            ["typescript", null],
             ["yn", "npm:3.1.1"]
           ],
           "packagePeers": [
@@ -7495,10 +7491,9 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["types", "workspace:packages/types"],
             ["@browselang/parser", "workspace:packages/parser"],
             ["@types/node", "npm:14.11.5"],
-            ["@types/yargs", "npm:15.0.7"],
+            ["@types/yargs", "npm:15.0.8"],
             ["fs", "npm:0.0.1-security"],
             ["ts-node", "virtual:6779a80b4631f3840ff8b6fb0823f9e0ae3fc7e9a3fe79b0243dac2657c15a44c8a406d88ae5ca916a882f23892396d7523ba413ed99489f2fc1aafa1544e981#npm:9.0.0"],
-            ["typescript", "patch:typescript@npm%3A4.0.3#builtin<compat/typescript>::version=4.0.3&hash=5b02a2"],
             ["yargs", "npm:16.0.3"]
           ],
           "linkType": "SOFT",
@@ -7509,13 +7504,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/typescript-patch-ba0dbfd217-f0d3d9c987.zip/node_modules/typescript/",
           "packageDependencies": [
             ["typescript", "patch:typescript@npm%3A3.9.7#builtin<compat/typescript>::version=3.9.7&hash=5b02a2"]
-          ],
-          "linkType": "HARD",
-        }],
-        ["patch:typescript@npm%3A4.0.3#builtin<compat/typescript>::version=4.0.3&hash=5b02a2", {
-          "packageLocation": "./.yarn/cache/typescript-patch-b8e40b0a95-72db87d09f.zip/node_modules/typescript/",
-          "packageDependencies": [
-            ["typescript", "patch:typescript@npm%3A4.0.3#builtin<compat/typescript>::version=4.0.3&hash=5b02a2"]
           ],
           "linkType": "HARD",
         }]

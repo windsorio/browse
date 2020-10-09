@@ -137,9 +137,9 @@ __metadata:
     "@browselang/format": "workspace:packages/format"
     "@browselang/parser": "workspace:packages/parser"
     "@browselang/web": "workspace:packages/web"
-    "@types/yargs": 15.0.5
+    "@types/yargs": 15.0.8
     ohm-js: 15.0.1
-    yargs: 15.4.1
+    yargs: 16.0.3
   bin:
     browse: bin/index.js
   languageName: unknown
@@ -585,21 +585,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/yargs@npm:15.0.5":
-  version: 15.0.5
-  resolution: "@types/yargs@npm:15.0.5"
+"@types/yargs@npm:15.0.8":
+  version: 15.0.8
+  resolution: "@types/yargs@npm:15.0.8"
   dependencies:
     "@types/yargs-parser": "*"
-  checksum: 2133c8cb5878d13959844f98e546e69dacdf44cd9baf87d84c828a1a093febfc97c8f4df19cffd34a4a4f726a3cdb1851da4391176accf56534c5f8a1c271f46
-  languageName: node
-  linkType: hard
-
-"@types/yargs@npm:15.0.7":
-  version: 15.0.7
-  resolution: "@types/yargs@npm:15.0.7"
-  dependencies:
-    "@types/yargs-parser": "*"
-  checksum: df076111e3564fb2e92dc11fe0b32b096bb3ed8e241dd70205159c83d32a0ba281ea73108a995679cb29c6a2fa434c5a90237e33ba9cdcba2e98165e35a74440
+  checksum: f3a946ef2ffefdd396998f97d9a9ad89b3e57aa8886c4529f754b72834f9ee5b797d779e27d1e9b639552c4bea8eb7cc852faa150773e7277fdae02bfea9aa38
   languageName: node
   linkType: hard
 
@@ -1777,9 +1768,9 @@ __metadata:
     "@browselang/parser": "workspace:packages/parser"
     "@types/babel__traverse": 7.0.13
     "@types/mkdirp": 1.0.1
-    "@types/yargs": 15.0.5
+    "@types/yargs": 15.0.8
     mkdirp: 1.0.4
-    yargs: 15.4.1
+    yargs: 16.0.3
   bin:
     browsedoc: ./index.js
   languageName: unknown
@@ -4867,10 +4858,9 @@ resolve@^1.10.0:
   dependencies:
     "@browselang/parser": "workspace:packages/parser"
     "@types/node": 14.11.5
-    "@types/yargs": 15.0.7
+    "@types/yargs": 15.0.8
     fs: 0.0.1-security
     ts-node: 9.0.0
-    typescript: 4.0.3
     yargs: 16.0.3
   languageName: unknown
   linkType: soft
@@ -4885,16 +4875,6 @@ typescript@3.9.7:
   languageName: node
   linkType: hard
 
-typescript@4.0.3:
-  version: 4.0.3
-  resolution: "typescript@npm:4.0.3"
-  bin:
-    tsc: bin/tsc
-    tsserver: bin/tsserver
-  checksum: 5c892e132756a83d22030d7fb38be47cde27613f71d233dbe7faf79e4a92852c5146bfddcaf8c2da1a37d35ae8bf7b8c888fdcd763d5ad184cea6b21e7466838
-  languageName: node
-  linkType: hard
-
 "typescript@patch:typescript@3.9.7#builtin<compat/typescript>":
   version: 3.9.7
   resolution: "typescript@patch:typescript@npm%3A3.9.7#builtin<compat/typescript>::version=3.9.7&hash=5b02a2"
@@ -4902,16 +4882,6 @@ typescript@4.0.3:
     tsc: bin/tsc
     tsserver: bin/tsserver
   checksum: f0d3d9c987860c7c458229ab6dd7e3d322405db36b70abccba610b5efd9f9451e4e67a3fc7983c0d3741033c1f1a8d7aa859a1510caa8f20fad762fc39648bfa
-  languageName: node
-  linkType: hard
-
-"typescript@patch:typescript@4.0.3#builtin<compat/typescript>":
-  version: 4.0.3
-  resolution: "typescript@patch:typescript@npm%3A4.0.3#builtin<compat/typescript>::version=4.0.3&hash=5b02a2"
-  bin:
-    tsc: bin/tsc
-    tsserver: bin/tsserver
-  checksum: 72db87d09f728c83062d64b5e12ed52effb6278963b6bc5c006219b22c104e02b8ce80164261de554923d3c47d894a1ca937ed542328caccb83ebaedeae98a69
   languageName: node
   linkType: hard
 
@@ -5223,7 +5193,22 @@ typescript@4.0.3:
   languageName: node
   linkType: hard
 
-"yargs@npm:15.4.1, yargs@npm:^15.4.1":
+"yargs@npm:16.0.3":
+  version: 16.0.3
+  resolution: "yargs@npm:16.0.3"
+  dependencies:
+    cliui: ^7.0.0
+    escalade: ^3.0.2
+    get-caller-file: ^2.0.5
+    require-directory: ^2.1.1
+    string-width: ^4.2.0
+    y18n: ^5.0.1
+    yargs-parser: ^20.0.0
+  checksum: 39490963e02bceb73ffff285cd9b241e5b019acbedef456586c97027cc18d0cadb743ad1340ccdc9340d0a21e18176c63b9f8bd90eee64c7e1f512c147aab1c2
+  languageName: node
+  linkType: hard
+
+"yargs@npm:^15.4.1":
   version: 15.4.1
   resolution: "yargs@npm:15.4.1"
   dependencies:
@@ -5239,21 +5224,6 @@ typescript@4.0.3:
     y18n: ^4.0.0
     yargs-parser: ^18.1.2
   checksum: dbf687d6b938f01bbf11e158dde6df906282b70cd9295af0217ee8cefbd83ad09d49fa9458d0d5325b0e66f03df954a38986db96f91e5b46ccdbbaf9a0157b23
-  languageName: node
-  linkType: hard
-
-"yargs@npm:16.0.3":
-  version: 16.0.3
-  resolution: "yargs@npm:16.0.3"
-  dependencies:
-    cliui: ^7.0.0
-    escalade: ^3.0.2
-    get-caller-file: ^2.0.5
-    require-directory: ^2.1.1
-    string-width: ^4.2.0
-    y18n: ^5.0.1
-    yargs-parser: ^20.0.0
-  checksum: 39490963e02bceb73ffff285cd9b241e5b019acbedef456586c97027cc18d0cadb743ad1340ccdc9340d0a21e18176c63b9f8bd90eee64c7e1f512c147aab1c2
   languageName: node
   linkType: hard
 
