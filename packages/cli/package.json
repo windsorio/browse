@@ -1,6 +1,6 @@
 {
   "name": "@browselang/cli",
-  "version": "0.0.21",
+  "version": "0.0.22-0",
   "description": "The Browse CLI",
   "keywords": [
     "browse",
