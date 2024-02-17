@@ -1,6 +1,6 @@
 {
   "name": "@browselang/parser",
-  "version": "0.0.22-0",
+  "version": "0.0.22-1",
   "description": "Parser for Browse using the ohm parser generator",
   "keywords": [
     "browse",
