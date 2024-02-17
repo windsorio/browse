@@ -32,10 +32,10 @@
     "url": "https://github.com/windsorio/browse/issues"
   },
   "dependencies": {
-    "@browselang/core": "workspace:packages/core",
-    "@browselang/format": "workspace:packages/format",
-    "@browselang/parser": "workspace:packages/parser",
-    "@browselang/web": "workspace:packages/web",
+    "@browselang/core": "*",
+    "@browselang/format": "*",
+    "@browselang/parser": "*",
+    "@browselang/web": "*",
     "ohm-js": "15.0.1",
     "yargs": "15.4.1"
   },

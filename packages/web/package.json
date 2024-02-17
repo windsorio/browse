@@ -32,17 +32,14 @@
   },
   "devDependencies": {
     "@types/fs-extra": "9.0.1",
-    "@types/is-docker": "2.0.0",
-    "@types/puppeteer": "3.0.1",
-    "@types/puppeteer-core": "2.0.0",
     "ava": "3.11.1"
   },
   "dependencies": {
-    "@browselang/core": "workspace:packages/core",
+    "@browselang/core": "*",
     "fs-extra": "9.0.1",
     "is-docker": "2.1.1",
-    "puppeteer": "5.2.1",
-    "puppeteer-core": "5.2.1",
+    "puppeteer": "22.0.0",
+    "puppeteer-core": "22.0.0",
     "remove-trailing-slash": "0.1.0",
     "url-pattern": "1.0.3"
   }
