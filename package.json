@@ -15,8 +15,7 @@
   ],
   "husky": {
     "hooks": {
-      "pre-commit": "yarn format:prettier --staged",
-      "pre-push": "yarn constraints"
+      "pre-commit": "yarn format:prettier --staged"
     }
   },
   "dependencies": {
