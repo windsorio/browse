@@ -4,7 +4,7 @@
   "private": true,
   "description": "Add VSCode support for the browse language",
   "icon": "images/square.png",
-  "version": "0.0.21",
+  "version": "0.0.27",
   "preview": true,
   "publisher": "pranaygp",
   "author": "Windsor Team <oss@windsor.io>",
@@ -61,6 +61,6 @@
     ]
   },
   "dependencies": {
-    "@browselang/format": "^0.0.21"
+    "@browselang/format": "^0.0.22"
   }
 }

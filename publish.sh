@@ -11,9 +11,8 @@ fi
 
 # Bump all versions
 for pkg in $PKG_DIRS; do
-  rm -rf .yarn/versions
   cd "packages/$pkg"
-  yarn version $1
+  yarn version --$1
   cd ../../
 done
 rm -rf .yarn/versions
@@ -22,9 +21,9 @@ rm -rf .yarn/versions
 for pkg in $PKG_DIRS; do
   cd "packages/$pkg"
   if [ "$1" == "prerelease" ]; then
-    yarn npm publish --access public --tag pre
+    npm publish --access public --tag pre
   else
-    yarn npm publish --access public
+    npm publish --access public
   fi
   cd ../../
 done
